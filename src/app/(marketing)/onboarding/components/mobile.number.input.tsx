@@ -1,3 +1,4 @@
+// app/(onboarding)/components/mobile.number.input.tsx
 "use client";
 
 import * as React from "react";
@@ -40,8 +41,8 @@ export interface PhoneInputProps {
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
   name?: string;
   inputRef?: React.Ref<HTMLInputElement>;
-  countryISO?: CountryCode;
-  onCountryISOChange?: (iso: CountryCode) => void;
+  countryISO?: string;
+  onCountryISOChange?: (iso: string) => void;
   placeholder?: string;
   className?: string;
   inputId?: string;
@@ -54,7 +55,7 @@ export function MobileNumberInput({
   onBlur,
   name,
   inputRef,
-  countryISO,
+  countryISO = "KE",
   onCountryISOChange,
   placeholder = "712 345 678",
   className,
@@ -63,24 +64,18 @@ export function MobileNumberInput({
 }: PhoneInputProps) {
   const [open, setOpen] = useState(false);
 
-  // Build once (cheap) — list of all countries from the lib
   const options = useMemo(() => {
     const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
-    return getCountries().map((iso) => {
-      const code = `+${getCountryCallingCode(iso)}`;
-      const name = regionNames.of(iso) ?? iso;
-      return { iso, code, name, flag: flagFromISO(iso) } as {
-        iso: CountryCode;
-        code: string;
-        name: string;
-        flag: string;
-      };
-    });
+    return getCountries().map((iso) => ({
+      iso,
+      code: `+${getCountryCallingCode(iso as CountryCode)}`,
+      name: regionNames.of(iso) ?? iso,
+      flag: flagFromISO(iso),
+    }));
   }, []);
 
   const selected =
-    options.find((o) => o.iso === countryISO) ??
-    options.find((o) => o.iso === "KE") ??
+    options.find((o) => o.iso === (countryISO?.toUpperCase() || "")) ??
     options[0];
 
   return (
@@ -132,7 +127,7 @@ export function MobileNumberInput({
         </div>
 
         <MInput
-          id={inputId}
+          id={inputId} // give this to help autofill if you want later
           name={name}
           ref={inputRef as any}
           type="tel"

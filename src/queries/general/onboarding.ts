@@ -7,7 +7,7 @@ export const GET_ONBOARDING_PAGE = gql`
       title
       onboarding {
         steps {
-          __typename
+          __typename # 👈 REQUIRED for your mapper
           ... on OnboardingStepsPersonalDetailsLayout {
             mainHeadline
             subHeadline
@@ -20,6 +20,19 @@ export const GET_ONBOARDING_PAGE = gql`
               }
             }
           }
+          ... on OnboardingStepsSkinTypeLayout {
+            mainHeadline
+            subHeadline
+            formTitle
+            formInstruction
+            backgroundImage {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+          }
+          # add other layouts here when you implement them
         }
       }
     }

@@ -11,20 +11,20 @@ import { onboardingSchema, type OnboardingSchema } from "./onboarding.schema";
 
 export default function OnboardingClient({ steps }: { steps: StepMeta[] }) {
   const methods = useForm<OnboardingSchema>({
-    resolver: zodResolver(onboardingSchema), // no generic here
+    resolver: zodResolver(onboardingSchema),
     defaultValues: {
       firstName: "",
       lastName: "",
       email: "",
       mobileLocal: "",
-      mobileCountryISO: "KE", // just a string
+      mobileCountryISO: "KE",
       dateOfBirth: "",
       goal: "",
       routineNote: "",
       skinTypes: [],
     },
-    mode: "onTouched",
-    reValidateMode: "onChange",
+    mode: "onTouched", // validate on submit (official pattern)
+    reValidateMode: "onChange", // then per-field after corrections
   });
 
   return (

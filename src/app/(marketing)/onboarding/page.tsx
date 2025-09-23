@@ -21,9 +21,18 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
             component: "personal",
             align: "center", // this step wants left-aligned headings in your UI
           } as StepMeta;
-
-        // Add more:
-        // case "OnboardingStepsSkinTypeLayout": return { component: "skinType", align: "center", ... }
+        case "OnboardingStepsSkinTypeLayout":
+          return {
+            id: idx + 1,
+            slug: `step-${idx + 1}`,
+            headline: s.mainHeadline ?? "",
+            subhead: s.subHeadline ?? "",
+            bgImage: s?.backgroundImage?.node?.sourceUrl ?? "/onboarding.jpg",
+            formTitle: s.formTitle ?? "",
+            formInstruction: s.formInstruction ?? "",
+            component: "skinType",
+            align: "left", // this step wants left-aligned headings in your UI
+          } as StepMeta;
         default:
           return null;
       }

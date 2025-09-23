@@ -1,62 +1,93 @@
-// app/(onboarding)/onboarding.schema.ts
 import { z } from "zod";
 import {
-  isValidPhoneNumber, // ← strict validation
   parsePhoneNumber,
   isSupportedCountry,
-} from "libphonenumber-js/mobile"; // ← switch from /min to /mobile
+  type CountryCode,
+} from "libphonenumber-js/mobile";
+
+// Accept string in form state; narrow to CountryCode only where we call the lib
+const countryCodeSchema = z
+  .string()
+  .transform((s) => s.toUpperCase())
+  .refine(
+    (iso): iso is CountryCode => isSupportedCountry(iso as any),
+    "Unsupported country"
+  );
 
 export const onboardingSchema = z
   .object({
     firstName: z.string().min(2, "Enter at least 2 characters"),
     lastName: z.string().min(2, "Enter at least 2 characters"),
     email: z.string().email("Enter a valid email"),
+
+    // Allow anything the browser/autofill provides; validate with libphonenumber only.
     mobileLocal: z.string().min(1, "Phone number is required"),
-    mobileCountryISO: z.string().min(2, "Select a country"),
+
+    mobileCountryISO: countryCodeSchema,
+
     dateOfBirth: z
       .string()
       .min(1, "Date of birth is required")
-      .refine((v) => !Number.isNaN(Date.parse(v)), "Select a valid date")
-      .refine((v) => new Date(v) < new Date(), "Date must be in the past"),
+      .refine((v) => !Number.isNaN(Date.parse(v)), "Select a valid date"),
+
     goal: z.string().optional(),
     routineNote: z.string().optional(),
-    skinTypes: z.array(z.string()).optional(),
+    skinTypes: z.array(z.string()).min(1, "Select at least one option"),
   })
   .superRefine((vals, ctx) => {
-    const iso = vals.mobileCountryISO?.trim().toUpperCase();
-    const raw = vals.mobileLocal?.trim();
-    if (!iso || !isSupportedCountry(iso as any)) {
-      ctx.addIssue({
-        path: ["mobileCountryISO"],
-        code: "custom",
-        message: "Unsupported country",
-      });
-      return;
-    }
+    const raw = (vals.mobileLocal ?? "").trim();
     if (!raw) return;
 
-    // Strict, country-aware validity (not just length)
-    const valid = raw.startsWith("+")
-      ? isValidPhoneNumber(raw) // already has +CC
-      : isValidPhoneNumber(raw, iso as any); // national + ISO
+    const selectedISO = vals.mobileCountryISO as CountryCode;
 
-    if (!valid) {
+    try {
+      // strict: whole string must be a phone number
+      const pn = parsePhoneNumber(raw, {
+        defaultCountry: selectedISO,
+        extract: false,
+      });
+
+      // must be valid
+      if (!pn?.isValid()) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["mobileLocal"],
+          message: "That number isn’t valid",
+        });
+        return;
+      }
+
+      // if user typed international (+...), ensure the parsed country matches the selected ISO
+      if (raw.startsWith("+")) {
+        if (!pn.country || pn.country !== selectedISO) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["mobileLocal"],
+            message: "Number’s country doesn’t match the country you selected",
+          });
+        }
+        return;
+      }
+
+      // if national (no +), it was validated against selected country via defaultCountry above
+    } catch {
       ctx.addIssue({
-        path: ["mobileLocal"],
         code: "custom",
-        message: "That number isn’t valid for the selected country",
+        path: ["mobileLocal"],
+        message: "That number isn’t valid",
       });
     }
   });
 
 export type OnboardingSchema = z.input<typeof onboardingSchema>;
 
+// Normalize to E.164 safely (null if invalid)
 export function normalizeToE164(values: OnboardingSchema): string | null {
   try {
-    const pn = parsePhoneNumber(
-      values.mobileLocal.trim(),
-      values.mobileCountryISO as any
-    );
+    const pn = parsePhoneNumber(values.mobileLocal.trim(), {
+      defaultCountry: values.mobileCountryISO as CountryCode,
+      extract: false,
+    });
     return pn?.number ?? null;
   } catch {
     return null;

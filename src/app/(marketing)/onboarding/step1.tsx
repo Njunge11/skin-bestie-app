@@ -1,32 +1,46 @@
 "use client";
 
 import * as React from "react";
-import { useRef, useState } from "react";
+import { useRef, useEffect } from "react";
 import { ArrowRight, Calendar as CalendarIcon } from "lucide-react";
-import { useFormContext, Controller } from "react-hook-form";
+import { useFormContext, Controller, useWatch } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { MInput } from "./components/input";
 import { MobileNumberInput } from "./components/mobile.number.input";
 import { MButton } from "./components/button";
-import type { OnboardingSchema } from "./onboarding.types";
-import type { CountryCode } from "libphonenumber-js/min";
+import type { OnboardingSchema } from "./onboarding.schema";
 
 export default function Step1({ onNext }: { onNext?: () => void }) {
   const {
     register,
     control,
-    trigger,
-    watch,
     setValue,
-    formState: { errors },
+    trigger,
+    formState: { errors, isSubmitting },
   } = useFormContext<OnboardingSchema>();
 
-  const [submitting, setSubmitting] = useState(false);
+  // Revalidate phone when country changes (only if there’s a current value)
+  const iso = useWatch({ control, name: "mobileCountryISO" });
+  const mobileVal = useWatch({ control, name: "mobileLocal" });
 
+  useEffect(() => {
+    if ((mobileVal ?? "").trim()) {
+      void trigger("mobileLocal");
+    }
+  }, [iso, mobileVal, trigger]);
+
+  // Date input helpers
   const dateInputRef = useRef<HTMLInputElement | null>(null);
-  const today = new Date().toISOString().slice(0, 10);
   const openNativePicker = () => (dateInputRef.current as any)?.showPicker?.();
+  const todayLocal = (() => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  })();
 
+  // Merge RHF + local ref to keep showPicker()
   const {
     ref: dobRef,
     onChange: dobOnChange,
@@ -34,36 +48,24 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
     name: dobName,
   } = register("dateOfBirth");
 
+  // ✅ Option A: validate only Step-1 fields, then advance
   const handleContinue = async () => {
-    if (submitting) return;
-    setSubmitting(true);
-    const ok = await trigger([
-      "firstName",
-      "lastName",
-      "email",
-      "mobileLocal",
-      "mobileCountryISO",
-      "dateOfBirth",
-    ]);
-    setSubmitting(false);
+    const ok = await trigger(
+      [
+        "firstName",
+        "lastName",
+        "email",
+        "mobileLocal",
+        "mobileCountryISO",
+        "dateOfBirth",
+      ],
+      { shouldFocus: true }
+    );
     if (ok) onNext?.();
   };
 
-  const handleKeyDown: React.KeyboardEventHandler<HTMLFormElement> = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      void handleContinue();
-    }
-  };
-
-  const iso = (watch("mobileCountryISO") ?? "KE") as CountryCode;
-
   return (
-    <form
-      onSubmit={(e) => e.preventDefault()}
-      onKeyDown={handleKeyDown}
-      noValidate
-    >
+    <form onSubmit={(e) => e.preventDefault()} noValidate autoComplete="on">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 pt-7">
         <div>
           <MInput
@@ -117,21 +119,19 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
           control={control}
           render={({ field }) => (
             <MobileNumberInput
-              inputId="mobile"
+              inputId="mobileLocal"
               value={field.value ?? ""}
               onChange={field.onChange}
               onBlur={field.onBlur}
               inputRef={field.ref}
               name={field.name}
               countryISO={iso}
-              onCountryISOChange={async (newIso) => {
+              onCountryISOChange={(newIso) => {
                 setValue("mobileCountryISO", newIso, {
                   shouldDirty: true,
                   shouldTouch: true,
-                  shouldValidate: true,
+                  shouldValidate: false, // effect above will validate if there's a value
                 });
-                // Revalidate the phone input against the new country immediately
-                await trigger(["mobileLocal", "mobileCountryISO"]);
               }}
               placeholder="712 345 678"
               aria-invalid={!!errors.mobileLocal || undefined}
@@ -161,7 +161,7 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             id="dateOfBirth"
             name={dobName}
             type="date"
-            max={today}
+            max={todayLocal}
             onChange={dobOnChange}
             onBlur={dobOnBlur}
             aria-invalid={!!errors.dateOfBirth || undefined}
@@ -172,9 +172,7 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             className={cn(
               "flex-1 bg-transparent border-0 shadow-none pl-[0.8125rem]",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
-              // Only target the indicator, not the entire input
               "[&::-webkit-calendar-picker-indicator]:opacity-0",
-              "[&::-webkit-calendar-picker-indicator]:pointer-events-none",
               "[&::-webkit-inner-spin-button]:appearance-none",
               "[&::-webkit-clear-button]:hidden"
             )}
@@ -189,11 +187,11 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
 
       <MButton
         className="mt-6"
-        label={submitting ? "Checking..." : "Continue"}
+        label={isSubmitting ? "Checking..." : "Continue"}
         icon={ArrowRight}
-        type="button"
-        disabled={submitting}
-        onClick={handleContinue}
+        type="button" // ← not submit
+        onClick={handleContinue} // ← only validates step-1 fields
+        disabled={isSubmitting}
       />
     </form>
   );

@@ -1,4 +1,4 @@
-// Single source of truth types
+// types.ts
 import type { CountryCode } from "libphonenumber-js/min";
 
 export type StepMeta = {
@@ -8,7 +8,8 @@ export type StepMeta = {
   subhead: string;
   bgImage: string;
   formTitle: string;
-  formSub: string;
+  formSub?: string;
+  formInstruction?: string;
   component: "personal" | "skinType" | "concerns" | "allergies" | "checkout";
   align?: "left" | "center";
 };
@@ -23,15 +24,21 @@ export type WizardCtx = {
   total: number;
 };
 
-// ONE form shape used everywhere
+// one form shape
 export type OnboardingSchema = {
   firstName: string;
   lastName: string;
   email: string;
-  mobileLocal: string; // user-typed digits
-  mobileCountryISO: CountryCode; // full union from the lib
+  mobileLocal: string;
+  mobileCountryISO: CountryCode;
   dateOfBirth: string; // yyyy-mm-dd
   goal?: string;
   routineNote?: string;
   skinTypes?: string[];
 };
+
+// derive the component key union from StepMeta
+export type StepComponentKey = StepMeta["component"];
+
+// and enforce the prop signature for each step component
+export type StepComponent = React.ComponentType<{ onNext?: () => void }>;
