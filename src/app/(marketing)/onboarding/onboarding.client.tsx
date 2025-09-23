@@ -24,6 +24,8 @@ export default function OnboardingClient({ steps }: { steps: StepMeta[] }) {
       skinTypes: [],
       concerns: [],
       concernOther: "",
+      hasAllergy: "No",
+      allergy: "",
     },
     mode: "onTouched", // validate on submit (official pattern)
     reValidateMode: "onChange", // then per-field after corrections

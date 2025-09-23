@@ -1,9 +1,10 @@
+// app/(onboarding)/step1.tsx
 "use client";
 
 import * as React from "react";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { ArrowRight, Calendar as CalendarIcon } from "lucide-react";
-import { useFormContext, Controller, useWatch } from "react-hook-form";
+import { useFormContext, Controller } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { MInput } from "./components/input";
 import { MobileNumberInput } from "./components/mobile.number.input";
@@ -15,19 +16,10 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
     register,
     control,
     setValue,
+    getValues,
     trigger,
     formState: { errors, isSubmitting },
   } = useFormContext<OnboardingSchema>();
-
-  // Revalidate phone when country changes (only if there’s a current value)
-  const iso = useWatch({ control, name: "mobileCountryISO" });
-  const mobileVal = useWatch({ control, name: "mobileLocal" });
-
-  useEffect(() => {
-    if ((mobileVal ?? "").trim()) {
-      void trigger("mobileLocal");
-    }
-  }, [iso, mobileVal, trigger]);
 
   // Date input helpers
   const dateInputRef = useRef<HTMLInputElement | null>(null);
@@ -48,7 +40,7 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
     name: dobName,
   } = register("dateOfBirth");
 
-  // ✅ Option A: validate only Step-1 fields, then advance
+  // Validate only Step-1 fields, then advance
   const handleContinue = async () => {
     const ok = await trigger(
       [
@@ -75,12 +67,10 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             aria-invalid={!!errors.firstName || undefined}
             {...register("firstName")}
           />
-          {errors.firstName ? (
+          {errors.firstName && (
             <p className="mt-1 text-sm text-red-600">
               {errors.firstName.message}
             </p>
-          ) : (
-            ""
           )}
         </div>
 
@@ -92,12 +82,10 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             aria-invalid={!!errors.lastName || undefined}
             {...register("lastName")}
           />
-          {errors.lastName ? (
+          {errors.lastName && (
             <p className="mt-1 text-sm text-red-600">
               {errors.lastName.message}
             </p>
-          ) : (
-            ""
           )}
         </div>
       </div>
@@ -112,10 +100,8 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
           aria-invalid={!!errors.email || undefined}
           {...register("email")}
         />
-        {errors.email ? (
+        {errors.email && (
           <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-        ) : (
-          ""
         )}
       </div>
 
@@ -123,7 +109,7 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
         <Controller
           name="mobileLocal"
           control={control}
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <MobileNumberInput
               inputId="mobileLocal"
               value={field.value ?? ""}
@@ -131,25 +117,32 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
               onBlur={field.onBlur}
               inputRef={field.ref}
               name={field.name}
-              countryISO={iso}
-              onCountryISOChange={(newIso) => {
+              // Keep the ISO in your component’s state via form state:
+              countryISO={getValues("mobileCountryISO")}
+              onCountryISOChange={async (newIso) => {
+                // update ISO
                 setValue("mobileCountryISO", newIso, {
                   shouldDirty: true,
                   shouldTouch: true,
-                  shouldValidate: false, // effect above will validate if there's a value
+                  shouldValidate: false,
                 });
+                // if there is a phone value, re-validate it immediately
+                const phone = (getValues("mobileLocal") ?? "").trim();
+                if (phone) {
+                  await trigger("mobileLocal");
+                }
               }}
               placeholder="712 345 678"
-              aria-invalid={!!errors.mobileLocal || undefined}
+              aria-invalid={
+                !!(fieldState.error || errors.mobileLocal) || undefined
+              }
             />
           )}
         />
-        {errors.mobileLocal ? (
+        {errors.mobileLocal && (
           <p className="mt-1 text-sm text-red-600">
             {errors.mobileLocal.message}
           </p>
-        ) : (
-          ""
         )}
       </div>
 
@@ -186,12 +179,10 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             )}
           />
         </div>
-        {errors.dateOfBirth ? (
+        {errors.dateOfBirth && (
           <p className="mt-1 text-sm text-red-600">
             {errors.dateOfBirth.message}
           </p>
-        ) : (
-          ""
         )}
       </div>
 
@@ -199,8 +190,8 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
         className="mt-6"
         label={isSubmitting ? "Checking..." : "Continue"}
         icon={ArrowRight}
-        type="button" // ← not submit
-        onClick={handleContinue} // ← only validates step-1 fields
+        type="button"
+        onClick={handleContinue}
         disabled={isSubmitting}
       />
     </form>

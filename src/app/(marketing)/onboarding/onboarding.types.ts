@@ -34,9 +34,11 @@ export type OnboardingSchema = {
   dateOfBirth: string; // yyyy-mm-dd
   goal?: string;
   routineNote?: string;
-  skinTypes?: string[];
-  concerns?: string[];
+  skinTypes: string[];
+  concerns: string[];
   concernOther?: string;
+  allergies: string[];
+  allergyOther: string;
 };
 
 // derive the component key union from StepMeta

@@ -41,6 +41,8 @@ export const onboardingSchema = z
     // --- Step 3 ---
     concerns: z.array(z.string()).min(1, "Pick at least one concern"),
     concernOther: z.string().optional(),
+    hasAllergy: z.enum(["Yes", "No"], { message: "Pick at least one allergy" }),
+    allergy: z.string().optional(),
   })
   .superRefine((vals, ctx) => {
     // Phone number validation (strict)
@@ -86,6 +88,13 @@ export const onboardingSchema = z
         code: "custom",
         path: ["concernOther"],
         message: "Please describe “Other”",
+      });
+    }
+    if (vals.hasAllergy === "Yes" && !vals.allergy?.trim()) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["allergy"],
+        message: "Please describe your allergy",
       });
     }
   });

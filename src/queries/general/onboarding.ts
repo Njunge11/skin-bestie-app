@@ -45,6 +45,18 @@ export const GET_ONBOARDING_PAGE = gql`
               }
             }
           }
+          ... on OnboardingStepsAllergiesLayout {
+            mainHeadline
+            subHeadline
+            formTitle
+            formDescription
+            backgroundImage {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+          }
           # add other layouts here when you implement them
         }
       }

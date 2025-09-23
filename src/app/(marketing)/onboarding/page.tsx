@@ -45,6 +45,18 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
             component: "concerns",
             align: "center", // this step wants left-aligned headings in your UI
           } as StepMeta;
+        case "OnboardingStepsAllergiesLayout":
+          return {
+            id: idx + 1,
+            slug: `step-${idx + 1}`,
+            headline: s.mainHeadline ?? "",
+            subhead: s.subHeadline ?? "",
+            bgImage: s?.backgroundImage?.node?.sourceUrl ?? "/onboarding.jpg",
+            formTitle: s.formTitle ?? "",
+            formSub: s.formDescription ?? "",
+            component: "allergies",
+            align: "center", // this step wants left-aligned headings in your UI
+          } as StepMeta;
         default:
           return null;
       }
