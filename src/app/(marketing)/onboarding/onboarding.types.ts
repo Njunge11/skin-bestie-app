@@ -35,6 +35,8 @@ export type OnboardingSchema = {
   goal?: string;
   routineNote?: string;
   skinTypes?: string[];
+  concerns?: string[];
+  concernOther?: string;
 };
 
 // derive the component key union from StepMeta

@@ -32,6 +32,19 @@ export const GET_ONBOARDING_PAGE = gql`
               }
             }
           }
+          ... on OnboardingStepsSkinConcernsLayout {
+            mainHeadline
+            subHeadline
+            formTitle
+            formInstruction
+            formDescription
+            backgroundImage {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+          }
           # add other layouts here when you implement them
         }
       }

@@ -22,6 +22,8 @@ export default function OnboardingClient({ steps }: { steps: StepMeta[] }) {
       goal: "",
       routineNote: "",
       skinTypes: [],
+      concerns: [],
+      concernOther: "",
     },
     mode: "onTouched", // validate on submit (official pattern)
     reValidateMode: "onChange", // then per-field after corrections

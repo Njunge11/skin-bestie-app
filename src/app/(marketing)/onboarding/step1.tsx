@@ -75,10 +75,12 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             aria-invalid={!!errors.firstName || undefined}
             {...register("firstName")}
           />
-          {errors.firstName && (
+          {errors.firstName ? (
             <p className="mt-1 text-sm text-red-600">
               {errors.firstName.message}
             </p>
+          ) : (
+            ""
           )}
         </div>
 
@@ -90,10 +92,12 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             aria-invalid={!!errors.lastName || undefined}
             {...register("lastName")}
           />
-          {errors.lastName && (
+          {errors.lastName ? (
             <p className="mt-1 text-sm text-red-600">
               {errors.lastName.message}
             </p>
+          ) : (
+            ""
           )}
         </div>
       </div>
@@ -108,8 +112,10 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
           aria-invalid={!!errors.email || undefined}
           {...register("email")}
         />
-        {errors.email && (
+        {errors.email ? (
           <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+        ) : (
+          ""
         )}
       </div>
 
@@ -138,10 +144,12 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             />
           )}
         />
-        {errors.mobileLocal && (
+        {errors.mobileLocal ? (
           <p className="mt-1 text-sm text-red-600">
             {errors.mobileLocal.message}
           </p>
+        ) : (
+          ""
         )}
       </div>
 
@@ -178,10 +186,12 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             )}
           />
         </div>
-        {errors.dateOfBirth && (
+        {errors.dateOfBirth ? (
           <p className="mt-1 text-sm text-red-600">
             {errors.dateOfBirth.message}
           </p>
+        ) : (
+          ""
         )}
       </div>
 

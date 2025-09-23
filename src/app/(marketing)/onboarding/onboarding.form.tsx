@@ -8,11 +8,12 @@ import type { OnboardingSchema } from "./onboarding.schema";
 
 import Step1 from "./step1";
 import Step2 from "./step2";
+import Step3 from "./step3";
 
 const STEP_COMPONENTS = {
   personal: Step1,
   skinType: Step2,
-  // concerns: Step3,
+  concerns: Step3,
   // allergies: Step4,
   // checkout: Step5,
 } as const;
@@ -31,6 +32,7 @@ const FIELDS_BY_STEP: Record<
     "dateOfBirth",
   ],
   skinType: ["skinTypes"],
+  concerns: ["concerns", "concernOther"] as const,
 };
 
 export default function OnboardingForm() {

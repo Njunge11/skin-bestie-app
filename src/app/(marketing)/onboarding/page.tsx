@@ -3,7 +3,6 @@ import { fetchGraphQL } from "@/utils/fetchGraphQL";
 import { GET_ONBOARDING_PAGE } from "@/queries/general/onboarding";
 import type { StepMeta } from "./onboarding.types";
 import OnboardingClient from "./onboarding.client";
-
 // Map WP steps -> your StepMeta
 function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
   return steps
@@ -32,6 +31,19 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
             formInstruction: s.formInstruction ?? "",
             component: "skinType",
             align: "left", // this step wants left-aligned headings in your UI
+          } as StepMeta;
+        case "OnboardingStepsSkinConcernsLayout":
+          return {
+            id: idx + 1,
+            slug: `step-${idx + 1}`,
+            headline: s.mainHeadline ?? "",
+            subhead: s.subHeadline ?? "",
+            bgImage: s?.backgroundImage?.node?.sourceUrl ?? "/onboarding.jpg",
+            formTitle: s.formTitle ?? "",
+            formInstruction: s.formInstruction ?? "",
+            formSub: s.formDescription ?? "",
+            component: "concerns",
+            align: "center", // this step wants left-aligned headings in your UI
           } as StepMeta;
         default:
           return null;

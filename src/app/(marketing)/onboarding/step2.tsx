@@ -21,12 +21,14 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
     control,
     setValue,
     trigger,
-    clearErrors,
     formState: { errors },
   } = useFormContext<OnboardingSchema>();
   const { current } = useWizard();
 
-  // one controller for the whole array field
+  // Track if the user has tried to submit this step
+  const [attempted, setAttempted] = React.useState(false);
+
+  // Own the array field
   const { field } = useController({
     name: "skinTypes",
     control,
@@ -40,23 +42,22 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
       ? selected.filter((v) => v !== val)
       : [...selected, val];
 
-    // ✅ update with validation so errors clear immediately
+    // Update value without triggering validation.
+    // We only validate when pressing Continue.
     setValue("skinTypes", next, {
-      shouldValidate: true,
+      shouldValidate: false,
       shouldDirty: true,
       shouldTouch: true,
     });
-
-    // Optional immediate UX cleanup (no flicker)
-    if (next.length > 0) {
-      clearErrors("skinTypes");
-    }
   };
 
   const handleContinue = async () => {
+    setAttempted(true);
     const ok = await trigger("skinTypes", { shouldFocus: true });
     if (ok) onNext?.();
   };
+
+  const showError = attempted && !!errors.skinTypes;
 
   return (
     <form onSubmit={(e) => e.preventDefault()} noValidate>
@@ -76,9 +77,14 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
           />
         ))}
 
-        <p className="min-h-[1.25rem] mt-2 text-sm text-red-600">
-          {errors.skinTypes?.message as string | undefined}
-        </p>
+        {showError ? (
+          <p className="mt-2 text-sm text-red-600">
+            {errors.skinTypes?.message as string}
+          </p>
+        ) : (
+          // keep space to avoid layout-jump
+          <p className="mt-2 min-h-[1.25rem] text-sm" />
+        )}
 
         <div className="mt-8 flex justify-end">
           <MButton label="Continue" type="button" onClick={handleContinue} />
