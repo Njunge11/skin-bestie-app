@@ -10,6 +10,8 @@ import Step1 from "./step1";
 import Step2 from "./step2";
 import Step3 from "./step3";
 import Step4 from "./step4";
+import Step5 from "./step5";
+import Step6 from "./step6";
 
 const STEP_COMPONENTS = {
   personal: Step1,
@@ -17,6 +19,8 @@ const STEP_COMPONENTS = {
   concerns: Step3,
   allergies: Step4,
   // checkout: Step5,
+  subscribe: Step5, // Stripe step has no RHF fields
+  book: Step6,
 } as const;
 
 // fields that belong to each step — used to clear that step's errors on Back
@@ -35,6 +39,8 @@ const FIELDS_BY_STEP: Record<
   skinType: ["skinTypes"],
   concerns: ["concerns", "concernOther"] as const,
   allergies: ["hasAllergy", "allergy"] as const,
+  subscribe: [],
+  book: [],
 };
 
 export default function OnboardingForm() {
@@ -68,7 +74,7 @@ export default function OnboardingForm() {
   };
 
   return (
-    <div className="h-full flex flex-col pt-5 px-4 md:px-[30px] bg-[#F3F0DF]">
+    <div className="flex flex-col pt-5 pb-5 px-4 md:px-[30px] bg-[#F3F0DF]">
       {/* Top bar */}
       <div className="flex justify-between items-baseline">
         <button

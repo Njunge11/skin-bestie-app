@@ -10,6 +10,7 @@ type Props = React.ComponentProps<typeof Button> & {
   label?: string;
   icon?: React.ElementType;
   iconClassName?: string;
+  showIcon?: boolean;
 };
 
 export function MButton({
@@ -19,6 +20,7 @@ export function MButton({
   iconClassName,
   className,
   children,
+  showIcon,
   ...props
 }: Props) {
   return (
@@ -33,7 +35,9 @@ export function MButton({
       {...props}
     >
       {label ?? children}
-      {Icon ? <Icon className={cn("h-6 w-6", iconClassName)} /> : null}
+      {showIcon && Icon ? (
+        <Icon className={cn("h-6 w-6", iconClassName)} />
+      ) : null}
     </Button>
   );
 }

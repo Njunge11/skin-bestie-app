@@ -57,6 +57,40 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
             component: "allergies",
             align: "center", // this step wants left-aligned headings in your UI
           } as StepMeta;
+        case "OnboardingStepsSubscriptionLayout":
+          return {
+            id: idx + 1,
+            slug: `step-${idx + 1}`,
+            headline: s.subscriptionHeadline ?? "",
+            subhead: s.subscriptionSubHeadline ?? "",
+            bgImage: s?.backgroundImage?.node?.sourceUrl ?? "/onboarding.jpg",
+            formTitle: s.mainHeadline ?? "Subscribe",
+            formSub: s.subHeadline ?? "",
+            subscriptionHeadline: s.subscriptionHeadline ?? "",
+            subscriptionSubHeadline: s.subscriptionSubHeadline ?? "",
+            subscriptionBenefits: (s.subscriptionBenefits ?? [])
+              .map((b: any) => b?.benefit)
+              .filter(Boolean),
+            component: "subscribe",
+            align: "center",
+          } as StepMeta;
+        case "OnboardingStepsBookingLayout":
+          return {
+            id: idx + 1,
+            slug: `step-${idx + 1}`,
+            headline: s.subscriptionHeadline ?? "",
+            subhead: s.subscriptionSubHeadline ?? "",
+            bgImage: s?.backgroundImage?.node?.sourceUrl ?? "/onboarding.jpg",
+            formTitle: s.mainHeadline ?? "Book",
+            formSub: s.subHeadline ?? "",
+            subscriptionHeadline: s.subscriptionHeadline ?? "",
+            subscriptionSubHeadline: s.subscriptionSubHeadline ?? "",
+            subscriptionBenefits: (s.subscriptionBenefits ?? [])
+              .map((b: any) => b?.benefit)
+              .filter(Boolean),
+            component: "book",
+            align: "center",
+          } as StepMeta;
         default:
           return null;
       }

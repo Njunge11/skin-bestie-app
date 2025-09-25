@@ -10,8 +10,17 @@ export type StepMeta = {
   formTitle: string;
   formSub?: string;
   formInstruction?: string;
-  component: "personal" | "skinType" | "concerns" | "allergies" | "checkout";
+  component:
+    | "personal"
+    | "skinType"
+    | "concerns"
+    | "allergies"
+    | "subscribe"
+    | "book";
   align?: "left" | "center";
+  subscriptionHeadline?: string;
+  subscriptionSubHeadline?: string;
+  subscriptionBenefits?: string[];
 };
 
 export type WizardCtx = {

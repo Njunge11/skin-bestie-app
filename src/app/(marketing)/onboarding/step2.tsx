@@ -1,7 +1,7 @@
 // app/(onboarding)/step2.tsx
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import { useController, useFormContext } from "react-hook-form";
 import { MButton } from "./components/button";
 import { MCheckbox } from "./components/checkbox";
@@ -26,7 +26,7 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
   const { current } = useWizard();
 
   // Track if the user has tried to submit this step
-  const [attempted, setAttempted] = React.useState(false);
+  const [attempted, setAttempted] = useState(false);
 
   // Own the array field
   const { field } = useController({

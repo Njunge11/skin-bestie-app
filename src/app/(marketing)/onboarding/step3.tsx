@@ -1,7 +1,7 @@
 // app/(onboarding)/step3.tsx
 "use client";
 
-import * as React from "react";
+import { useId } from "react";
 import { useFormContext, useController, useWatch } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { MButton } from "./components/button";
@@ -31,7 +31,7 @@ function ConcernTile({
   onToggle: () => void;
   className?: string;
 }) {
-  const id = React.useId();
+  const id = useId();
   return (
     <div className="relative">
       <input

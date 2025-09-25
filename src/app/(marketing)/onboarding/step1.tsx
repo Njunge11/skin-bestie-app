@@ -1,7 +1,6 @@
 // app/(onboarding)/step1.tsx
 "use client";
 
-import * as React from "react";
 import { useRef } from "react";
 import { ArrowRight, Calendar as CalendarIcon } from "lucide-react";
 import { useFormContext, Controller } from "react-hook-form";

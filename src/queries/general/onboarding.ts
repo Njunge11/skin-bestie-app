@@ -57,6 +57,37 @@ export const GET_ONBOARDING_PAGE = gql`
               }
             }
           }
+          ... on OnboardingStepsSubscriptionLayout {
+            mainHeadline
+            subHeadline
+            subscriptionHeadline
+            subscriptionSubHeadline
+            backgroundImage {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+            subscriptionBenefits {
+              benefit
+            }
+          }
+          ... on OnboardingStepsBookingLayout {
+            mainHeadline
+            subHeadline
+            subscriptionHeadline
+            subscriptionSubHeadline
+            backgroundImage {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+            subscriptionBenefits {
+              benefit
+            }
+          }
+
           # add other layouts here when you implement them
         }
       }

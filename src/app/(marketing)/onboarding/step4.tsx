@@ -1,7 +1,7 @@
 // app/(onboarding)/step4.tsx
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { MButton } from "./components/button";
 import { MRadioButton } from "./components/radio.button";
@@ -16,11 +16,54 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
     watch,
     register,
     trigger,
+    getValues,
     formState: { errors },
   } = useFormContext<OnboardingSchema>();
 
-  const [attempted, setAttempted] = React.useState(false);
+  const [attempted, setAttempted] = useState(false);
   const selected = watch(FIELD);
+
+  //   function getConcerns(v: OnboardingSchema): string[] {
+  //     const other = (v.concernOther ?? "").trim();
+  //     const base = v.concerns ?? [];
+  //     const replaced = base.map((c) => (c === "Other" && other ? other : c));
+  //     return Array.from(new Set(replaced.filter(Boolean)));
+  //   }
+
+  //   function buildAccountPayload(v: OnboardingSchema) {
+  //     return {
+  //       firstName: v.firstName,
+  //       lastName: v.lastName,
+  //       phoneNumber: v.mobileLocal,
+  //       email: v.email,
+  //       dateOfBirth: v.dateOfBirth,
+  //       skinType: [...(v.skinTypes ?? [])],
+  //       concerns: getConcerns(v),
+  //       hasAllergy: v.hasAllergy === "Yes",
+  //       allergy: v.hasAllergy === "Yes" ? (v.allergy ?? "").trim() : "",
+  //       subscription: "not_yet",
+  //       initialBooking: false,
+  //     } as const;
+  //   }
+
+  //   const handleError = async (response: Response) => {
+  //     if (response.status === 409) {
+  //       const result = await response.json();
+  //       const { existing } = result;
+  //       if (existing.subscription === "active" && existing.initialBooking) {
+  //         console.log("go to login page ");
+  //       }
+  //       if (existing.subscription === "active" && !existing.initialBooking) {
+  //         console.log("go to booking page");
+  //       }
+  //       if (existing.subscription !== "active") {
+  //         console.log("go to next step");
+  //         onNext?.();
+  //       }
+  //     } else {
+  //       console.log("an error occured");
+  //     }
+  //   };
 
   const handleContinue = async () => {
     setAttempted(true);
