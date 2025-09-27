@@ -1,5 +1,7 @@
-// queries/general/GetLandingPage.ts
-export const GetLandingPage = /* GraphQL */ `
+// queries/landing.page.ts  (adjust path if yours differs)
+import { gql } from "graphql-tag";
+
+export const GetLandingPage = gql(/* GraphQL */ `
   query GetLandingPage {
     page(id: "/", idType: URI) {
       title
@@ -34,7 +36,27 @@ export const GetLandingPage = /* GraphQL */ `
             }
           }
         }
+        skinbestieTestimonials {
+          ... on HomeSkinbestieTestimonialsContentLayout {
+            mainHeadline
+            subHeadline
+            image {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+            carousel {
+              cardContent {
+                concern
+                goal
+                testimonial
+                customerName
+              }
+            }
+          }
+        }
       }
     }
   }
-`;
+`);

@@ -5,7 +5,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "http",
-        hostname: process.env.NEXT_PUBLIC_WORDPRESS_API_HOSTNAME,
+        hostname: "dhur3fak4lnqy.cloudfront.net",
         port: "",
       },
     ],
