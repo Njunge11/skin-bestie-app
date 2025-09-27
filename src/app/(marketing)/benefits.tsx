@@ -30,7 +30,7 @@ export default function Benefits({
   ] as const;
 
   return (
-    <section className="min-h-screen bg-[#FFFDF2] flex items-center justify-center p-4">
+    <section className="min-h-screen bg-[#FFFDF2] flex items-center justify-center p-2">
       <div className="w-full max-w-7xl">
         <h1
           className={`${anton.className} font-normal text-5xl leading-[1.2] tracking-tighter uppercase text-[#222118]`}
@@ -38,7 +38,7 @@ export default function Benefits({
           {heading}
         </h1>
 
-        <div className="mt-6 flex flex-col lg:flex-row border-[0.4px] border-[#959170] rounded-lg overflow-hidden">
+        <div className="mt-2 sm:mt-6 flex flex-col lg:flex-row border-[0.4px] border-[#959170] rounded-lg overflow-hidden">
           {/* Image */}
           <div className="relative bg-gray-50 w-full lg:w-[416px] lg:h-[395px] flex-shrink-0">
             <div className="aspect-[416/395] lg:aspect-auto lg:h-full">

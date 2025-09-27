@@ -4,16 +4,35 @@ export const GetLandingPage = /* GraphQL */ `
     page(id: "/", idType: URI) {
       title
       home {
-        mainHeadline
-        backgroundImage {
-          node {
-            altText
-            sourceUrl
+        skinbestieBenefits {
+          ... on HomeSkinbestieBenefitsContentLayout {
+            backgroundImage {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+            list {
+              title
+              description
+            }
           }
         }
-        skinbestieBenefits {
-          skinbestieBenefit
-          skinbestieBenefitDescription
+        skinbestieJourney {
+          ... on HomeSkinbestieJourneyContentLayout {
+            mainHeadline
+            subHeadline
+            list {
+              icon {
+                node {
+                  altText
+                  sourceUrl
+                }
+              }
+              title
+              description
+            }
+          }
         }
       }
     }
