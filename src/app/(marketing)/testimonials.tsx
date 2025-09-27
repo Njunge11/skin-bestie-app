@@ -31,11 +31,10 @@ export default function Testimonials({
 }) {
   console.log("the items", items);
   return (
-    <section className="min-h-screen w-full mx-auto bg-[#13110F]">
+    <section className="w-full mx-auto bg-[#13110F] p-6 md:pt-20 md:pb-16">
       <div className="pt-[5.313rem] flex justify-center">
         <Image src={imageSrc!} alt={imageAlt!} width={219} height={84} />
       </div>
-
       <h1
         className={`mt-6 ${anton.className} text-[#FFF7D4] text-5xl text-center uppercase leading-[1.2] tracking-[-0.02em]`}
       >
@@ -47,7 +46,7 @@ export default function Testimonials({
 
       <Carousel
         opts={{ align: "start", loop: true }}
-        className="w-full max-w-7xl mx-auto pt-11 pb-1"
+        className="w-full max-w-7xl mx-auto pt-11 pb-16"
       >
         <CarouselContent className="-ml-0 md:-ml-4">
           {items.map((card, idx) => (

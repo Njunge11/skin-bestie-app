@@ -56,6 +56,26 @@ export const GetLandingPage = gql(/* GraphQL */ `
             }
           }
         }
+        skinbestieValues {
+          ... on HomeSkinbestieValuesContentLayout {
+            image {
+              node {
+                altText
+                sourceUrl
+              }
+            }
+            values {
+              icon {
+                node {
+                  altText
+                  sourceUrl
+                }
+              }
+              title
+              description
+            }
+          }
+        }
       }
     }
   }
