@@ -5,6 +5,7 @@ import Benefits from "./benefits";
 import Journey from "./journey";
 import Testimonials from "./testimonials";
 import Values from "./values";
+import Pricing from "./pricing";
 
 export const revalidate = 60;
 
@@ -81,6 +82,27 @@ function extractValues(home: any) {
   return hasContent ? { imageSrc, imageAlt, items } : null;
 }
 
+function extractPricing(home: any) {
+  const block = home?.skinbestiePricing?.[0];
+  if (!block) return null;
+
+  const heading = block?.mainHeadline ?? "";
+  const subheading = block?.subHeadline ?? "";
+
+  const plan = block?.valueProp?.[0];
+  const priceHeadline = plan?.mainHeadline ?? ""; // e.g. "£60 / month"
+  const priceSub = plan?.subHeadline ?? ""; // e.g. "Limited Time – Early Access"
+  const benefits: string[] = (plan?.benefits ?? [])
+    .map((b: any) => b?.benefit ?? "")
+    .filter(Boolean);
+
+  const hasContent =
+    heading || subheading || priceHeadline || priceSub || benefits.length > 0;
+  return hasContent
+    ? { heading, subheading, priceHeadline, priceSub, benefits }
+    : null;
+}
+
 // --- data loader ---
 async function getLanding() {
   const data = await fetchGraphQL<any>(print(GetLandingPage));
@@ -91,13 +113,15 @@ async function getLanding() {
     journey: extractJourney(home),
     testimonials: extractTestimonials(home),
     values: extractValues(home),
+    pricing: extractPricing(home),
   };
 }
 
 export default async function MarketingHome() {
-  const { benefits, journey, testimonials, values } = await getLanding();
+  const { benefits, journey, testimonials, values, pricing } =
+    await getLanding();
 
-  console.log("values", values);
+  console.log("pricing", pricing);
 
   return (
     <main>
@@ -131,6 +155,15 @@ export default async function MarketingHome() {
           imageSrc={values.imageSrc}
           imageAlt={values.imageAlt}
           items={values.items}
+        />
+      )}
+      {pricing && (
+        <Pricing
+          heading={pricing.heading}
+          subheading={pricing.subheading}
+          priceHeadline={pricing.priceHeadline}
+          priceSub={pricing.priceSub}
+          benefits={pricing.benefits}
         />
       )}
     </main>

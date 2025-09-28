@@ -111,7 +111,7 @@ export default function Journey({
 
   return (
     <div
-      className="min-h-screen w-full flex flex-col min-[1350px]:flex-row"
+      className="w-full flex flex-col min-[1350px]:flex-row sm:pb-24"
       style={{ background: "radial-gradient(circle, #FDDF66, #F3ECC7)" }}
     >
       {/* Column 1: Text content */}

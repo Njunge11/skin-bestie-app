@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     {
       slug: isPreview ? slug.split("preview/")[1] : slug,
       idType: isPreview ? "DATABASE_ID" : "URI",
-    },
+    }
   );
 
   if (!contentNode) {
@@ -54,7 +54,7 @@ export default async function Page({ params }: Props) {
     {
       slug: isPreview ? slug.split("preview/")[1] : slug,
       idType: isPreview ? "DATABASE_ID" : "URI",
-    },
+    }
   );
 
   if (!contentNode) return notFound();

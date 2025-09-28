@@ -31,7 +31,7 @@ export default function Testimonials({
 }) {
   console.log("the items", items);
   return (
-    <section className="w-full mx-auto bg-[#13110F] p-6 md:pt-20 md:pb-16">
+    <section className="w-full mx-auto bg-[#13110F] p-6 sm:pt-20 sm:pb-16">
       <div className="pt-[5.313rem] flex justify-center">
         <Image src={imageSrc!} alt={imageAlt!} width={219} height={84} />
       </div>

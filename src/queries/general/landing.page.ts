@@ -76,6 +76,21 @@ export const GetLandingPage = gql(/* GraphQL */ `
             }
           }
         }
+        skinbestiePricing {
+          ... on HomeSkinbestiePricingContentLayout {
+            mainHeadline
+            subHeadline
+            valueProp {
+              ... on HomeSkinbestiePricingValuePropPriceDetailsLayout {
+                mainHeadline
+                subHeadline
+                benefits {
+                  benefit
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
