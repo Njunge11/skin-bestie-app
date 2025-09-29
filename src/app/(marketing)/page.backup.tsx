@@ -1,16 +1,15 @@
-// app/(marketing)/page.tsx
 import { print } from "graphql";
 import { wpFetch } from "@/utils/wp";
 import { GetLandingPage } from "@/queries/general/landing.page";
 import Benefits from "./benefits";
 import Journey from "./journey";
-import Testimonials from "./testimonials"; // Community
+import Testimonials from "./testimonials";
 import Values from "./values";
 import Pricing from "./pricing";
 import Faqs from "./faqs";
+import Header from "./header";
+import HeroSection from "./hero";
 import ScrollEffectWrapper from "./ScrollEffectWrapper";
-import HeroWithHeader from "./HeroWithHeader";
-import OurStory from "./OurStory";
 
 export const revalidate = 60;
 
@@ -55,6 +54,7 @@ function extractTestimonials(home: any) {
   const imageSrc = block?.image?.node?.sourceUrl ?? "";
   const imageAlt = block?.image?.node?.altText ?? "";
 
+  // WP shape: carousel[] -> cardContent[]
   const items = (block?.carousel ?? [])
     .flatMap((slide: any) => slide?.cardContent ?? [])
     .map((c: any) => ({
@@ -94,8 +94,8 @@ function extractPricing(home: any) {
   const subheading = block?.subHeadline ?? "";
 
   const plan = block?.valueProp?.[0];
-  const priceHeadline = plan?.mainHeadline ?? "";
-  const priceSub = plan?.subHeadline ?? "";
+  const priceHeadline = plan?.mainHeadline ?? ""; // e.g. "£60 / month"
+  const priceSub = plan?.subHeadline ?? ""; // e.g. "Limited Time – Early Access"
   const benefits: string[] = (plan?.benefits ?? [])
     .map((b: any) => b?.benefit ?? "")
     .filter(Boolean);
@@ -107,12 +107,13 @@ function extractPricing(home: any) {
     : null;
 }
 
+// wherever your extractors live
 function extractFaqs(home: any) {
   const block = home?.skinbestieFaqs?.[0];
   if (!block) return null;
 
   const heading = block?.mainHeadline ?? "";
-  const heading2 = block?.mainHeadline2 ?? "";
+  const heading2 = block?.mainHeadline2 ?? ""; // 👈 NEW
   const subheading = block?.subHeadline ?? "";
 
   const items = (block?.faqs ?? []).map((f: any) => ({
@@ -146,67 +147,119 @@ export default async function MarketingHome() {
     await getLanding();
 
   return (
-    <main>
-      {/* 0: Hero with Header INSIDE, so Benefits can wipe over both */}
-      <HeroWithHeader />
-      <OurStory />
+    <>
+      <main>
+        <Header />
+        <ScrollEffectWrapper>
+          <HeroSection />
 
-      {/* 1: Benefits (curtain over Hero+Header) */}
-      {benefits && (
-        <Benefits
-          imageSrc={benefits.imageSrc}
-          imageAlt={benefits.imageAlt}
-          items={benefits.items}
-        />
-      )}
+          {benefits && (
+            <Benefits
+              imageSrc={benefits.imageSrc}
+              imageAlt={benefits.imageAlt}
+              items={benefits.items}
+            />
+          )}
 
-      {/* 2: Journey (pinned base for next scene) */}
-      {journey && (
-        <Journey
-          heading={journey.heading}
-          subheading={journey.subheading}
-          steps={journey.steps}
-        />
-      )}
+          {journey && (
+            <Journey
+              heading={journey.heading}
+              subheading={journey.subheading}
+              steps={journey.steps}
+            />
+          )}
 
-      {/* 3: Community (curtain 1) */}
-      {testimonials && (
-        <Testimonials
-          heading={testimonials.heading}
-          subheading={testimonials.subheading}
-          imageSrc={testimonials.imageSrc}
-          imageAlt={testimonials.imageAlt}
-          items={testimonials.items}
-        />
-      )}
+          {/* Note: Testimonials is renamed to Community in your flow */}
+          {testimonials && (
+            <Testimonials
+              heading={testimonials.heading}
+              subheading={testimonials.subheading}
+              imageSrc={testimonials.imageSrc}
+              imageAlt={testimonials.imageAlt}
+              items={testimonials.items}
+            />
+          )}
 
-      {/* 4: Values (curtain 2) */}
-      {values && (
-        <Values
-          imageSrc={values.imageSrc}
-          imageAlt={values.imageAlt}
-          items={values.items}
-        />
-      )}
+          {values && (
+            <Values
+              imageSrc={values.imageSrc}
+              imageAlt={values.imageAlt}
+              items={values.items}
+            />
+          )}
 
-      {/* 5+: Normal scroll */}
-      {pricing && (
-        <Pricing
-          heading={pricing.heading}
-          subheading={pricing.subheading}
-          priceHeadline={pricing.priceHeadline}
-          priceSub={pricing.priceSub}
-          benefits={pricing.benefits}
-        />
-      )}
-      {faqs && (
-        <Faqs
-          heading={faqs.heading}
-          heading2={faqs.heading2}
-          subheading={faqs.subheading}
-          items={faqs.items}
-        />
-      )}
-    </main>
+          {pricing && (
+            <Pricing
+              heading={pricing.heading}
+              subheading={pricing.subheading}
+              priceHeadline={pricing.priceHeadline}
+              priceSub={pricing.priceSub}
+              benefits={pricing.benefits}
+            />
+          )}
+
+          {faqs && (
+            <Faqs
+              heading={faqs.heading}
+              heading2={faqs.heading2}
+              subheading={faqs.subheading}
+              items={faqs.items}
+            />
+          )}
+        </ScrollEffectWrapper>
+        {/* <HeroSection />
+      <main>
+        {benefits && (
+          <Benefits
+            imageSrc={benefits.imageSrc}
+            imageAlt={benefits.imageAlt}
+            items={benefits.items}
+          />
+        )}
+
+        {journey && (
+          <Journey
+            heading={journey.heading}
+            subheading={journey.subheading}
+            steps={journey.steps}
+          />
+        )}
+
+        {testimonials && (
+          <Testimonials
+            heading={testimonials.heading}
+            subheading={testimonials.subheading}
+            imageSrc={testimonials.imageSrc}
+            imageAlt={testimonials.imageAlt}
+            items={testimonials.items}
+          />
+        )}
+        {values && (
+          <Values
+            imageSrc={values.imageSrc}
+            imageAlt={values.imageAlt}
+            items={values.items}
+          />
+        )}
+
+        {pricing && (
+          <Pricing
+            heading={pricing.heading}
+            subheading={pricing.subheading}
+            priceHeadline={pricing.priceHeadline}
+            priceSub={pricing.priceSub}
+            benefits={pricing.benefits}
+          />
+        )}
+        {faqs && (
+          <Faqs
+            heading={faqs.heading}
+            heading2={faqs.heading2} // 👈 NEW
+            subheading={faqs.subheading}
+            items={faqs.items}
+          />
+        )} */}
+      </main>
+    </>
   );
 }

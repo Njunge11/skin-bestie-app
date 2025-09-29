@@ -2,26 +2,24 @@ import { draftMode, cookies } from "next/headers";
 
 export async function fetchGraphQL<T = any>(
   query: string,
-  variables?: { [key: string]: any },
-  headers?: { [key: string]: string }
+  variables?: Record<string, any>,
+  headers?: Record<string, string>
 ): Promise<T> {
   const { isEnabled: preview } = await draftMode();
 
   try {
     let authHeader = "";
+
+    // 👇 Next 15: cookies() returns a Promise<ReadonlyRequestCookies>
+    const cookieStore = await cookies();
     if (preview) {
-      const auth = cookies().get("wp_jwt")?.value;
-      if (auth) {
-        authHeader = `Bearer ${auth}`;
-      }
+      const auth = cookieStore.get("wp_jwt")?.value;
+      if (auth) authHeader = `Bearer ${auth}`;
     }
 
     const body = JSON.stringify({
       query,
-      variables: {
-        preview,
-        ...variables,
-      },
+      variables: { preview, ...variables },
     });
 
     const response = await fetch(
@@ -35,25 +33,23 @@ export async function fetchGraphQL<T = any>(
         },
         body,
         cache: preview ? "no-cache" : "default",
-        next: {
-          tags: ["wordpress"],
-        },
+        next: { tags: ["wordpress"] },
       }
     );
 
     if (!response.ok) {
-      console.error("Response Status:", response);
+      console.error("Response Status:", response.status, await response.text());
       throw new Error(response.statusText);
     }
 
     const data = await response.json();
 
-    if (data.errors) {
+    if (data?.errors) {
       console.error("GraphQL Errors:", data.errors);
       throw new Error("Error executing GraphQL query");
     }
 
-    return data.data;
+    return data.data as T;
   } catch (error) {
     console.error(error);
     throw error;

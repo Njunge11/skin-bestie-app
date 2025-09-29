@@ -110,11 +110,12 @@ export default function Journey({
     "w-full min-[1350px]:w-[322px] min-[1350px]:shrink-0 bg-[#FFFBE7] border-b-[0.4px] border-[#B5AF95] rounded-b-lg h-[280px]";
 
   return (
+    // IMPORTANT: OUTER fills scene, but no vertical-centering here
     <div
-      className="w-full flex flex-col min-[1350px]:flex-row sm:pb-24"
+      className="h-full w-full flex flex-col min-[1350px]:flex-row overflow-hidden"
       style={{ background: "radial-gradient(circle, #FDDF66, #F3ECC7)" }}
     >
-      {/* Column 1: Text content */}
+      {/* Column 1: Text content (top-aligned as before) */}
       <div className="p-6 min-[1350px]:pl-[4.375rem] min-[1350px]:pt-24">
         <div className="w-full min-[1350px]:max-w-[355px]">
           <h2
@@ -134,9 +135,8 @@ export default function Journey({
         </div>
       </div>
 
-      {/* Column 2: Cards */}
+      {/* Column 2: Cards (top-aligned, touching the top like before) */}
       <div className="flex-1">
-        {/* ≤1350px: stack; ≥1351px: 3 across, right-aligned */}
         <div className="p-2 md:p-6 min-[1350px]:!p-0 flex flex-col gap-2 min-[1350px]:flex-row min-[1350px]:justify-end min-[1350px]:items-start w-full min-[1350px]:w-auto">
           {steps.slice(0, 3).map((s, i) => (
             <div

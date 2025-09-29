@@ -1,7 +1,6 @@
 // app/(marketing)/pricing.tsx
 import React from "react";
 import { anton } from "../fonts";
-import LButton from "./LButton";
 
 export default function Pricing({
   heading,
@@ -64,7 +63,10 @@ export default function Pricing({
               ))}
             </div>
 
-            <LButton className="mt-5" />
+            {/* CTA Button */}
+            <button className="w-full bg-gray-900 text-white py-5 px-8 rounded-2xl text-lg font-semibold hover:bg-gray-800 transition-colors mt-5">
+              Begin My SkinBestie Journey
+            </button>
           </div>
         </div>
       </div>

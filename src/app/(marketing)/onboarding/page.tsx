@@ -1,5 +1,5 @@
 import { print } from "graphql/language/printer";
-import { fetchGraphQL } from "@/utils/fetchGraphQL";
+import { wpFetch } from "@/utils/wp";
 import { GET_ONBOARDING_PAGE } from "@/queries/general/onboarding";
 import type { StepMeta } from "./onboarding.types";
 import OnboardingClient from "./onboarding.client";
@@ -100,7 +100,7 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
 
 async function getOnboardingSteps(): Promise<StepMeta[]> {
   const query = print(GET_ONBOARDING_PAGE);
-  const data = await fetchGraphQL(query);
+  const data = await wpFetch(query);
   const rawSteps = data?.page?.onboarding?.steps ?? [];
   const mapped = mapWpStepsToStepMeta(rawSteps);
 

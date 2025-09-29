@@ -1,7 +1,8 @@
 // app/(marketing)/layout.tsx
 import type { Metadata } from "next";
-import Navigation from "@/components/Globals/Navigation/Navigation";
-import { PreviewNotice } from "@/components/Globals/PreviewNotice/PreviewNotice";
+
+import Header from "./header";
+import HeroSection from "./hero";
 // If you have app/fonts.ts exporting fonts, import them here
 // import { anton } from "@/app/fonts";
 
@@ -17,10 +18,10 @@ export default function MarketingLayout({
 }) {
   return (
     <div className="min-h-dvh bg-background text-foreground">
-      <Navigation />
       {/* <div className={anton.className}> // if you want a marketing-only font */}
+
       <main>{children}</main>
-      <PreviewNotice />
+
       {/* </div> */}
     </div>
   );

@@ -91,6 +91,21 @@ export const GetLandingPage = gql(/* GraphQL */ `
             }
           }
         }
+        skinbestieFaqs {
+          ... on HomeSkinbestieFaqsContentLayout {
+            mainHeadline
+            mainHeadline2
+            subHeadline
+            faqs {
+              question
+              answerType
+              answerList {
+                item
+              }
+              answerText
+            }
+          }
+        }
       }
     }
   }
