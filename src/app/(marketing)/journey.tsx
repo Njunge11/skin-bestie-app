@@ -1,92 +1,4 @@
-// import { anton } from "../fonts";
-// import { MButton } from "./onboarding/components/button";
-
-// export default function Journey() {
-//   const cardBase =
-//     "w-full min-[1350px]:w-[322px] min-[1350px]:shrink-0 bg-[#FFFBE7] border-b-[0.4px] border-[#B5AF95] rounded-b-lg h-[280px]";
-
-//   return (
-//     <div
-//       className="min-h-screen w-full flex flex-col min-[1350px]:flex-row"
-//       style={{ background: "radial-gradient(circle, #FDDF66, #F3ECC7)" }}
-//     >
-//       {/* Column 1: Text content */}
-//       <div className="p-6 min-[1350px]:pl-[4.375rem] min-[1350px]:pt-24">
-//         <div className="w-full min-[1350px]:max-w-[355px]">
-//           <h2
-//             className={`${anton.className} w-full min-[1350px]:max-w-[330px] font-normal text-4xl sm:text-5xl min-[1350px]:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118]`}
-//           >
-//             How your SkinBestie journey unfolds
-//           </h2>
-//           <p className="mt-6 font-medium text-base sm:text-lg leading-[1.5] tracking-[-0.01em] text-[#1B1D1F]">
-//             Coaching and community that empowers you with judgment-free skincare
-//             guidance, education, and routines built just for you.
-//           </p>
-//           <MButton
-//             className="mt-9 w-full sm:w-auto sm:max-w-[304px] py-5"
-//             showIcon
-//           >
-//             Begin My SkinBestie Journey
-//           </MButton>
-//         </div>
-//       </div>
-
-//       {/* Column 2: Cards */}
-//       <div className="flex-1">
-//         {/* ≤1350px: stack; ≥1351px: 3 across, right-aligned */}
-//         <div className="p-2 md:p-6 min-[1350px]:!p-0 flex flex-col gap-2 min-[1350px]:flex-row min-[1350px]:justify-end min-[1350px]:items-start w-full min-[1350px]:w-auto">
-//           <div
-//             className={`${cardBase} h-auto min-[1350px]:h-[450px] p-6 min-[1350px]:pt-16  min-[1350px]:px-6`}
-//           >
-//             <img src="/calendar.svg" className="w-[40px] h-[40px]" />
-//             <h2
-//               className={`mt-6 ${anton.className} font-normal text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}
-//             >
-//               1. Share your details & pick a time
-//             </h2>
-//             <p className="mt-5">
-//               Answer a few quick questions about your skin, and book a slot that
-//               works for you.
-//             </p>
-//           </div>
-//           <div
-//             className={`${cardBase} h-auto min-[1350px]:h-[400px] p-6 min-[1350px]:pt-16  min-[1350px]:px-6`}
-//           >
-//             <img src="/calendar.svg" className="w-[40px] h-[40px]" />
-//             <h2
-//               className={`mt-6 ${anton.className} font-normal text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}
-//             >
-//               2. meet your coach
-//             </h2>
-//             <p className="mt-5">
-//               A relaxed video chat where we get to know more about you and your
-//               lifestyle, your skin history, current state of skin, create skin
-//               goals, analyse your current routine and create a plan for your
-//               tailored routine.
-//             </p>
-//           </div>
-
-//           <div
-//             className={`${cardBase} h-auto min-[1350px]:h-[323px] p-6 min-[1350px]:pt-16  min-[1350px]:px-6`}
-//           >
-//             <img src="/calendar.svg" className="w-[40px] h-[40px]" />
-//             <h2
-//               className={`mt-6 ${anton.className} font-normal text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}
-//             >
-//               3. GROW TOGETHER
-//             </h2>
-//             <p className="mt-5">
-//               Get ongoing support, guidance, and pep talks along the way. Expect
-//               small tweaks, weekly reflections, and a coach who makes sure every
-//               win gets noticed.
-//             </p>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-// app/(marketing)/journey.tsx
+import { ArrowRight } from "lucide-react";
 import { anton } from "../fonts";
 import { MButton } from "./onboarding/components/button";
 
@@ -107,63 +19,88 @@ export default function Journey({
   steps: JourneyStep[];
 }) {
   const cardBase =
-    "w-full min-[1350px]:w-[322px] min-[1350px]:shrink-0 bg-[#FFFBE7] border-b-[0.4px] border-[#B5AF95] rounded-b-lg h-[280px]";
+    "w-full lg:w-[322px] bg-[#FFFBE7] border-b-[0.4px] border-[#B5AF95] rounded-b-lg";
 
   return (
-    // IMPORTANT: OUTER fills scene, but no vertical-centering here
-    <div
-      className="h-full w-full flex flex-col min-[1350px]:flex-row overflow-hidden"
+    // Parent container - flex column on mobile for ordering, regular layout on larger screens
+    <section
+      className="w-full h-auto min-[1440px]:h-[570px] flex flex-col min-[1440px]:flex-row overflow-hidden"
       style={{ background: "radial-gradient(circle, #FDDF66, #F3ECC7)" }}
     >
-      {/* Column 1: Text content (top-aligned as before) */}
-      <div className="p-6 min-[1350px]:pl-[4.375rem] min-[1350px]:pt-24">
-        <div className="w-full min-[1350px]:max-w-[355px]">
+      {/* Column 1 - Text content and button */}
+      <div className="w-full flex flex-col min-[1440px]:min-w-[460px] min-[1440px]:w-auto">
+        {/* Text content wrapper - order-1 on mobile */}
+        <div className="order-1 lg:order-none p-4 lg:pl-[4.375rem] lg:pt-24 min-[1440px]:pt-24 lg:max-[1439px]:flex lg:max-[1439px]:flex-col lg:max-[1439px]:items-center lg:max-[1439px]:text-center">
           <h2
-            className={`${anton.className} w-full min-[1350px]:max-w-[330px] font-normal text-4xl sm:text-5xl min-[1350px]:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118]`}
+            className={`${anton.className} font-normal text-4xl sm:text-5xl lg:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118] min-[1440px]:max-w-[330px]`}
           >
             {heading}
           </h2>
-          <p className="mt-6 font-medium text-base sm:text-lg leading-[1.5] tracking-[-0.01em] text-[#1B1D1F]">
+          <p className="w-full min-[1440px]:w-[355px] mt-6 font-medium text-base sm:text-lg leading-[1.5] tracking-[-0.01em] text-[#1B1D1F]">
             {subheading}
           </p>
-          <MButton
-            className="mt-9 w-full sm:w-auto sm:max-w-[304px] py-5"
-            showIcon
+          {/* Button hidden on mobile, shown on lg+ */}
+          <a
+            href="#"
+            className="mt-9 hidden lg:grid w-[328px] h-16 grid-cols-[1fr_auto] items-center gap-[10px]
+             rounded-xl border-2 border-white bg-black px-5"
           >
-            Begin My SkinBestie Journey
-          </MButton>
+            <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap">
+              Begin My SkinBestie Journey
+            </span>
+            <ArrowRight className="w-6 h-6 text-white" />
+          </a>
         </div>
       </div>
 
-      {/* Column 2: Cards (top-aligned, touching the top like before) */}
-      <div className="flex-1">
-        <div className="p-2 md:p-6 min-[1350px]:!p-0 flex flex-col gap-2 min-[1350px]:flex-row min-[1350px]:justify-end min-[1350px]:items-start w-full min-[1350px]:w-auto">
-          {steps.slice(0, 3).map((s, i) => (
-            <div
-              key={i}
-              className={`${cardBase} ${
-                i === 0
-                  ? "h-auto min-[1350px]:h-[450px] p-6 min-[1350px]:pt-16  min-[1350px]:px-6"
-                  : i === 1
-                    ? "h-auto min-[1350px]:h-[400px] p-6 min-[1350px]:pt-16  min-[1350px]:px-6"
-                    : "h-auto min-[1350px]:h-[323px] p-6 min-[1350px]:pt-16  min-[1350px]:px-6"
-              }`}
-            >
-              <img
-                src={s.iconSrc}
-                alt={s.iconAlt}
-                className="w-[40px] h-[40px]"
-              />
-              <h2
-                className={`mt-6 ${anton.className} font-normal text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}
+      {/* Column 2 - Cards container - order-2 on mobile */}
+      <div className="order-2 lg:order-none flex-1 min-[1440px]:flex min-[1440px]:justify-end">
+        <div className="w-full min-[1440px]:w-[982px] min-[1440px]:flex min-[1440px]:justify-end">
+          <div className="w-full min-[1440px]:w-auto flex flex-col lg:flex-row gap-4 sm:gap-2 p-4 md:p-6 lg:p-6 min-[1440px]:!p-0 lg:justify-center min-[1440px]:justify-end">
+            {steps.slice(0, 3).map((s, i) => (
+              <div
+                key={i}
+                className={`${cardBase} p-6 lg:pt-16 ${
+                  // Mobile: auto height
+                  // lg to <1440px: equal heights (400px)
+                  // 1440px+: staggered heights (with max-lg to prevent override)
+                  i === 0
+                    ? "h-auto lg:max-[1439px]:h-[400px] min-[1440px]:h-[450px]"
+                    : i === 1
+                      ? "h-auto lg:max-[1439px]:h-[400px] min-[1440px]:h-[400px]"
+                      : "h-auto lg:max-[1439px]:h-[400px] min-[1440px]:h-[323px]"
+                }`}
               >
-                {s.title}
-              </h2>
-              <p className="mt-5">{s.description}</p>
-            </div>
-          ))}
+                <img
+                  src={s.iconSrc}
+                  alt={s.iconAlt}
+                  className="w-[40px] h-[40px]"
+                />
+                <h2
+                  className={`mt-6 ${anton.className} font-normal text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}
+                >
+                  {s.title}
+                </h2>
+                <p className="mt-5">{s.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Button for mobile only - order-3 */}
+      <div className="order-3 lg:hidden px-4 pb-4">
+        <a
+          href="#"
+          className="flex w-full h-16 items-center justify-center gap-2.5
+               rounded-xl border-2 border-white bg-black px-5"
+        >
+          <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap text-center">
+            Begin My SkinBestie Journey
+          </span>
+          <ArrowRight className="w-6 h-6 text-white" />
+        </a>
+      </div>
+    </section>
   );
 }
