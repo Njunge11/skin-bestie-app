@@ -11,12 +11,9 @@ const HeroSection = () => {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/hero.jpg')`,
+          backgroundImage: `url('/hero.jpg')`,
         }}
-      >
-        {/* Optional: Add a subtle animation */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20"></div>
-      </div>
+      ></div>
 
       {/* Content Container */}
       <div className="relative z-10 flex items-center h-full px-4 sm:px-6 lg:px-0 lg:pr-8 ">
@@ -40,10 +37,13 @@ const HeroSection = () => {
           </p>
 
           {/* CTA Button */}
-          <button className="mt-10 group inline-flex items-center gap-2 font-semibold text-[1rem] sm:text-[1.125rem] leading-[150%] tracking-[-0.01em] text-[#FDFAEB] border-[1.5px] border-[#FDFAEB] rounded-[0.75rem] pt-4 pr-6 pb-4 pl-6 bg-transparent transition-all duration-300 hover:opacity-90">
+          <a
+            href="/onboarding"
+            className="mt-10 group inline-flex items-center gap-2 font-semibold text-[1rem] sm:text-[1.125rem] leading-[150%] tracking-[-0.01em] text-[#FDFAEB] border-[1.5px] border-[#FDFAEB] rounded-[0.75rem] pt-4 pr-6 pb-4 pl-6 bg-transparent transition-all duration-300 hover:opacity-90"
+          >
             <span>Step Into Skin Bestie</span>
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </button>
+          </a>
         </div>
       </div>
     </div>

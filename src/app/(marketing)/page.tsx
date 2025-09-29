@@ -24,7 +24,6 @@ function extractBenefits(home: any) {
   const imageSrc = block?.backgroundImage?.node?.sourceUrl ?? "";
   const imageAlt = block?.backgroundImage?.node?.altText ?? "";
   const items = (block?.list ?? []).slice(0, 4).map((x: any) => ({
-    title: x?.title ?? "",
     description: x?.description ?? "",
   }));
 

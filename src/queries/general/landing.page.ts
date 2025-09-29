@@ -15,7 +15,6 @@ export const GetLandingPage = gql(/* GraphQL */ `
               }
             }
             list {
-              title
               description
             }
           }
