@@ -11,6 +11,8 @@ import Faqs from "./faqs";
 import ScrollEffectWrapper from "./ScrollEffectWrapper";
 import HeroWithHeader from "./HeroWithHeader";
 import OurStory from "./OurStory";
+import Header from "./header";
+import HeroSection from "./hero";
 
 export const revalidate = 60;
 
@@ -148,8 +150,10 @@ export default async function MarketingHome() {
   return (
     <main>
       {/* 0: Hero with Header INSIDE, so Benefits can wipe over both */}
-      <HeroWithHeader />
-      <OurStory />
+
+      <Header />
+      <HeroSection />
+      {/* <OurStory /> */}
 
       {/* 1: Benefits (curtain over Hero+Header) */}
       {benefits && (
