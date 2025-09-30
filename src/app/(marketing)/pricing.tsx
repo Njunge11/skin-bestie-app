@@ -1,6 +1,7 @@
 // app/(marketing)/pricing.tsx
 import React from "react";
 import { anton } from "../fonts";
+import { ArrowRight } from "lucide-react";
 
 export default function Pricing({
   heading,
@@ -17,24 +18,24 @@ export default function Pricing({
 }) {
   return (
     <div className="bg-[#FFFDF2]">
-      <div className="max-w-6xl mx-auto w-full sm:pb-28">
+      <div className="max-w-6xl mx-auto w-full pb-10 md:pb-20 lg:pb-28">
         <div className="grid lg:grid-cols-2 lg:gap-12 items-start">
           {/* Left Column */}
-          <div className="space-y-6 p-6 sm:pt-[10.438rem]">
+          <div className="space-y-6 flex lg:justify-center px-4 pt-10 md:pt-20 lg:pt-44">
             <div>
               <h1
-                className={`${anton.className} text-5xl font-normal text-[#222118] mb-6 uppercase leading-[1.2] tracking-[-0.02em] w-full max-w-[333px]`}
+                className={`${anton.className} text-center lg:text-left text-4xl sm:text-5xl font-normal text-[#222118] uppercase leading-[1.2] tracking-[-0.02em] w-full lg:max-w-[333px]`}
               >
                 {heading}
               </h1>
-              <p className="text-lg sm:text-xl text-gray-700 leading-relaxed w-full max-w-[410px]">
+              <p className="text-center mt-2 px-1 lg:text-left text-lg sm:text-xl text-gray-700 leading-relaxed w-full lg:max-w-[410px]">
                 {subheading}
               </p>
             </div>
           </div>
 
           {/* Right Column */}
-          <div className="space-y-2 p-2 sm:pt-28">
+          <div className="space-y-2 px-4 pt-6 md:pt-10 lg:pt-28">
             {/* Price Card */}
             <div className="bg-[#FAFAFA] border-[0.7px] border-[#000000] rounded-lg pt-[1.125rem] pb-[1.125rem]">
               <h2
@@ -52,7 +53,7 @@ export default function Pricing({
               {benefits.map((b, i) => (
                 <div
                   key={`${b}-${i}`}
-                  className="box-border h-20  bg-[#F3ECC7] rounded-lg flex items-center border-[0.6px] border-[#C4BC8E] p-5"
+                  className="box-border h-20 bg-[#F3ECC7] rounded-lg flex items-center border-[0.6px] border-[#C4BC8E] p-5"
                 >
                   <span
                     className={`${anton.className} font-normal text-[1.375rem] leading-[1.2] tracking-[-0.01em] uppercase text-[#2A2E30]`}
@@ -62,11 +63,16 @@ export default function Pricing({
                 </div>
               ))}
             </div>
-
-            {/* CTA Button */}
-            <button className="w-full bg-gray-900 text-white py-5 px-8 rounded-2xl text-lg font-semibold hover:bg-gray-800 transition-colors mt-5">
-              Begin My SkinBestie Journey
-            </button>
+            <a
+              href="#"
+              className="flex w-full py-4.5 items-center justify-center gap-2.5
+               rounded-xl border-2 border-white bg-black px-5"
+            >
+              <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap text-center">
+                Begin My SkinBestie Journey
+              </span>
+              <ArrowRight className="w-6 h-6 text-white" />
+            </a>
           </div>
         </div>
       </div>

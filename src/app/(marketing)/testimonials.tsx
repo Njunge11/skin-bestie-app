@@ -47,9 +47,9 @@ export default function Testimonials({
       className="h-full w-full bg-[#13110F] overflow-hidden"
     >
       {/* Inner content centered into a 795px frame on xl */}
-      <div className="w-full h-full p-6 sm:pt-20 sm:pb-16 xl:flex xl:items-center xl:justify-center">
-        <div className="w-full max-w-7xl mx-auto xl:flex xl:flex-col xl:justify-center">
-          <div className="pt-[5.313rem] flex justify-center">
+      <div className="w-full h-full xl:flex xl:items-center xl:justify-center">
+        <div className="w-full max-w-7xl mx-auto xl:flex xl:flex-col xl:justify-center py-10 md:py-20 lg:py-40 px-4">
+          <div className="flex justify-center">
             <Image src={imageSrc!} alt={imageAlt!} width={219} height={84} />
           </div>
 
@@ -68,7 +68,7 @@ export default function Testimonials({
             // optional: also pause/resume on hover via events
             onMouseEnter={autoplay.current.stop}
             onMouseLeave={autoplay.current.reset}
-            className="w-full max-w-7xl mx-auto pt-11 pb-16"
+            className="pt-11 w-full max-w-7xl mx-auto"
           >
             <CarouselContent className="-ml-0 md:-ml-4">
               {items.map((card, idx) => (

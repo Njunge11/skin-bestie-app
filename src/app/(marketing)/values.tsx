@@ -22,7 +22,7 @@ export default function Values({
     // OUTER fills the scene height (100dvh from the wrapper). Keep solid bg.
     <section className="h-full w-full bg-[#FFFBE7] overflow-hidden">
       {/* Center the desktop composition into a 558px inner frame */}
-      <div className="w-full h-full p-4 md:py-20 xl:flex xl:items-center xl:justify-center">
+      <div className="w-full h-full py-10 md:py-20 lg:py-40 px-4 xl:flex xl:items-center xl:justify-center">
         <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 xl:items-center">
           {/* Left: Image */}
           <div className="flex justify-center">

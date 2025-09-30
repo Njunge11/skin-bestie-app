@@ -23,13 +23,13 @@ export default function Journey({
   return (
     // Parent container - flex column on mobile for ordering, regular layout on larger screens
     <section
-      className="w-full h-auto flex flex-col min-[1440px]:flex-row overflow-hidden"
+      className="w-full h-auto flex flex-col min-[1440px]:flex-row overflow-hidden py-10 md:py-20 min-[1440px]:!py-0"
       style={{ background: "radial-gradient(circle, #FDDF66, #F3ECC7)" }}
     >
       {/* Column 1 - Text content and button */}
       <div className="w-full flex flex-col min-[1440px]:min-w-[460px] min-[1440px]:w-auto min-[1440px]:pb-20">
         {/* Text content wrapper - order-1 on mobile */}
-        <div className="order-1 lg:order-none p-4 lg:pl-[4.375rem] lg:pt-24 min-[1440px]:pt-24 lg:max-[1439px]:flex lg:max-[1439px]:flex-col lg:max-[1439px]:items-center lg:max-[1439px]:text-center">
+        <div className="px-4 min-[1440px]:pl-20 order-1 lg:order-none min-[1440px]:pt-24 lg:max-[1439px]:flex lg:max-[1439px]:flex-col lg:max-[1439px]:items-center lg:max-[1439px]:text-center">
           <h2
             className={`${anton.className} font-normal text-4xl sm:text-5xl lg:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118] min-[1440px]:max-w-[330px]`}
           >
@@ -55,11 +55,11 @@ export default function Journey({
       {/* Column 2 - Cards container - order-2 on mobile */}
       <div className="order-2 lg:order-none flex-1 min-[1440px]:flex min-[1440px]:justify-end">
         <div className="w-full min-[1440px]:w-[982px] min-[1440px]:flex min-[1440px]:justify-end">
-          <div className="w-full min-[1440px]:w-auto flex flex-col lg:flex-row gap-4 sm:gap-2 p-4 md:p-6 lg:p-6 min-[1440px]:!p-0 lg:justify-center min-[1440px]:justify-end">
+          <div className="pt-10 px-4 md w-full min-[1440px]:w-auto flex flex-col lg:flex-row gap-4 sm:gap-2 min-[1440px]:!p-0 lg:justify-center min-[1440px]:justify-end">
             {steps.slice(0, 3).map((s, i) => (
               <div
                 key={i}
-                className={`${cardBase} p-6 lg:pt-16 ${
+                className={`${cardBase} p-6 ${
                   // Mobile: auto height
                   // lg to <1440px: equal heights (400px)
                   // 1440px+: staggered heights (with max-lg to prevent override)
@@ -88,10 +88,10 @@ export default function Journey({
       </div>
 
       {/* Button for mobile only - order-3 */}
-      <div className="order-3 lg:hidden px-4 pb-4">
+      <div className="order-3 lg:hidden px-4">
         <a
           href="#"
-          className="flex w-full py-4.5 items-center justify-center gap-2.5
+          className="mt-6 flex w-full py-4.5 items-center justify-center gap-2.5
                rounded-xl border-2 border-white bg-black px-5"
         >
           <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap text-center">
