@@ -1,34 +1,15 @@
 import type { Metadata } from "next";
-import { print } from "graphql/language/printer";
 
-import { setSeoData } from "@/utils/seoData";
-import { wpFetch } from "@/utils/wp";
-import { ContentNode, Page } from "@/gql/graphql";
-import { PageQuery } from "@/components/Templates/Page/PageQuery";
-import { SeoQuery } from "@/queries/general/SeoQuery";
+export const metadata: Metadata = {
+  title: "404 - Page Not Found",
+  description: "The page you're looking for doesn't exist.",
+};
 
-const notFoundPageWordPressId = 9;
-
-export async function generateMetadata(): Promise<Metadata> {
-  const { contentNode } = await wpFetch<{ contentNode: ContentNode }>(
-    print(SeoQuery),
-    { slug: notFoundPageWordPressId, idType: "DATABASE_ID" }
+export default function NotFound() {
+  return (
+    <div style={{ padding: "2rem", textAlign: "center" }}>
+      <h1>404 - Page Not Found</h1>
+      <p>The page you're looking for doesn't exist.</p>
+    </div>
   );
-
-  const metadata = setSeoData({ seo: contentNode.seo });
-
-  return {
-    ...metadata,
-    alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_BASE_URL}/404-not-found/`,
-    },
-  } as Metadata;
-}
-
-export default async function NotFound() {
-  const { page } = await wpFetch<{ page: Page }>(print(PageQuery), {
-    id: notFoundPageWordPressId,
-  });
-
-  return <div dangerouslySetInnerHTML={{ __html: page.content || " " }} />;
 }
