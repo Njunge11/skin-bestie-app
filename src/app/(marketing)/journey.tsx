@@ -31,24 +31,26 @@ export default function Journey({
         {/* Text content wrapper - order-1 on mobile */}
         <div className="px-4 md:px-6 min-[1440px]:!pl-20 order-1 lg:order-none min-[1440px]:pt-24 lg:max-[1439px]:flex lg:max-[1439px]:flex-col lg:max-[1439px]:items-center lg:max-[1439px]:text-center">
           <h2
-            className={`${anton.className} font-normal text-4xl sm:text-5xl lg:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118] min-[1440px]:max-w-[330px]`}
+            className={`${anton.className} text-center min-[1440px]:text-left font-normal text-4xl sm:text-5xl lg:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118] min-[1440px]:max-w-[330px]`}
           >
             {heading}
           </h2>
-          <p className="w-full min-[1440px]:w-[355px] mt-6 font-medium text-base sm:text-lg leading-[1.5] tracking-[-0.01em] text-[#1B1D1F]">
+          <p className="text-center min-[1440px]:text-left w-full min-[1440px]:w-[355px] mt-6 font-medium text-base sm:text-lg leading-[1.5] tracking-[-0.01em] text-[#1B1D1F]">
             {subheading}
           </p>
           {/* Button hidden on mobile, shown on lg+ */}
-          <a
-            href="#"
-            className="mt-9 hidden py-4.5 lg:grid w-[328px] grid-cols-[1fr_auto] items-center gap-[10px]
+          <div className="flex justify-center min-[1440px]:justify-start">
+            <a
+              href="#"
+              className="mt-9 hidden py-4.5 lg:grid w-[328px] grid-cols-[1fr_auto] items-center gap-[10px]
              rounded-xl border-2 border-white bg-black px-5"
-          >
-            <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap">
-              Begin My SkinBestie Journey
-            </span>
-            <ArrowRight className="w-6 h-6 text-white" />
-          </a>
+            >
+              <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap">
+                Begin My SkinBestie Journey
+              </span>
+              <ArrowRight className="w-6 h-6 text-white" />
+            </a>
+          </div>
         </div>
       </div>
 

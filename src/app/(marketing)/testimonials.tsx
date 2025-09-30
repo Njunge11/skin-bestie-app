@@ -33,11 +33,9 @@ export default function Testimonials({
 }) {
   const autoplay = React.useRef(
     Autoplay({
-      delay: 3000, // 3s between slides
-      stopOnInteraction: false, // keep playing after arrows/swipe
-      stopOnMouseEnter: true, // pause on hover (desktop)
-      // rootNode lets the plugin find the viewport if your markup differs
-      // rootNode: (emblaRoot) => emblaRoot.parentElement,
+      delay: 3000,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
     })
   );
   return (
@@ -63,12 +61,13 @@ export default function Testimonials({
           </p>
 
           <Carousel
-            opts={{ align: "start", loop: true }}
+            // Key bits: center + trimSnaps + loop
+            opts={{ align: "center", containScroll: "trimSnaps", loop: true }}
             plugins={[autoplay.current]}
-            // optional: also pause/resume on hover via events
-            onMouseEnter={autoplay.current.stop}
-            onMouseLeave={autoplay.current.reset}
-            className="pt-11 w-full max-w-7xl mx-auto"
+            className="w-full max-w-7xl mx-auto pt-11"
+            // Optional: you can remove these since stopOnMouseEnter is true above
+            // onMouseEnter={autoplay.current.stop}
+            // onMouseLeave={autoplay.current.reset}
           >
             <CarouselContent className="-ml-0 md:-ml-4">
               {items.map((card, idx) => (

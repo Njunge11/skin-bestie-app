@@ -152,7 +152,13 @@ export default async function MarketingHome() {
 
       <Header />
       <HeroSection />
-      {/* <OurStory /> */}
+      {values && (
+        <OurStory
+          imageSrc={values.imageSrc}
+          imageAlt={values.imageAlt}
+          items={values.items}
+        />
+      )}
 
       {/* 1: Benefits (curtain over Hero+Header) */}
       {benefits && (

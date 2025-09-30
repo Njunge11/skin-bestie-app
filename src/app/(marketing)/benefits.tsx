@@ -112,7 +112,7 @@ export default function Benefits({
 
   return (
     // OUTER must match the curtain parent: 100dvh on mobile; 816px on xl
-    <section className="w-full bg-[#FFFDF2] py-10 md:py-20 xl:py-40 px-4 md:px-6">
+    <section className="w-full bg-[#FFFDF2] py-10 md:py-20 px-4 md:px-6">
       {/* keep padding inside, outer paints full-bleed */}
       <div className="h-full w-full flex items-center justify-center">
         {/* Content container with 1169px max-width as per Figma spec */}
