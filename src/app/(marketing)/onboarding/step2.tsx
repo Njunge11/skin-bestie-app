@@ -42,10 +42,10 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
       ? selected.filter((v) => v !== val)
       : [...selected, val];
 
-    // Update value without triggering validation.
-    // We only validate when pressing Continue.
+    // If user already attempted submit, revalidate on selection to clear errors.
+    // Otherwise, don't validate until they click Continue.
     setValue("skinTypes", next, {
-      shouldValidate: false,
+      shouldValidate: attempted,
       shouldDirty: true,
       shouldTouch: true,
     });

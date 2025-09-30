@@ -1,45 +1,55 @@
 // db/schema.ts
 import {
   pgTable,
-  serial,
   text,
   boolean,
   date,
   varchar,
-  pgEnum,
   timestamp,
+  uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-export const subscriptionEnum = pgEnum("subscription_status", [
-  "cancelled",
-  "not_yet",
-  "active",
-]);
-
-export const accounts = pgTable(
-  "accounts",
+export const userProfiles = pgTable(
+  "user_profiles",
   {
-    id: serial("id").primaryKey(),
+    // Primary Key
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    // Step 1 - Always required
     firstName: varchar("first_name", { length: 120 }).notNull(),
     lastName: varchar("last_name", { length: 120 }).notNull(),
-    phoneNumber: varchar("phone_number", { length: 32 }).notNull(),
     email: varchar("email", { length: 255 }).notNull(),
+    phoneNumber: varchar("phone_number", { length: 32 }).notNull(),
     dateOfBirth: date("date_of_birth", { mode: "date" }).notNull(),
-    skinType: text("skin_type")
+
+    // Step 2 - Nullable until completed
+    skinType: text("skin_type").array().$type<string[]>(),
+
+    // Step 3 - Nullable until completed
+    concerns: text("concerns").array().$type<string[]>(),
+
+    // Step 4 - Nullable until completed
+    hasAllergies: boolean("has_allergies"),
+    allergyDetails: text("allergy_details"),
+
+    // Step 5 - Nullable until completed
+    isSubscribed: boolean("is_subscribed"),
+
+    // Step 6 - Nullable until completed
+    hasCompletedBooking: boolean("has_completed_booking"),
+
+    // Tracking fields
+    completedSteps: text("completed_steps")
       .array()
       .$type<string[]>()
       .notNull()
       .default(sql`ARRAY[]::text[]`),
-    concerns: text("concerns")
-      .array()
-      .$type<string[]>()
-      .notNull()
-      .default(sql`ARRAY[]::text[]`),
-    hasAllergy: boolean("has_allergy").notNull().default(false),
-    allergy: text("allergy"),
-    subscription: subscriptionEnum("subscription").notNull().default("not_yet"),
-    initialBooking: boolean("initial_booking").notNull().default(false),
+    isCompleted: boolean("is_completed").notNull().default(false),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+
+    // Timestamps
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -48,12 +58,11 @@ export const accounts = pgTable(
       .defaultNow(),
   },
   (table) => ({
-    emailUnique: { columns: [table.email], unique: true },
-    phoneUnique: { columns: [table.phoneNumber], unique: true },
+    emailIdx: uniqueIndex("user_profiles_email_idx").on(table.email),
+    phoneIdx: uniqueIndex("user_profiles_phone_idx").on(table.phoneNumber),
   })
 );
 
 // Helpful TS types
-export type Account = typeof accounts.$inferSelect;
-export type NewAccount = typeof accounts.$inferInsert;
-export type SubscriptionStatus = (typeof subscriptionEnum.enumValues)[number];
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type NewUserProfile = typeof userProfiles.$inferInsert;

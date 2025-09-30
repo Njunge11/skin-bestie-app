@@ -218,12 +218,13 @@ function YouTube({
 
   return (
     <div
-      className="relative overflow-hidden rounded-[8px] w-full xl:max-w-[519px]"
-      // style={{ width: 519, height: 332 }}
+      className="relative overflow-hidden rounded-[8px] w-full
+                aspect-[519/332] sm:aspect-video
+                xl:max-w-[519px] xl:h-[332px] xl:aspect-auto"
     >
       {playing ? (
         <iframe
-          className="w-full h-full block"
+          className="absolute inset-0 w-full h-full block"
           src={src}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -234,7 +235,7 @@ function YouTube({
           <img
             src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
             alt=""
-            className="w-full h-full object-cover block"
+            className="absolute inset-0 w-full h-full object-cover block"
           />
           <div className="absolute inset-0 bg-black/30" />
           <PlayButton

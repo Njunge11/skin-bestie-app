@@ -55,6 +55,12 @@ export default function OnboardingForm() {
 
   // ✅ When user presses Back, clear errors for the step we're LEAVING
   const handleBack = () => {
+    // If on step 1, navigate to home page
+    if (stepIndex === 0) {
+      window.location.href = "/";
+      return;
+    }
+
     const currentKey = current.component as keyof typeof STEP_COMPONENTS;
     const fields = FIELDS_BY_STEP[currentKey] ?? [];
 
