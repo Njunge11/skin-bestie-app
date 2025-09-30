@@ -48,13 +48,13 @@ export default function Testimonials({
     >
       {/* Inner content centered into a 795px frame on xl */}
       <div className="w-full h-full p-6 sm:pt-20 sm:pb-16 xl:flex xl:items-center xl:justify-center">
-        <div className="w-full max-w-7xl mx-auto xl:h-[795px] xl:flex xl:flex-col xl:justify-center">
+        <div className="w-full max-w-7xl mx-auto xl:flex xl:flex-col xl:justify-center">
           <div className="pt-[5.313rem] flex justify-center">
             <Image src={imageSrc!} alt={imageAlt!} width={219} height={84} />
           </div>
 
           <h1
-            className={`mt-6 ${anton.className} text-[#FFF7D4] text-5xl text-center uppercase leading-[1.2] tracking-[-0.02em]`}
+            className={`mt-6 ${anton.className} text-[#FFF7D4] text-4xl sm:text-5xl text-center uppercase leading-[1.2] tracking-[-0.02em]`}
           >
             {heading}
           </h1>

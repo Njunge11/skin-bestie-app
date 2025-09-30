@@ -23,11 +23,11 @@ export default function Journey({
   return (
     // Parent container - flex column on mobile for ordering, regular layout on larger screens
     <section
-      className="w-full h-auto min-[1440px]:h-[570px] flex flex-col min-[1440px]:flex-row overflow-hidden"
+      className="w-full h-auto flex flex-col min-[1440px]:flex-row overflow-hidden"
       style={{ background: "radial-gradient(circle, #FDDF66, #F3ECC7)" }}
     >
       {/* Column 1 - Text content and button */}
-      <div className="w-full flex flex-col min-[1440px]:min-w-[460px] min-[1440px]:w-auto">
+      <div className="w-full flex flex-col min-[1440px]:min-w-[460px] min-[1440px]:w-auto min-[1440px]:pb-20">
         {/* Text content wrapper - order-1 on mobile */}
         <div className="order-1 lg:order-none p-4 lg:pl-[4.375rem] lg:pt-24 min-[1440px]:pt-24 lg:max-[1439px]:flex lg:max-[1439px]:flex-col lg:max-[1439px]:items-center lg:max-[1439px]:text-center">
           <h2
@@ -41,7 +41,7 @@ export default function Journey({
           {/* Button hidden on mobile, shown on lg+ */}
           <a
             href="#"
-            className="mt-9 hidden lg:grid w-[328px] h-16 grid-cols-[1fr_auto] items-center gap-[10px]
+            className="mt-9 hidden py-4.5 lg:grid w-[328px] grid-cols-[1fr_auto] items-center gap-[10px]
              rounded-xl border-2 border-white bg-black px-5"
           >
             <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap">
@@ -76,7 +76,7 @@ export default function Journey({
                   className="w-[40px] h-[40px]"
                 />
                 <h2
-                  className={`mt-6 ${anton.className} font-normal text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}
+                  className={`mt-6 ${anton.className} font-normal text-2xl sm:text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}
                 >
                   {s.title}
                 </h2>
@@ -91,7 +91,7 @@ export default function Journey({
       <div className="order-3 lg:hidden px-4 pb-4">
         <a
           href="#"
-          className="flex w-full h-16 items-center justify-center gap-2.5
+          className="flex w-full py-4.5 items-center justify-center gap-2.5
                rounded-xl border-2 border-white bg-black px-5"
         >
           <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap text-center">
