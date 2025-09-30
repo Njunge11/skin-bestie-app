@@ -36,10 +36,18 @@ export async function wpFetch<T = any>(
 
   if (!res.ok) {
     const text = await safeText(res);
+    console.error(`[wpFetch] HTTP ${res.status}:`, text);
     throw new Error(`GraphQL HTTP ${res.status}: ${text ?? res.statusText}`);
   }
 
-  const json = (await res.json()) as WPResponse<T>;
+  let json: WPResponse<T>;
+  try {
+    json = (await res.json()) as WPResponse<T>;
+  } catch (parseError) {
+    const text = await safeText(res.clone());
+    console.error(`[wpFetch] JSON parse error. Response text:`, text);
+    throw new Error(`Failed to parse JSON response. Got: ${text?.substring(0, 200)}`);
+  }
 
   if (json.errors?.length) {
     const msg = json.errors.map((e) => e.message).join(" | ");
