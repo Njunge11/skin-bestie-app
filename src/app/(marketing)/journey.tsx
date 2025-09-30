@@ -1,6 +1,5 @@
 import { ArrowRight } from "lucide-react";
 import { anton } from "../fonts";
-import { MButton } from "./onboarding/components/button";
 
 type JourneyStep = {
   iconSrc: string;
