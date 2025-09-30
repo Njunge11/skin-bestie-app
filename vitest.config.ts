@@ -10,6 +10,12 @@ export default defineConfig({
     globals: true,
     environment: "node",
     setupFiles: ["./src/test/setup.ts"],
+    pool: "forks", // Use process forks for better isolation and parallelization
+    poolOptions: {
+      forks: {
+        singleFork: false, // Allow multiple forks for parallel execution
+      },
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

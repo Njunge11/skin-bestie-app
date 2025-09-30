@@ -3,7 +3,7 @@ import { print } from "graphql/language/printer";
 
 import { setSeoData } from "@/utils/seoData";
 
-import { wpFetch } from "@/utils/wp";
+import { fetchGraphQL } from "@/utils/fetchGraphQL";
 import { ContentNode, Page } from "@/gql/graphql";
 import { PageQuery } from "@/components/Templates/Page/PageQuery";
 import { SeoQuery } from "@/queries/general/SeoQuery";
@@ -11,9 +11,9 @@ import { SeoQuery } from "@/queries/general/SeoQuery";
 const notFoundPageWordPressId = 9;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { contentNode } = await wpFetch<{ contentNode: ContentNode }>(
+  const { contentNode } = await fetchGraphQL<{ contentNode: ContentNode }>(
     print(SeoQuery),
-    { slug: notFoundPageWordPressId, idType: "DATABASE_ID" }
+    { slug: notFoundPageWordPressId, idType: "DATABASE_ID" },
   );
 
   const metadata = setSeoData({ seo: contentNode.seo });
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NotFound() {
-  const { page } = await wpFetch<{ page: Page }>(print(PageQuery), {
+  const { page } = await fetchGraphQL<{ page: Page }>(print(PageQuery), {
     id: notFoundPageWordPressId,
   });
 
