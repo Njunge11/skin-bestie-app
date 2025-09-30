@@ -28,14 +28,14 @@ export default function Pricing({
               >
                 {heading}
               </h1>
-              <p className="text-center mt-2 px-1 lg:text-left text-lg sm:text-xl text-gray-700 leading-relaxed w-full lg:max-w-[410px]">
+              <p className="text-center mt-2 px-2 lg:text-left text-lg sm:text-xl text-gray-700 leading-relaxed w-full lg:max-w-[410px]">
                 {subheading}
               </p>
             </div>
           </div>
 
           {/* Right Column */}
-          <div className="space-y-2 px-4 pt-6 md:pt-10 lg:pt-28">
+          <div className="space-y-2 px-4 md:px-6 pt-6 md:pt-10 lg:pt-28">
             {/* Price Card */}
             <div className="bg-[#FAFAFA] border-[0.7px] border-[#000000] rounded-lg pt-[1.125rem] pb-[1.125rem]">
               <h2

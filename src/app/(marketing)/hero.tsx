@@ -6,7 +6,7 @@ import { anton } from "../fonts";
 
 const HeroSection = () => {
   return (
-    <div className="relative w-full h-screen min-h-[600px] max-h-[1080px] overflow-hidden">
+    <div className="relative w-full h-[600px] xl:h-screen overflow-hidden pt-6">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
