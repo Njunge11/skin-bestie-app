@@ -258,7 +258,7 @@ export default function OurStory({
 }) {
   return (
     <section
-      className="min-h-screen xl:h-[816px] w-full bg-cover bg-center bg-no-repeat"
+      className="xl:h-[816px] w-full bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: "url('/background.svg')",
       }}
