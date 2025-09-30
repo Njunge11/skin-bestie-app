@@ -21,7 +21,7 @@ export default function Pricing({
       <div className="max-w-6xl mx-auto w-full pb-10 md:pb-20 lg:pb-28">
         <div className="grid lg:grid-cols-2 lg:gap-12 items-start">
           {/* Left Column */}
-          <div className="space-y-6 flex lg:justify-center px-4 pt-10 md:pt-20 lg:pt-44">
+          <div className="space-y-6 flex lg:justify-center pt-10 md:pt-20 lg:pt-44">
             <div>
               <h1
                 className={`${anton.className} text-center lg:text-left text-4xl sm:text-5xl font-normal text-[#222118] uppercase leading-[1.2] tracking-[-0.02em] w-full lg:max-w-[333px]`}

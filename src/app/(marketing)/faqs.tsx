@@ -31,7 +31,7 @@ export default function Faqs({
   return (
     <section className="bg-[#FFFBE7] w-full overflow-x-hidden">
       {/* Responsive container with max-width */}
-      <div className="mx-auto w-full px-4 sm:px-6 md:px-12 lg:px-20 py-8 sm:py-12 lg:py-20">
+      <div className="mx-auto w-full px-4 md:px-6  py-10 md:py-20 lg:py-40">
         {/* Use CSS Grid with fr units for true responsive behavior */}
         {/* On large screens: maintain the 413/739 ratio with 128px gap */}
         {/* Below lg: stack vertically */}
@@ -60,7 +60,7 @@ export default function Faqs({
                 <div
                   key={`${faq.question}-${i}`}
                   className={[
-                    "border border-[#D4C9A3] bg-[#F5F0E0]",
+                    "border border-[#D4C9A3] bg-[#F3ECC7]",
                     isFirst ? "rounded-t-lg" : "",
                     isLast ? "rounded-b-lg" : "border-b-0",
                   ].join(" ")}
@@ -69,10 +69,10 @@ export default function Faqs({
                     type="button"
                     onClick={() => toggleItem(i)}
                     aria-expanded={isOpen}
-                    className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 text-left transition-colors hover:bg-[#EDE5D0]"
+                    className="w-full flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 text-left"
                   >
                     <span
-                      className={`${anton.className} text-[#2C2C2C] text-base sm:text-lg tracking-wider pr-2`}
+                      className={`${anton.className} text-[#2C2C2C] text-base lg:text-2xl tracking-wider pr-2`}
                     >
                       {faq.question}
                     </span>
@@ -91,7 +91,7 @@ export default function Faqs({
                           {faq.list.map((item, idx) => (
                             <li
                               key={idx}
-                              className="flex items-start leading-relaxed text-sm sm:text-base text-[#4A4A4A]"
+                              className="flex items-start leading-relaxed text-base lg:text-lg text-[#4A4A4A]"
                             >
                               <span className="mr-2 flex-shrink-0">•</span>
                               <span>{item}</span>
