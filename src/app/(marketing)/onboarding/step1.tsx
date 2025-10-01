@@ -9,6 +9,10 @@ import { MInput } from "./components/input";
 import { MobileNumberInput } from "./components/mobile.number.input";
 import { MButton } from "./components/button";
 import type { OnboardingSchema } from "./onboarding.schema";
+import { normalizeToE164 } from "./onboarding.schema";
+import { useWizard } from "./wizard.provider";
+import { trpc } from "@/trpc/react";
+import { getIncompleteStepIndex, populateFormFromProfile } from "./onboarding.utils";
 
 export default function Step1({ onNext }: { onNext?: () => void }) {
   const {
@@ -17,8 +21,11 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
     setValue,
     getValues,
     trigger,
-    formState: { errors, isSubmitting },
+    setError,
+    formState: { errors },
   } = useFormContext<OnboardingSchema>();
+
+  const { next, setStepIndex } = useWizard();
 
   // Date input helpers
   const dateInputRef = useRef<HTMLInputElement | null>(null);
@@ -39,7 +46,32 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
     name: dobName,
   } = register("dateOfBirth");
 
-  // Validate only Step-1 fields, then advance
+  // tRPC mutation
+  const createProfile = trpc.userProfile.create.useMutation({
+    onSuccess: (data) => {
+      const completedSteps = data.completedSteps || [];
+
+      if (completedSteps.length > 1) {
+        // Existing profile - populate form and navigate to incomplete step
+        populateFormFromProfile(data, setValue);
+        const incompleteIndex = getIncompleteStepIndex(completedSteps);
+        setStepIndex(incompleteIndex);
+      } else {
+        // New profile - go to next step
+        setValue('userProfileId', data.id);
+        next();
+      }
+    },
+    onError: (error: any) => {
+      // Show error on the email field
+      setError('email', {
+        type: 'manual',
+        message: error.message || 'Failed to create profile'
+      });
+    },
+  });
+
+  // Validate only Step-1 fields, then create profile
   const handleContinue = async () => {
     const ok = await trigger(
       [
@@ -52,7 +84,28 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
       ],
       { shouldFocus: true }
     );
-    if (ok) onNext?.();
+
+    if (ok) {
+      const values = getValues();
+      const phoneNumber = normalizeToE164(values);
+
+      if (!phoneNumber) {
+        setError('mobileLocal', {
+          type: 'manual',
+          message: 'Invalid phone number'
+        });
+        return;
+      }
+
+      // Call the mutation
+      createProfile.mutate({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phoneNumber,
+        dateOfBirth: values.dateOfBirth,
+      });
+    }
   };
 
   return (
@@ -187,11 +240,11 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
 
       <MButton
         className="mt-6"
-        label={isSubmitting ? "Checking..." : "Continue"}
+        label={createProfile.isPending ? "Creating..." : "Continue"}
         icon={ArrowRight}
         type="button"
         onClick={handleContinue}
-        disabled={isSubmitting}
+        disabled={createProfile.isPending}
       />
     </form>
   );

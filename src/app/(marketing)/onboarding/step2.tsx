@@ -7,6 +7,8 @@ import { MButton } from "./components/button";
 import { MCheckbox } from "./components/checkbox";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { useWizard } from "./wizard.provider";
+import { trpc } from "@/trpc/react";
+import { mergeCompletedSteps } from "./onboarding.utils";
 
 const SKIN_TYPES = [
   "Dry",
@@ -20,10 +22,12 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
   const {
     control,
     setValue,
+    getValues,
     trigger,
+    setError,
     formState: { errors },
   } = useFormContext<OnboardingSchema>();
-  const { current } = useWizard();
+  const { current, next } = useWizard();
 
   // Track if the user has tried to submit this step
   const [attempted, setAttempted] = useState(false);
@@ -51,10 +55,59 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
     });
   };
 
+  // Get current profile to preserve completedSteps
+  const userProfileId = getValues("userProfileId");
+  const { data: currentProfile } = trpc.userProfile.getById.useQuery(
+    { id: userProfileId || "" },
+    { enabled: !!userProfileId }
+  );
+
+  // tRPC mutation to update profile
+  const updateProfile = trpc.userProfile.update.useMutation({
+    onSuccess: () => {
+      // Navigate to next step on success
+      next();
+    },
+    onError: (error) => {
+      // Show error (generic for now)
+      setError("skinTypes", {
+        type: "manual",
+        message: error.message || "Failed to save skin type selection",
+      });
+    },
+  });
+
   const handleContinue = async () => {
     setAttempted(true);
     const ok = await trigger("skinTypes", { shouldFocus: true });
-    if (ok) onNext?.();
+
+    if (ok) {
+      const userProfileId = getValues("userProfileId");
+      const skinTypes = getValues("skinTypes");
+
+      if (!userProfileId) {
+        setError("skinTypes", {
+          type: "manual",
+          message: "Profile ID is missing. Please start from Step 1.",
+        });
+        return;
+      }
+
+      // Merge completed steps (preserve existing progress)
+      const completedSteps = mergeCompletedSteps(
+        currentProfile?.completedSteps,
+        ["PERSONAL", "SKIN_TYPE"]
+      );
+
+      // Update profile with skin types
+      updateProfile.mutate({
+        id: userProfileId,
+        data: {
+          skinType: skinTypes,
+          completedSteps,
+        },
+      });
+    }
   };
 
   const showError = attempted && !!errors.skinTypes;
@@ -87,7 +140,12 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
         )}
 
         <div className="mt-8 flex justify-end">
-          <MButton label="Continue" type="button" onClick={handleContinue} />
+          <MButton
+            label={updateProfile.isPending ? "Saving..." : "Continue"}
+            type="button"
+            onClick={handleContinue}
+            disabled={updateProfile.isPending}
+          />
         </div>
       </div>
     </form>

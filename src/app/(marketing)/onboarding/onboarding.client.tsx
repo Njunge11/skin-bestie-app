@@ -13,6 +13,7 @@ export default function OnboardingClient({ steps }: { steps: StepMeta[] }) {
   const methods = useForm<OnboardingSchema>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: {
+      userProfileId: undefined,
       firstName: "",
       lastName: "",
       email: "",

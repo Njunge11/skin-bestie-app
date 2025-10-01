@@ -18,44 +18,50 @@ async function createProfile(input: z.infer<typeof UserProfileCreateSchema>) {
     const email = normalizeEmail(input.email);
     const phone = normalizePhone(input.phoneNumber);
 
-    // Check uniqueness
-    const existing = await db.query.userProfiles.findFirst({
+    // Check if profile exists with BOTH email AND phone
+    const exactMatch = await db.query.userProfiles.findFirst({
+      where: (acct, { and, eq }) =>
+        and(eq(acct.email, email), eq(acct.phoneNumber, phone)),
+    });
+
+    // If exact match found, allow resume
+    if (exactMatch) {
+      const completedSteps = exactMatch.completedSteps || [];
+
+      return {
+        id: exactMatch.id,
+        completedSteps: completedSteps,
+        // Only return data for completed steps
+        skinType: completedSteps.includes('SKIN_TYPE') ? exactMatch.skinType : null,
+        concerns: completedSteps.includes('SKIN_CONCERNS') ? exactMatch.concerns : null,
+        hasAllergies: completedSteps.includes('ALLERGIES') ? exactMatch.hasAllergies : null,
+        allergyDetails: completedSteps.includes('ALLERGIES') ? exactMatch.allergyDetails : null,
+        isSubscribed: completedSteps.includes('SUBSCRIBE') ? exactMatch.isSubscribed : null,
+        hasCompletedBooking: completedSteps.includes('BOOKING') ? exactMatch.hasCompletedBooking : null,
+        // Required fields - return empty/null for security
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        dateOfBirth: new Date(),
+        isCompleted: exactMatch.isCompleted,
+        completedAt: exactMatch.completedAt,
+        createdAt: exactMatch.createdAt,
+        updatedAt: exactMatch.updatedAt,
+      };
+    }
+
+    // Check if email OR phone is already taken (partial match)
+    const partialMatch = await db.query.userProfiles.findFirst({
       where: (acct, { or, eq }) =>
         or(eq(acct.email, email), eq(acct.phoneNumber, phone)),
     });
 
-    if (existing) {
-      const field =
-        existing.email === email
-          ? "Email"
-          : existing.phoneNumber === phone
-            ? "Phone number"
-            : "Account";
-
+    if (partialMatch) {
+      const field = partialMatch.email === email ? "Email" : "Phone number";
       throw new TRPCError({
         code: "CONFLICT",
-        message: `${field} is already registered`,
-        cause: {
-          existingProfile: {
-            id: existing.id,
-            firstName: existing.firstName,
-            lastName: existing.lastName,
-            email: existing.email,
-            phoneNumber: existing.phoneNumber,
-            dateOfBirth: existing.dateOfBirth,
-            skinType: existing.skinType,
-            concerns: existing.concerns,
-            hasAllergies: existing.hasAllergies,
-            allergyDetails: existing.allergyDetails,
-            isSubscribed: existing.isSubscribed,
-            hasCompletedBooking: existing.hasCompletedBooking,
-            completedSteps: existing.completedSteps,
-            isCompleted: existing.isCompleted,
-            completedAt: existing.completedAt,
-            createdAt: existing.createdAt,
-            updatedAt: existing.updatedAt,
-          },
-        },
+        message: `${field} is already registered with different details`,
       });
     }
 

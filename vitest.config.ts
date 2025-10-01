@@ -1,15 +1,17 @@
 import { defineConfig } from "vitest/config";
 import path from "path";
 import { config } from "dotenv";
+import react from "@vitejs/plugin-react";
 
 // Load environment variables from .env file
 config();
 
 export default defineConfig({
+  plugins: [react()],
   test: {
     globals: true,
-    environment: "node",
-    setupFiles: ["./src/test/setup.ts"],
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts", "./src/test/setup-rtl.ts"],
     pool: "forks", // Use process forks for better isolation and parallelization
     poolOptions: {
       forks: {

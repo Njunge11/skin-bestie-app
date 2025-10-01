@@ -17,6 +17,9 @@ const countryCodeSchema = z
 
 export const onboardingSchema = z
   .object({
+    // --- Hidden field to track profile ID ---
+    userProfileId: z.string().uuid().optional(),
+
     // --- Step 1 ---
     firstName: z.string().min(2, "Enter at least 2 characters"),
     lastName: z.string().min(2, "Enter at least 2 characters"),

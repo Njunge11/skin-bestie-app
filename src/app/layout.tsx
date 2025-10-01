@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { TRPCProvider } from "@/trpc/react";
+import Footer from "./(marketing)/footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en" className="bg-black">
       <body className={`${inter.className} antialiased`}>
         <TRPCProvider>{children}</TRPCProvider>
+        <Footer />
       </body>
     </html>
   );

@@ -8,9 +8,14 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { useFormContext } from "react-hook-form";
 import { MButton } from "./components/button";
 import { PaymentSkeleton } from "./components/payment.skeleton";
 import { Lock } from "lucide-react";
+import type { OnboardingSchema } from "./onboarding.schema";
+import { useWizard } from "./wizard.provider";
+import { trpc } from "@/trpc/react";
+import { mergeCompletedSteps } from "./onboarding.utils";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -37,6 +42,9 @@ type IntentType = "payment" | "setup";
 const HEIGHT_CLS = "min-h-[21rem] sm:min-h-[21rem] md:min-h-[21rem]";
 
 export default function Step5({ onNext }: { onNext?: () => void }) {
+  const { getValues } = useFormContext<OnboardingSchema>();
+  const { next } = useWizard();
+
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [intentType, setIntentType] = useState<IntentType | null>(null);
   const [buttonText, setButtonText] = useState("Subscribe");
@@ -44,6 +52,13 @@ export default function Step5({ onNext }: { onNext?: () => void }) {
 
   const didFetchRef = useRef(false);
   const mountedRef = useRef(false);
+
+  // Get profile data
+  const userProfileId = getValues("userProfileId");
+  const { data: currentProfile } = trpc.userProfile.getById.useQuery(
+    { id: userProfileId || "" },
+    { enabled: !!userProfileId }
+  );
 
   useEffect(() => {
     mountedRef.current = true;
@@ -54,15 +69,26 @@ export default function Step5({ onNext }: { onNext?: () => void }) {
 
   useEffect(() => {
     if (didFetchRef.current) return;
+    if (!currentProfile) return; // Wait for profile data
+
     didFetchRef.current = true;
 
     (async () => {
       try {
         setErr(null);
+
         const r = await fetch("/api/checkout/session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ priceId: "price_1SAsSTIbiE06ZB2bOXj4Ce1P" }),
+          body: JSON.stringify({
+            priceId: "price_1SAsSTIbiE06ZB2bOXj4Ce1P",
+            customerEmail: currentProfile.email,
+            metadata: {
+              userProfileId: currentProfile.id,
+              firstName: currentProfile.firstName,
+              lastName: currentProfile.lastName,
+            },
+          }),
         });
         const d = await r.json();
         if (!r.ok) throw new Error(d?.error || "Failed to start subscription");
@@ -87,7 +113,16 @@ export default function Step5({ onNext }: { onNext?: () => void }) {
         setErr(e?.message || "Something went wrong");
       }
     })();
-  }, []);
+  }, [currentProfile]);
+
+  // If already subscribed, show success screen
+  if (currentProfile?.isSubscribed) {
+    return (
+      <div className="relative p-3">
+        <SuccessScreen onNext={() => next()} />
+      </div>
+    );
+  }
 
   return (
     <div className="relative p-3">
@@ -100,7 +135,8 @@ export default function Step5({ onNext }: { onNext?: () => void }) {
           <Form
             intentType={intentType}
             buttonText={buttonText}
-            onNext={onNext}
+            userProfileId={userProfileId}
+            currentProfile={currentProfile}
           />
         </Elements>
       )}
@@ -117,17 +153,49 @@ export default function Step5({ onNext }: { onNext?: () => void }) {
   );
 }
 
+// Success screen component
+function SuccessScreen({ onNext }: { onNext: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[21rem] space-y-6">
+      <div className="text-center space-y-2">
+        <h2 className="text-2xl font-semibold text-[#272B2D]">
+          Subscription Successful!
+        </h2>
+        <p className="text-base text-[#3F4548]">
+          Your payment was processed successfully.
+        </p>
+      </div>
+      <MButton onClick={onNext} showIcon={false}>
+        Continue
+      </MButton>
+    </div>
+  );
+}
+
 function Form({
   intentType,
   buttonText,
-  onNext,
+  userProfileId,
+  currentProfile,
 }: {
   intentType: IntentType;
   buttonText: string;
-  onNext?: () => void;
+  userProfileId?: string;
+  currentProfile: any;
 }) {
   const stripe = useStripe();
   const elements = useElements();
+  const { next } = useWizard();
+
+  const utils = trpc.useUtils();
+
+  // tRPC mutation to update profile after payment
+  const updateProfile = trpc.userProfile.update.useMutation({
+    onSuccess: () => {
+      // Invalidate the profile query to trigger a refetch
+      utils.userProfile.getById.invalidate({ id: userProfileId || "" });
+    },
+  });
 
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<{
@@ -183,8 +251,25 @@ function Form({
           },
         });
         if (error) throw new Error(error.message || "Payment failed");
+
         if (paymentIntent?.status === "succeeded") {
-          onNext?.();
+          // Update profile after successful payment
+          if (userProfileId) {
+            const completedSteps = mergeCompletedSteps(
+              currentProfile?.completedSteps,
+              ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE"]
+            );
+
+            await updateProfile.mutateAsync({
+              id: userProfileId,
+              data: {
+                isSubscribed: true,
+                completedSteps,
+              },
+            });
+          }
+
+          // Success - component will remount and show success screen
           return;
         }
         if (mounted.current)
@@ -201,8 +286,25 @@ function Form({
           },
         });
         if (error) throw new Error(error.message || "Setup failed");
+
         if (setupIntent?.status === "succeeded") {
-          onNext?.();
+          // Update profile after successful setup
+          if (userProfileId) {
+            const completedSteps = mergeCompletedSteps(
+              currentProfile?.completedSteps,
+              ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE"]
+            );
+
+            await updateProfile.mutateAsync({
+              id: userProfileId,
+              data: {
+                isSubscribed: true,
+                completedSteps,
+              },
+            });
+          }
+
+          // Success - component will remount and show success screen
           return;
         }
         if (mounted.current)
@@ -215,7 +317,7 @@ function Form({
       if (mounted.current)
         setNotice({
           kind: "error",
-          text: err?.message || "Something went wrong",
+          text: err?.message || "Payment failed. Please try again.",
         });
     } finally {
       if (mounted.current) setLoading(false);

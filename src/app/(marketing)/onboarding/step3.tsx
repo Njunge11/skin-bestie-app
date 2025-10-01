@@ -6,6 +6,9 @@ import { useFormContext, useController, useWatch } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { MButton } from "./components/button";
 import type { OnboardingSchema } from "./onboarding.schema";
+import { useWizard } from "./wizard.provider";
+import { trpc } from "@/trpc/react";
+import { mergeCompletedSteps } from "./onboarding.utils";
 
 const ALL_CONCERNS = [
   "Acne",
@@ -72,10 +75,21 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
     control,
     register,
     setValue,
+    getValues,
+    setError,
     clearErrors,
     trigger,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useFormContext<OnboardingSchema>();
+
+  const { next } = useWizard();
+
+  // Get current profile to preserve completedSteps
+  const userProfileId = getValues("userProfileId");
+  const { data: currentProfile } = trpc.userProfile.getById.useQuery(
+    { id: userProfileId || "" },
+    { enabled: !!userProfileId }
+  );
 
   // Own the array field; validate "at least one"
   const { field: concernsField } = useController<OnboardingSchema, "concerns">({
@@ -128,12 +142,59 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
     // void trigger("concernOther");
   };
 
+  // tRPC mutation to update profile
+  const updateProfile = trpc.userProfile.update.useMutation({
+    onSuccess: () => {
+      next();
+    },
+    onError: (error) => {
+      setError("concerns", {
+        type: "manual",
+        message: error.message || "Failed to save concerns",
+      });
+    },
+  });
+
   const handleContinue = async () => {
-    // Validate only this step’s fields
+    // Validate only this step's fields
     const ok = await trigger(["concerns", "concernOther"], {
       shouldFocus: true,
     });
-    if (ok) onNext?.();
+
+    if (ok) {
+      const userProfileId = getValues("userProfileId");
+      const concerns = getValues("concerns");
+      const concernOther = getValues("concernOther");
+
+      if (!userProfileId) {
+        setError("concerns", {
+          type: "manual",
+          message: "Profile ID is missing. Please start from Step 1.",
+        });
+        return;
+      }
+
+      // Keep "Other" in array AND add custom text (Option B)
+      let finalConcerns = [...concerns];
+      if (concerns.includes("Other") && concernOther?.trim()) {
+        finalConcerns.push(concernOther.trim());
+      }
+
+      // Merge completed steps (preserve existing progress)
+      const completedSteps = mergeCompletedSteps(
+        currentProfile?.completedSteps,
+        ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS"]
+      );
+
+      // Update profile with concerns
+      updateProfile.mutate({
+        id: userProfileId,
+        data: {
+          concerns: finalConcerns,
+          completedSteps,
+        },
+      });
+    }
   };
 
   return (
@@ -200,9 +261,9 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
       <div className="mt-8 flex justify-end">
         <MButton
           type="button"
-          label={isSubmitting ? "Checking..." : "Continue"}
+          label={updateProfile.isPending ? "Saving..." : "Continue"}
           onClick={handleContinue}
-          disabled={isSubmitting}
+          disabled={updateProfile.isPending}
         />
       </div>
     </form>

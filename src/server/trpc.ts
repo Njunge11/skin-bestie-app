@@ -8,6 +8,16 @@ import superjson from "superjson";
  */
 const t = initTRPC.create({
   transformer: superjson,
+  errorFormatter({ shape, error }) {
+    return {
+      ...shape,
+      data: {
+        ...shape.data,
+        // Serialize the cause property so it's available on the client
+        cause: error.cause,
+      },
+    };
+  },
 });
 
 /**

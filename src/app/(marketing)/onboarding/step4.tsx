@@ -6,6 +6,9 @@ import { useFormContext } from "react-hook-form";
 import { MButton } from "./components/button";
 import { MRadioButton } from "./components/radio.button";
 import type { OnboardingSchema } from "./onboarding.schema";
+import { useWizard } from "./wizard.provider";
+import { trpc } from "@/trpc/react";
+import { mergeCompletedSteps } from "./onboarding.utils";
 
 const OPTIONS = ["No", "Yes"] as const;
 const FIELD = "hasAllergy" as const; // radio field
@@ -17,11 +20,20 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
     register,
     trigger,
     getValues,
+    setError,
     formState: { errors },
   } = useFormContext<OnboardingSchema>();
 
+  const { next } = useWizard();
   const [attempted, setAttempted] = useState(false);
   const selected = watch(FIELD);
+
+  // Get current profile to preserve completedSteps
+  const userProfileId = getValues("userProfileId");
+  const { data: currentProfile } = trpc.userProfile.getById.useQuery(
+    { id: userProfileId || "" },
+    { enabled: !!userProfileId }
+  );
 
   //   function getConcerns(v: OnboardingSchema): string[] {
   //     const other = (v.concernOther ?? "").trim();
@@ -46,24 +58,18 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
   //     } as const;
   //   }
 
-  //   const handleError = async (response: Response) => {
-  //     if (response.status === 409) {
-  //       const result = await response.json();
-  //       const { existing } = result;
-  //       if (existing.subscription === "active" && existing.initialBooking) {
-  //         console.log("go to login page ");
-  //       }
-  //       if (existing.subscription === "active" && !existing.initialBooking) {
-  //         console.log("go to booking page");
-  //       }
-  //       if (existing.subscription !== "active") {
-  //         console.log("go to next step");
-  //         onNext?.();
-  //       }
-  //     } else {
-  //       console.log("an error occured");
-  //     }
-  //   };
+  // tRPC mutation to update profile
+  const updateProfile = trpc.userProfile.update.useMutation({
+    onSuccess: () => {
+      next();
+    },
+    onError: (error) => {
+      setError(FIELD, {
+        type: "manual",
+        message: error.message || "Failed to save allergy information",
+      });
+    },
+  });
 
   const handleContinue = async () => {
     setAttempted(true);
@@ -72,7 +78,36 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
       Boolean
     ) as (keyof OnboardingSchema)[];
     const ok = await trigger(fields, { shouldFocus: true });
-    if (ok) onNext?.();
+
+    if (ok) {
+      const userProfileId = getValues("userProfileId");
+      const hasAllergy = getValues(FIELD);
+      const allergyDetails = getValues(DETAIL_FIELD);
+
+      if (!userProfileId) {
+        setError(FIELD, {
+          type: "manual",
+          message: "Profile ID is missing. Please start from Step 1.",
+        });
+        return;
+      }
+
+      // Merge completed steps (preserve existing progress)
+      const completedSteps = mergeCompletedSteps(
+        currentProfile?.completedSteps,
+        ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES"]
+      );
+
+      // Update profile with allergy info
+      updateProfile.mutate({
+        id: userProfileId,
+        data: {
+          hasAllergies: hasAllergy === "Yes",
+          allergyDetails: hasAllergy === "Yes" ? allergyDetails?.trim() || null : null,
+          completedSteps,
+        },
+      });
+    }
   };
 
   const showRadioError = attempted && !!errors[FIELD];
@@ -141,7 +176,12 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
         )}
 
         <div className="mt-8 flex justify-end">
-          <MButton label="Continue" type="button" onClick={handleContinue} />
+          <MButton
+            label={updateProfile.isPending ? "Saving..." : "Continue"}
+            type="button"
+            onClick={handleContinue}
+            disabled={updateProfile.isPending}
+          />
         </div>
       </div>
     </form>
