@@ -38,7 +38,11 @@ export async function fetchGraphQL<T = any>(
     );
 
     if (!response.ok) {
-      console.error("Response Status:", response.status, await response.text());
+      console.error(
+        "Response Status1:",
+        response.status,
+        await response.text()
+      );
       throw new Error(response.statusText);
     }
 
