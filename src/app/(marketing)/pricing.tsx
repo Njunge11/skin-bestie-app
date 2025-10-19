@@ -17,18 +17,18 @@ export default function Pricing({
   benefits: string[];
 }) {
   return (
-    <div className="bg-[#FFFDF2]">
+    <div id="pricing" className="bg-[#FFFDF2]">
       <div className="max-w-6xl mx-auto w-full pb-10 md:pb-20 lg:pb-28">
         <div className="grid lg:grid-cols-2 lg:gap-12 items-start">
           {/* Left Column */}
           <div className="space-y-6 flex lg:justify-center pt-10 md:pt-20 lg:pt-44">
             <div>
               <h1
-                className={`${anton.className} text-center lg:text-left text-4xl sm:text-5xl font-normal text-[#222118] uppercase leading-[1.2] tracking-[-0.02em] w-full lg:max-w-[333px]`}
+                className={`${anton.className} text-left sm:text-center lg:text-left px-4 sm:px-0 text-4xl sm:text-5xl font-normal text-[#222118] uppercase leading-[1.2] tracking-[-0.02em] w-full lg:max-w-[333px]`}
               >
                 {heading}
               </h1>
-              <p className="text-center mt-2 px-2 lg:text-left text-lg sm:text-xl text-gray-700 leading-relaxed w-full lg:max-w-[410px]">
+              <p className="text-left sm:text-center lg:text-left mt-2 px-4 sm:px-2 text-lg sm:text-xl text-gray-700 leading-relaxed w-full lg:max-w-[410px]">
                 {subheading}
               </p>
             </div>

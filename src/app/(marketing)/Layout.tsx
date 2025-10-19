@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import Header from "./header";
 import HeroSection from "./hero";
+import Footer from "./footer";
 // If you have app/fonts.ts exporting fonts, import them here
 // import { anton } from "@/app/fonts";
 
@@ -21,6 +22,7 @@ export default function MarketingLayout({
       {/* <div className={anton.className}> // if you want a marketing-only font */}
 
       <main>{children}</main>
+      <Footer />
 
       {/* </div> */}
     </div>

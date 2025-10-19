@@ -23,6 +23,7 @@ export default function Journey({
   return (
     // Parent container - flex column on mobile for ordering, regular layout on larger screens
     <section
+      id="how"
       className="w-full h-auto flex flex-col min-[1440px]:flex-row overflow-hidden py-10 md:py-20 min-[1440px]:!py-0"
       style={{ background: "radial-gradient(circle, #FDDF66, #F3ECC7)" }}
     >
@@ -31,11 +32,11 @@ export default function Journey({
         {/* Text content wrapper - order-1 on mobile */}
         <div className="px-4 md:px-6 min-[1440px]:!pl-20 order-1 lg:order-none min-[1440px]:pt-24 lg:max-[1439px]:flex lg:max-[1439px]:flex-col lg:max-[1439px]:items-center lg:max-[1439px]:text-center">
           <h2
-            className={`${anton.className} text-center min-[1440px]:text-left font-normal text-4xl sm:text-5xl lg:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118] min-[1440px]:max-w-[330px]`}
+            className={`${anton.className} text-left sm:text-center min-[1440px]:!text-left font-normal text-4xl sm:text-5xl lg:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118] min-[1440px]:max-w-[330px]`}
           >
             {heading}
           </h2>
-          <p className="text-center min-[1440px]:text-left w-full min-[1440px]:w-[355px] mt-6 font-medium text-base sm:text-lg leading-[1.5] tracking-[-0.01em] text-[#1B1D1F]">
+          <p className="text-left sm:text-center min-[1440px]:!text-left w-full min-[1440px]:w-[355px] mt-6 font-medium text-base sm:text-lg leading-[1.5] tracking-[-0.01em] text-[#1B1D1F]">
             {subheading}
           </p>
           {/* Button hidden on mobile, shown on lg+ */}

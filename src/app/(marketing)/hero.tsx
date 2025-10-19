@@ -15,6 +15,22 @@ const HeroSection = () => {
         }}
       ></div>
 
+      {/* Gradient Overlay - Mobile */}
+      <div
+        className="absolute inset-0 lg:hidden"
+        style={{
+          background: 'linear-gradient(18.93deg, rgba(245, 67, 61, 0.15) 16.65%, rgba(0, 0, 0, 0.5) 38.77%, rgba(0, 0, 0, 0.5) 50.4%, rgba(0, 0, 0, 0.5) 65.39%, rgba(245, 67, 61, 0.05) 80.55%)',
+        }}
+      ></div>
+
+      {/* Gradient Overlay - Desktop */}
+      <div
+        className="absolute inset-0 hidden lg:block"
+        style={{
+          background: 'linear-gradient(264.19deg, rgba(0, 0, 0, 0.6) 38.02%, rgba(245, 67, 61, 0.12) 96.07%)',
+        }}
+      ></div>
+
       {/* Content Container */}
       <div className="relative z-10 flex items-center h-full px-4 sm:px-6 lg:px-0 lg:pr-8 ">
         <div className="text-left max-w-3xl w-full lg:w-auto lg:ml-[50%] lg:pr-8 xl:pr-12">
@@ -39,7 +55,7 @@ const HeroSection = () => {
           {/* CTA Button */}
           <a
             href="/onboarding"
-            className="mt-10 group inline-flex items-center gap-2 font-semibold text-[1rem] sm:text-[1.125rem] leading-[150%] tracking-[-0.01em] text-[#FDFAEB] border-[1.5px] border-[#FDFAEB] rounded-[0.75rem] pt-4 pr-6 pb-4 pl-6 bg-transparent transition-all duration-300 hover:opacity-90"
+            className="mt-10 w-full sm:w-auto group inline-flex items-center justify-center gap-2 font-semibold text-[1rem] sm:text-[1.125rem] leading-[150%] tracking-[-0.01em] text-[#FDFAEB] border-[0.8px] border-[#FDFAEB] rounded-xl py-4 px-6 bg-transparent transition-all duration-300 hover:opacity-90"
           >
             <span>Step Into Skin Bestie</span>
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />

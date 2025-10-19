@@ -7,30 +7,26 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import Image from "next/image";
 import { anton } from "../fonts";
 import Autoplay from "embla-carousel-autoplay";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 type TestimonialItem = {
   concern: string;
   goal: string;
+  timeline: string;
   testimonial: string;
   customerName: string;
 };
 
 export default function Testimonials({
   heading,
-  subheading,
-  imageSrc,
-  imageAlt,
   items,
 }: {
   heading?: string;
-  subheading?: string;
-  imageSrc?: string;
-  imageAlt?: string;
   items: TestimonialItem[];
 }) {
+  const [carouselApi, setCarouselApi] = React.useState<any>(null);
   const autoplay = React.useRef(
     Autoplay({
       delay: 3000,
@@ -47,23 +43,17 @@ export default function Testimonials({
       {/* Inner content centered into a 795px frame on xl */}
       <div className="w-full h-full xl:flex xl:items-center xl:justify-center">
         <div className="w-full max-w-7xl mx-auto xl:flex xl:flex-col xl:justify-center py-10 md:py-20 lg:py-40 px-4">
-          <div className="flex justify-center">
-            <Image src={imageSrc!} alt={imageAlt!} width={219} height={84} />
-          </div>
-
           <h1
-            className={`mt-6 ${anton.className} text-[#FFF7D4] text-4xl sm:text-5xl text-center uppercase leading-[1.2] tracking-[-0.02em]`}
+            className={`${anton.className} text-[#FFF7D4] text-4xl sm:text-5xl text-center uppercase leading-[1.2] tracking-[-0.02em]`}
           >
             {heading}
           </h1>
-          <p className="w-full max-w-[478px] mx-auto mt-2 font-medium text-[#FAFAFA] text-lg text-center leading-[1.5] tracking-[-0.01em]">
-            {subheading}
-          </p>
 
           <Carousel
             // Key bits: center + trimSnaps + loop
             opts={{ align: "center", containScroll: "trimSnaps", loop: true }}
             plugins={[autoplay.current]}
+            setApi={setCarouselApi}
             className="w-full max-w-7xl mx-auto pt-11"
             // Optional: you can remove these since stopOnMouseEnter is true above
             // onMouseEnter={autoplay.current.stop}
@@ -100,6 +90,16 @@ export default function Testimonials({
                       <h2
                         className={`${anton.className} font-normal text-2xl text-[#FFF7D4] uppercase leading-[1.2] tracking-[-0.02em]`}
                       >
+                        TIMELINE
+                      </h2>
+                      <p className="mt-2 font-medium text-base text-[#DFDBD2] leading-[1.5] tracking-[-0.01em]">
+                        {card.timeline}
+                      </p>
+                    </div>
+                    <div className="pt-8">
+                      <h2
+                        className={`${anton.className} font-normal text-2xl text-[#FFF7D4] uppercase leading-[1.2] tracking-[-0.02em]`}
+                      >
                         TESTIMONIAL
                       </h2>
                       <p className="mt-2 font-medium text-base text-[#DFDBD2] leading-[1.5] tracking-[-0.01em]">
@@ -120,14 +120,40 @@ export default function Testimonials({
             </CarouselContent>
 
             <CarouselPrevious
-              className="hidden sm:flex border-0 bg-transparent hover:bg-transparent"
+              className="hidden xl:flex border-0 bg-transparent hover:bg-transparent w-[21px] h-[20px] p-0"
               style={{ color: "#FFF7D4" }}
-            />
+            >
+              <ArrowLeft width={21} height={20} />
+              <span className="sr-only">Previous slide</span>
+            </CarouselPrevious>
             <CarouselNext
-              className="hidden sm:flex border-0 bg-transparent hover:bg-transparent"
+              className="hidden xl:flex border-0 bg-transparent hover:bg-transparent w-[21px] h-[20px] p-0"
               style={{ color: "#FFF7D4" }}
-            />
+            >
+              <ArrowRight width={21} height={20} />
+              <span className="sr-only">Next slide</span>
+            </CarouselNext>
           </Carousel>
+
+          {/* Mobile/Tablet/iPad Pro arrows below carousel */}
+          <div className="flex justify-center gap-4 mt-6 xl:hidden">
+            <button
+              onClick={() => carouselApi?.scrollPrev()}
+              className="border-0 bg-transparent w-[21px] h-[20px] p-0"
+              style={{ color: "#FFF7D4" }}
+              aria-label="Previous slide"
+            >
+              <ArrowLeft width={21} height={20} />
+            </button>
+            <button
+              onClick={() => carouselApi?.scrollNext()}
+              className="border-0 bg-transparent w-[21px] h-[20px] p-0"
+              style={{ color: "#FFF7D4" }}
+              aria-label="Next slide"
+            >
+              <ArrowRight width={21} height={20} />
+            </button>
+          </div>
         </div>
       </div>
     </section>

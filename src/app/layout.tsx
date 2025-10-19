@@ -22,10 +22,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="bg-black">
+    <html lang="en" className="bg-black scroll-smooth scroll-pt-20">
       <body className={`${inter.className} antialiased`}>
         <TRPCProvider>{children}</TRPCProvider>
-        <Footer />
       </body>
     </html>
   );

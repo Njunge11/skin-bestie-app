@@ -8,8 +8,6 @@ import Testimonials from "./testimonials"; // Community
 import Values from "./values";
 import Pricing from "./pricing";
 import Faqs from "./faqs";
-import ScrollEffectWrapper from "./ScrollEffectWrapper";
-import HeroWithHeader from "./HeroWithHeader";
 import OurStory from "./OurStory";
 import Header from "./header";
 import HeroSection from "./hero";
@@ -24,6 +22,8 @@ function extractBenefits(home: any) {
   const imageSrc = block?.backgroundImage?.node?.sourceUrl ?? "";
   const imageAlt = block?.backgroundImage?.node?.altText ?? "";
   const items = (block?.list ?? []).slice(0, 4).map((x: any) => ({
+    iconSrc: x?.icon?.node?.sourceUrl ?? "",
+    iconAlt: x?.icon?.node?.altText ?? "",
     description: x?.description ?? "",
   }));
 
@@ -61,6 +61,7 @@ function extractTestimonials(home: any) {
     .map((c: any) => ({
       concern: c?.concern ?? "",
       goal: c?.goal ?? "",
+      timeline: c?.timeline ?? "",
       testimonial: c?.testimonial ?? "",
       customerName: c?.customerName ?? "",
     }));
@@ -85,6 +86,22 @@ function extractValues(home: any) {
 
   const hasContent = imageSrc || items.length > 0;
   return hasContent ? { imageSrc, imageAlt, items } : null;
+}
+
+function extractStory(home: any) {
+  const block = home?.skinbestieStory?.[0];
+  if (!block) return null;
+
+  const heading = block?.mainHeadline ?? "";
+  const items = (block?.values ?? []).map((v: any) => ({
+    iconSrc: v?.icon?.node?.sourceUrl ?? "",
+    iconAlt: v?.icon?.node?.altText ?? "",
+    title: v?.title ?? "",
+    description: v?.description ?? "",
+  }));
+
+  const hasContent = heading || items.length > 0;
+  return hasContent ? { heading, items } : null;
 }
 
 function extractPricing(home: any) {
@@ -137,30 +154,23 @@ async function getLanding() {
     journey: extractJourney(home),
     testimonials: extractTestimonials(home),
     values: extractValues(home),
+    story: extractStory(home),
     pricing: extractPricing(home),
     faqs: extractFaqs(home),
   };
 }
 
 export default async function MarketingHome() {
-  const { benefits, journey, testimonials, values, pricing, faqs } =
+  const { benefits, journey, testimonials, values, story, pricing, faqs } =
     await getLanding();
 
   return (
     <main>
-      {/* 0: Hero with Header INSIDE, so Benefits can wipe over both */}
-
       <Header />
       <HeroSection />
-      {values && (
-        <OurStory
-          imageSrc={values.imageSrc}
-          imageAlt={values.imageAlt}
-          items={values.items}
-        />
-      )}
 
-      {/* 1: Benefits (curtain over Hero+Header) */}
+      {story && <OurStory heading={story.heading} items={story.items} />}
+
       {benefits && (
         <Benefits
           imageSrc={benefits.imageSrc}
@@ -169,7 +179,6 @@ export default async function MarketingHome() {
         />
       )}
 
-      {/* 2: Journey (pinned base for next scene) */}
       {journey && (
         <Journey
           heading={journey.heading}
@@ -178,18 +187,10 @@ export default async function MarketingHome() {
         />
       )}
 
-      {/* 3: Community (curtain 1) */}
       {testimonials && (
-        <Testimonials
-          heading={testimonials.heading}
-          subheading={testimonials.subheading}
-          imageSrc={testimonials.imageSrc}
-          imageAlt={testimonials.imageAlt}
-          items={testimonials.items}
-        />
+        <Testimonials heading={testimonials.heading} items={testimonials.items} />
       )}
 
-      {/* 4: Values (curtain 2) */}
       {values && (
         <Values
           imageSrc={values.imageSrc}
@@ -198,7 +199,6 @@ export default async function MarketingHome() {
         />
       )}
 
-      {/* 5+: Normal scroll */}
       {pricing && (
         <Pricing
           heading={pricing.heading}
@@ -208,6 +208,7 @@ export default async function MarketingHome() {
           benefits={pricing.benefits}
         />
       )}
+
       {faqs && (
         <Faqs
           heading={faqs.heading}

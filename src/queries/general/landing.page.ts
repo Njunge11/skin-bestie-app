@@ -15,6 +15,12 @@ export const GetLandingPage = gql(/* GraphQL */ `
               }
             }
             list {
+              icon {
+                node {
+                  altText
+                  sourceUrl
+                }
+              }
               description
             }
           }
@@ -49,6 +55,7 @@ export const GetLandingPage = gql(/* GraphQL */ `
               cardContent {
                 concern
                 goal
+                timeline
                 testimonial
                 customerName
               }
@@ -63,6 +70,21 @@ export const GetLandingPage = gql(/* GraphQL */ `
                 sourceUrl
               }
             }
+            values {
+              icon {
+                node {
+                  altText
+                  sourceUrl
+                }
+              }
+              title
+              description
+            }
+          }
+        }
+        skinbestieStory {
+          ... on HomeSkinbestieStoryContentLayout {
+            mainHeadline
             values {
               icon {
                 node {
