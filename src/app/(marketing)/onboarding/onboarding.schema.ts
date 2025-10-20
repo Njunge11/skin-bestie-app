@@ -86,12 +86,12 @@ export const onboardingSchema = z
       }
     }
 
-    // Step 3 “Other” rule: whenever "Other" is selected at all, concernOther is required.
+    // Step 3 "Other" rule: whenever "Other" is selected at all, concernOther is required.
     if ((vals.concerns ?? []).includes("Other") && !vals.concernOther?.trim()) {
       ctx.addIssue({
         code: "custom",
         path: ["concernOther"],
-        message: "Please describe “Other”",
+        message: 'Please describe "Other"',
       });
     }
     if (vals.hasAllergy === "Yes" && !vals.allergy?.trim()) {

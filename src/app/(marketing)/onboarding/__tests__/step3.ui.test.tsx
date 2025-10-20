@@ -76,15 +76,16 @@ describe('Step 3: Skin Concerns - User Workflows', () => {
     const user = userEvent.setup();
     render(<Step3WithProfile />);
 
-    // Select "Other"
-    await user.click(screen.getByLabelText(/^other$/i));
+    // Select "Other" checkbox (use role to differentiate from textarea label)
+    const otherCheckbox = screen.getByRole('checkbox', { name: /^other$/i });
+    await user.click(otherCheckbox);
     expect(screen.getByPlaceholderText(/write something/i)).toBeInTheDocument();
 
     // Type something
     await user.type(screen.getByPlaceholderText(/write something/i), 'My concern');
 
-    // Deselect "Other"
-    await user.click(screen.getByLabelText(/^other$/i));
+    // Deselect "Other" checkbox
+    await user.click(otherCheckbox);
 
     // Text field disappears
     expect(screen.queryByPlaceholderText(/write something/i)).not.toBeInTheDocument();

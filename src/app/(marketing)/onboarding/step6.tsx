@@ -2,6 +2,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useFormContext } from "react-hook-form";
+import type { OnboardingSchema } from "./onboarding.schema";
 
 declare global {
   interface Window {
@@ -9,7 +11,13 @@ declare global {
       initInlineWidget: (opts: {
         url: string;
         parentElement: HTMLElement;
-        prefill?: Record<string, unknown>;
+        prefill?: {
+          name?: string;
+          firstName?: string;
+          lastName?: string;
+          email?: string;
+          customAnswers?: Record<string, string>;
+        };
         utm?: Record<string, unknown>;
       }) => void;
     };
@@ -57,6 +65,7 @@ function CalendarSkeleton() {
 }
 
 export default function CalendlyInline() {
+  const { getValues } = useFormContext<OnboardingSchema>();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const didInitRef = useRef(false);
   const mountedRef = useRef(false);
@@ -80,6 +89,18 @@ export default function CalendlyInline() {
     });
     return `${base}?${params.toString()}`;
   }, [base]);
+
+  // Get user info for prefilling
+  const prefillData = useMemo(() => {
+    const firstName = getValues("firstName");
+    const lastName = getValues("lastName");
+    const email = getValues("email");
+
+    return {
+      name: [firstName, lastName].filter(Boolean).join(" "),
+      email: email || undefined,
+    };
+  }, [getValues]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -150,6 +171,7 @@ export default function CalendlyInline() {
       window.Calendly.initInlineWidget({
         url,
         parentElement: containerRef.current,
+        prefill: prefillData,
       });
 
       const t = window.setTimeout(() => {
@@ -183,7 +205,7 @@ export default function CalendlyInline() {
       if (containerRef.current) containerRef.current.innerHTML = "";
       if (cleanupFallback) cleanupFallback();
     };
-  }, [url]);
+  }, [url, prefillData]);
 
   if (!base) {
     return (

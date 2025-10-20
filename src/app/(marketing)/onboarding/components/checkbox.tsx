@@ -14,6 +14,7 @@ export function MCheckbox({ label, checked, onToggle, className = "" }: Props) {
       type="button"
       role="checkbox"
       aria-checked={checked}
+      aria-label={label}
       onClick={onToggle}
       className={[
         "mt-2 flex w-full items-center justify-center cursor-pointer transition-all duration-200 select-none",

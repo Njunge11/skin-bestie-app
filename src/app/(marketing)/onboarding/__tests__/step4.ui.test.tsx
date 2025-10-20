@@ -29,25 +29,18 @@ describe('Step 4: Allergies - User Workflows', () => {
     expect(await screen.findByRole('button', { name: /saving/i })).toBeInTheDocument();
   });
 
-  it('user encounters validation error when no option selected and recovers', async () => {
+  it('user submits with default "No" selection', async () => {
     const user = userEvent.setup();
     render(<Step4WithProfile />);
 
-    // Submit without selection
+    // "No" is selected by default (schema has .default('No'))
+    const noRadio = screen.getByLabelText(/^no$/i) as HTMLInputElement;
+    expect(noRadio).toBeChecked();
+
+    // Submit without explicitly selecting (default "No" is already selected)
     await user.click(screen.getByRole('button', { name: /continue/i }));
 
-    // Should see validation error
-    await waitFor(() => {
-      const errorMessage = screen.queryByText(/required/i);
-      expect(errorMessage).toBeInTheDocument();
-    });
-
-    // Select "No"
-    await user.click(screen.getByLabelText(/^no$/i));
-
-    // Submit successfully
-    await user.click(screen.getByRole('button', { name: /continue/i }));
-
+    // Should save successfully
     expect(await screen.findByRole('button', { name: /saving/i })).toBeInTheDocument();
   });
 
@@ -68,10 +61,7 @@ describe('Step 4: Allergies - User Workflows', () => {
     await user.click(screen.getByRole('button', { name: /continue/i }));
 
     // Validation error for empty allergy field
-    await waitFor(() => {
-      const errorMessage = screen.queryByText(/required/i);
-      expect(errorMessage).toBeInTheDocument();
-    });
+    expect(await screen.findByText(/please describe your allergy/i)).toBeInTheDocument();
 
     // Fill in the allergy details
     const allergyTextarea = screen.getByLabelText(/allergy/i);

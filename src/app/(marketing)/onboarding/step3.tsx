@@ -121,7 +121,7 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
       const selected = formValues?.concerns ?? [];
       const otherPicked = selected.includes("Other");
       return (
-        !otherPicked || !!(v && v.trim().length) || "Please describe “Other”"
+        !otherPicked || !!(v && v.trim().length) || 'Please describe "Other"'
       );
     },
   });
@@ -171,8 +171,8 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
       }
 
       // Keep "Other" in array AND add custom text (Option B)
-      let finalConcerns = [...concerns];
-      if (concerns.includes("Other") && concernOther?.trim()) {
+      let finalConcerns = [...(concerns || [])];
+      if (concerns?.includes("Other") && concernOther?.trim()) {
         finalConcerns.push(concernOther.trim());
       }
 

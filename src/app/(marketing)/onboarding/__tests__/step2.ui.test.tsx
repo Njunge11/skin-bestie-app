@@ -54,14 +54,14 @@ describe('Step 2: Skin Type - User Workflows', () => {
     await user.click(screen.getByRole('button', { name: /continue/i }));
 
     // User sees validation error
-    expect(await screen.findByText(/at least one skin type/i)).toBeInTheDocument();
+    expect(await screen.findByText(/select at least one option/i)).toBeInTheDocument();
 
     // User selects a skin type
     await user.click(screen.getByLabelText(/combination/i));
 
     // Error should disappear (validation happens on selection)
     await waitFor(() => {
-      expect(screen.queryByText(/at least one skin type/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/select at least one option/i)).not.toBeInTheDocument();
     });
 
     // User submits successfully

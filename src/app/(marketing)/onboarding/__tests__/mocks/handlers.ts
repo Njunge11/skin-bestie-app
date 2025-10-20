@@ -46,6 +46,9 @@ export const handlers = [
       );
     }
 
+    // Add delay to simulate network request (so tests can catch loading state)
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     // Create new profile
     profileStore = {
       id: `profile-${Date.now()}`,
@@ -95,6 +98,9 @@ export const handlers = [
         { status: 404 }
       );
     }
+
+    // Add delay to simulate network request (so tests can catch loading state)
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     // Update profile store
     profileStore = {
