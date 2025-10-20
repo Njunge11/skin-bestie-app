@@ -3,11 +3,12 @@
 
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import { MButton } from "./components/button";
 import { MRadioButton } from "./components/radio.button";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { useWizard } from "./wizard.provider";
-import { trpc } from "@/trpc/react";
+import { getUserProfile, updateUserProfile } from "./actions";
 import { mergeCompletedSteps } from "./onboarding.utils";
 
 const OPTIONS = ["No", "Yes"] as const;
@@ -30,10 +31,19 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
 
   // Get current profile to preserve completedSteps
   const userProfileId = getValues("userProfileId");
-  const { data: currentProfile } = trpc.userProfile.getById.useQuery(
-    { id: userProfileId || "" },
-    { enabled: !!userProfileId }
-  );
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  // Fetch profile using TanStack Query
+  const { data: currentProfile } = useQuery({
+    queryKey: ["userProfile", userProfileId],
+    queryFn: async () => {
+      if (!userProfileId) return null;
+      const result = await getUserProfile(userProfileId);
+      return result.success ? result.data : null;
+    },
+    enabled: !!userProfileId,
+  });
 
   //   function getConcerns(v: OnboardingSchema): string[] {
   //     const other = (v.concernOther ?? "").trim();
@@ -58,21 +68,10 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
   //     } as const;
   //   }
 
-  // tRPC mutation to update profile
-  const updateProfile = trpc.userProfile.update.useMutation({
-    onSuccess: () => {
-      next();
-    },
-    onError: (error) => {
-      setError(FIELD, {
-        type: "manual",
-        message: error.message || "Failed to save allergy information",
-      });
-    },
-  });
-
   const handleContinue = async () => {
     setAttempted(true);
+    setServerError(null);
+
     // Only validate textarea when "Yes" is selected
     const fields = [FIELD, selected === "Yes" ? DETAIL_FIELD : null].filter(
       Boolean
@@ -85,10 +84,7 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
       const allergyDetails = getValues(DETAIL_FIELD);
 
       if (!userProfileId) {
-        setError(FIELD, {
-          type: "manual",
-          message: "Profile ID is missing. Please start from Step 1.",
-        });
+        setServerError("Profile ID is missing. Please start from Step 1.");
         return;
       }
 
@@ -99,14 +95,21 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
       );
 
       // Update profile with allergy info
-      updateProfile.mutate({
-        id: userProfileId,
-        data: {
-          hasAllergies: hasAllergy === "Yes",
-          allergyDetails: hasAllergy === "Yes" ? allergyDetails?.trim() || null : null,
-          completedSteps,
-        },
+      setIsUpdating(true);
+      const result = await updateUserProfile(userProfileId, {
+        hasAllergies: hasAllergy === "Yes",
+        allergyDetails: hasAllergy === "Yes" ? allergyDetails?.trim() || null : null,
+        completedSteps,
       });
+      setIsUpdating(false);
+
+      if (!result.success) {
+        setServerError(result.error);
+        return;
+      }
+
+      // Navigate to next step on success
+      next();
     }
   };
 
@@ -117,6 +120,13 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
 
   return (
     <form onSubmit={(e) => e.preventDefault()} noValidate>
+      {/* Server error message */}
+      {serverError && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+          <p className="text-sm text-red-800">{serverError}</p>
+        </div>
+      )}
+
       <div className="mx-auto w-full max-w-[392px] pt-4">
         {/* Radios: no onChange, let MRadioButton integrate with RHF as-is */}
         {OPTIONS.map((opt) => (
@@ -177,10 +187,10 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
 
         <div className="mt-8 flex justify-end">
           <MButton
-            label={updateProfile.isPending ? "Saving..." : "Continue"}
+            label={isUpdating ? "Saving..." : "Continue"}
             type="button"
             onClick={handleContinue}
-            disabled={updateProfile.isPending}
+            disabled={isUpdating}
           />
         </div>
       </div>

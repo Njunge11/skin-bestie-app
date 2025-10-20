@@ -9,12 +9,13 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { useFormContext } from "react-hook-form";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { MButton } from "./components/button";
 import { PaymentSkeleton } from "./components/payment.skeleton";
-import { Lock } from "lucide-react";
+import { Lock, CheckCircle2 } from "lucide-react";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { useWizard } from "./wizard.provider";
-import { trpc } from "@/trpc/react";
+import { getUserProfile, updateUserProfile } from "./actions";
 import { mergeCompletedSteps } from "./onboarding.utils";
 
 const stripePromise = loadStripe(
@@ -41,79 +42,73 @@ type IntentType = "payment" | "setup";
 // One place to control the vertical space (skeleton + Stripe share it)
 const HEIGHT_CLS = "min-h-[21rem] sm:min-h-[21rem] md:min-h-[21rem]";
 
-export default function Step5({ onNext }: { onNext?: () => void }) {
+export default function Step5({ onNext, onShowingSuccess }: { onNext?: () => void; onShowingSuccess?: (showing: boolean) => void }) {
   const { getValues } = useFormContext<OnboardingSchema>();
   const { next } = useWizard();
 
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [intentType, setIntentType] = useState<IntentType | null>(null);
-  const [buttonText, setButtonText] = useState("Subscribe");
-  const [err, setErr] = useState<string | null>(null);
-
-  const didFetchRef = useRef(false);
-  const mountedRef = useRef(false);
-
-  // Get profile data
+  // Get profile data using TanStack Query
   const userProfileId = getValues("userProfileId");
-  const { data: currentProfile } = trpc.userProfile.getById.useQuery(
-    { id: userProfileId || "" },
-    { enabled: !!userProfileId }
-  );
+  const { data: currentProfile } = useQuery({
+    queryKey: ["userProfile", userProfileId],
+    queryFn: async () => {
+      if (!userProfileId) return null;
+      const result = await getUserProfile(userProfileId);
+      return result.success ? result.data : null;
+    },
+    enabled: !!userProfileId,
+  });
 
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
+  // Fetch checkout session using TanStack Query (replaces useEffect)
+  const { data: checkoutSession, error: checkoutError } = useQuery({
+    queryKey: ["checkoutSession", currentProfile?.id],
+    queryFn: async () => {
+      if (!currentProfile) return null;
 
-  useEffect(() => {
-    if (didFetchRef.current) return;
-    if (!currentProfile) return; // Wait for profile data
+      const r = await fetch("/api/checkout/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          priceId: "price_1SAsSTIbiE06ZB2bOXj4Ce1P",
+          customerEmail: currentProfile.email,
+          metadata: {
+            userProfileId: currentProfile.id,
+            firstName: currentProfile.firstName,
+            lastName: currentProfile.lastName,
+          },
+        }),
+      });
 
-    didFetchRef.current = true;
-
-    (async () => {
-      try {
-        setErr(null);
-
-        const r = await fetch("/api/checkout/session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            priceId: "price_1SAsSTIbiE06ZB2bOXj4Ce1P",
-            customerEmail: currentProfile.email,
-            metadata: {
-              userProfileId: currentProfile.id,
-              firstName: currentProfile.firstName,
-              lastName: currentProfile.lastName,
-            },
-          }),
-        });
-        const d = await r.json();
-        if (!r.ok) throw new Error(d?.error || "Failed to start subscription");
-        if (!d?.client_secret || !d?.intent_type)
-          throw new Error("Malformed session response");
-        if (!mountedRef.current) return;
-
-        setClientSecret(d.client_secret);
-        setIntentType(d.intent_type as IntentType);
-
-        if (typeof d.plan_unit_amount === "number" && d.plan_currency) {
-          const formatted = new Intl.NumberFormat(undefined, {
-            style: "currency",
-            currency: String(d.plan_currency).toUpperCase(),
-          }).format(d.plan_unit_amount / 100);
-          setButtonText(`Subscribe ${formatted}`);
-        } else {
-          setButtonText("Subscribe");
-        }
-      } catch (e: any) {
-        if (!mountedRef.current) return;
-        setErr(e?.message || "Something went wrong");
+      const d = await r.json();
+      if (!r.ok) throw new Error(d?.error || "Failed to start subscription");
+      if (!d?.client_secret || !d?.intent_type) {
+        throw new Error("Malformed session response");
       }
-    })();
-  }, [currentProfile]);
+
+      return {
+        clientSecret: d.client_secret,
+        intentType: d.intent_type as IntentType,
+        planUnitAmount: d.plan_unit_amount,
+        planCurrency: d.plan_currency,
+      };
+    },
+    enabled: !!currentProfile && !currentProfile.isSubscribed,
+    retry: false,
+    staleTime: Infinity, // Session should only be created once
+  });
+
+  // Calculate button text from checkout session
+  const buttonText = checkoutSession?.planUnitAmount && checkoutSession?.planCurrency
+    ? `Subscribe ${new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: String(checkoutSession.planCurrency).toUpperCase(),
+      }).format(checkoutSession.planUnitAmount / 100)}`
+    : "Subscribe";
+
+  // Notify parent when showing success screen (stable callback with useEffect)
+  const isShowingSuccess = !!currentProfile?.isSubscribed;
+  useEffect(() => {
+    onShowingSuccess?.(isShowingSuccess);
+  }, [isShowingSuccess, onShowingSuccess]);
 
   // If already subscribed, show success screen
   if (currentProfile?.isSubscribed) {
@@ -126,28 +121,28 @@ export default function Step5({ onNext }: { onNext?: () => void }) {
 
   return (
     <div className="relative p-3">
-      {!clientSecret || !intentType ? (
+      {/* Server error message */}
+      {checkoutError && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+          <p className="text-sm text-red-800">
+            {checkoutError instanceof Error ? checkoutError.message : "Something went wrong"}
+          </p>
+        </div>
+      )}
+
+      {!checkoutSession ? (
         <div className={`relative w-full ${HEIGHT_CLS}`}>
           <PaymentSkeleton />
         </div>
       ) : (
-        <Elements stripe={stripePromise} options={{ clientSecret, appearance }}>
+        <Elements stripe={stripePromise} options={{ clientSecret: checkoutSession.clientSecret, appearance }}>
           <Form
-            intentType={intentType}
+            intentType={checkoutSession.intentType}
             buttonText={buttonText}
             userProfileId={userProfileId}
             currentProfile={currentProfile}
           />
         </Elements>
-      )}
-
-      {err && (
-        <p
-          className="absolute bottom-3 left-3 right-3 text-sm text-red-600"
-          role="alert"
-        >
-          {err}
-        </p>
       )}
     </div>
   );
@@ -157,16 +152,28 @@ export default function Step5({ onNext }: { onNext?: () => void }) {
 function SuccessScreen({ onNext }: { onNext: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[21rem] space-y-6">
-      <div className="text-center space-y-2">
+      {/* Success Icon */}
+      <div className="relative">
+        <CheckCircle2
+          className="w-16 h-16 text-green-600"
+          strokeWidth={1.5}
+          aria-hidden="true"
+        />
+      </div>
+
+      {/* Title and Description */}
+      <div className="text-center space-y-3">
         <h2 className="text-2xl font-semibold text-[#272B2D]">
-          Subscription Successful!
+          You're all set!
         </h2>
-        <p className="text-base text-[#3F4548]">
-          Your payment was processed successfully.
+        <p className="text-base text-[#3F4548] max-w-md">
+          Your subscription is active. Finish by booking your first session.
         </p>
       </div>
+
+      {/* CTA Button */}
       <MButton onClick={onNext} showIcon={false}>
-        Continue
+        Book first session
       </MButton>
     </div>
   );
@@ -186,16 +193,7 @@ function Form({
   const stripe = useStripe();
   const elements = useElements();
   const { next } = useWizard();
-
-  const utils = trpc.useUtils();
-
-  // tRPC mutation to update profile after payment
-  const updateProfile = trpc.userProfile.update.useMutation({
-    onSuccess: () => {
-      // Invalidate the profile query to trigger a refetch
-      utils.userProfile.getById.invalidate({ id: userProfileId || "" });
-    },
-  });
+  const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<{
@@ -206,14 +204,6 @@ function Form({
   // Stripe element readiness & visibility
   const [peReady, setPeReady] = useState(false);
   const [peVisible, setPeVisible] = useState(false); // used only for the fade
-
-  const mounted = useRef(false);
-  useEffect(() => {
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-    };
-  }, []);
 
   const prefersReduced =
     typeof window !== "undefined" &&
@@ -260,23 +250,27 @@ function Form({
               ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE"]
             );
 
-            await updateProfile.mutateAsync({
-              id: userProfileId,
-              data: {
-                isSubscribed: true,
-                completedSteps,
-              },
+            const result = await updateUserProfile(userProfileId, {
+              isSubscribed: true,
+              completedSteps,
             });
+
+            if (result.success) {
+              // Invalidate and refetch the profile
+              await queryClient.invalidateQueries({
+                queryKey: ["userProfile", userProfileId],
+              });
+            }
           }
 
           // Success - component will remount and show success screen
           return;
         }
-        if (mounted.current)
-          setNotice({
-            kind: "success",
-            text: `Payment status: ${paymentIntent?.status ?? "processing"}`,
-          });
+
+        setNotice({
+          kind: "success",
+          text: `Payment status: ${paymentIntent?.status ?? "processing"}`,
+        });
       } else {
         const { error, setupIntent } = await stripe.confirmSetup({
           elements,
@@ -295,32 +289,35 @@ function Form({
               ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE"]
             );
 
-            await updateProfile.mutateAsync({
-              id: userProfileId,
-              data: {
-                isSubscribed: true,
-                completedSteps,
-              },
+            const result = await updateUserProfile(userProfileId, {
+              isSubscribed: true,
+              completedSteps,
             });
+
+            if (result.success) {
+              // Invalidate and refetch the profile
+              await queryClient.invalidateQueries({
+                queryKey: ["userProfile", userProfileId],
+              });
+            }
           }
 
           // Success - component will remount and show success screen
           return;
         }
-        if (mounted.current)
-          setNotice({
-            kind: "success",
-            text: `Setup status: ${setupIntent?.status ?? "processing"}`,
-          });
+
+        setNotice({
+          kind: "success",
+          text: `Setup status: ${setupIntent?.status ?? "processing"}`,
+        });
       }
     } catch (err: any) {
-      if (mounted.current)
-        setNotice({
-          kind: "error",
-          text: err?.message || "Payment failed. Please try again.",
-        });
+      setNotice({
+        kind: "error",
+        text: err?.message || "Payment failed. Please try again.",
+      });
     } finally {
-      if (mounted.current) setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -350,16 +347,22 @@ function Form({
       </div>
 
       {notice && (
-        <p
+        <div
           className={
             notice.kind === "error"
-              ? "text-sm text-red-600"
-              : "text-sm text-green-600"
+              ? "p-3 bg-red-50 border border-red-200 rounded-md"
+              : "p-3 bg-green-50 border border-green-200 rounded-md"
           }
           role={notice.kind === "error" ? "alert" : "status"}
         >
-          {notice.text}
-        </p>
+          <p
+            className={
+              notice.kind === "error" ? "text-sm text-red-800" : "text-sm text-green-800"
+            }
+          >
+            {notice.text}
+          </p>
+        </div>
       )}
 
       {/* ✅ Render button + secure copy ONLY after the element is actually ready */}

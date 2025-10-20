@@ -1,7 +1,7 @@
 // app/(onboarding)/step1.tsx
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ArrowRight, Calendar as CalendarIcon } from "lucide-react";
 import { useFormContext, Controller } from "react-hook-form";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,7 @@ import { MButton } from "./components/button";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { normalizeToE164 } from "./onboarding.schema";
 import { useWizard } from "./wizard.provider";
-import { trpc } from "@/trpc/react";
+import { createUserProfile } from "./actions";
 import { getIncompleteStepIndex, populateFormFromProfile } from "./onboarding.utils";
 
 export default function Step1({ onNext }: { onNext?: () => void }) {
@@ -46,33 +46,16 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
     name: dobName,
   } = register("dateOfBirth");
 
-  // tRPC mutation
-  const createProfile = trpc.userProfile.create.useMutation({
-    onSuccess: (data) => {
-      const completedSteps = data.completedSteps || [];
-
-      if (completedSteps.length > 1) {
-        // Existing profile - populate form and navigate to incomplete step
-        populateFormFromProfile(data, setValue);
-        const incompleteIndex = getIncompleteStepIndex(completedSteps);
-        setStepIndex(incompleteIndex);
-      } else {
-        // New profile - go to next step
-        setValue('userProfileId', data.id);
-        next();
-      }
-    },
-    onError: (error: any) => {
-      // Show error on the email field
-      setError('email', {
-        type: 'manual',
-        message: error.message || 'Failed to create profile'
-      });
-    },
-  });
+  // Loading state for profile creation
+  const [isCreating, setIsCreating] = useState(false);
+  // Server error state (shown after subheading, not inline)
+  const [serverError, setServerError] = useState<string | null>(null);
 
   // Validate only Step-1 fields, then create profile
   const handleContinue = async () => {
+    // Clear any previous server error
+    setServerError(null);
+
     const ok = await trigger(
       [
         "firstName",
@@ -97,19 +80,48 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
         return;
       }
 
-      // Call the mutation
-      createProfile.mutate({
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
+      // Call the server action
+      setIsCreating(true);
+      const result = await createUserProfile({
+        firstName: values.firstName!,
+        lastName: values.lastName!,
+        email: values.email!,
         phoneNumber,
-        dateOfBirth: values.dateOfBirth,
+        dateOfBirth: values.dateOfBirth!,
       });
+      setIsCreating(false);
+
+      if (!result.success) {
+        // Show server error after subheading, not inline
+        setServerError(result.error);
+        return;
+      }
+
+      // Handle success
+      const completedSteps = result.data.completedSteps || [];
+
+      if (completedSteps.length > 1) {
+        // Existing profile - populate form and navigate to incomplete step
+        populateFormFromProfile(result.data, setValue);
+        const incompleteIndex = getIncompleteStepIndex(completedSteps);
+        setStepIndex(incompleteIndex);
+      } else {
+        // New profile - go to next step
+        setValue('userProfileId', result.data.id);
+        next();
+      }
     }
   };
 
   return (
     <form onSubmit={(e) => e.preventDefault()} noValidate autoComplete="on">
+      {/* Server error message */}
+      {serverError && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+          <p className="text-sm text-red-800">{serverError}</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 pt-7">
         <div>
           <MInput
@@ -240,11 +252,11 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
 
       <MButton
         className="mt-6"
-        label={createProfile.isPending ? "Creating..." : "Continue"}
+        label={isCreating ? "Creating..." : "Continue"}
         icon={ArrowRight}
         type="button"
         onClick={handleContinue}
-        disabled={createProfile.isPending}
+        disabled={isCreating}
       />
     </form>
   );

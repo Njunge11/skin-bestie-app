@@ -1,13 +1,14 @@
 // app/(onboarding)/step3.tsx
 "use client";
 
-import { useId } from "react";
+import { useId, useState } from "react";
 import { useFormContext, useController, useWatch } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { MButton } from "./components/button";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { useWizard } from "./wizard.provider";
-import { trpc } from "@/trpc/react";
+import { getUserProfile, updateUserProfile } from "./actions";
 import { mergeCompletedSteps } from "./onboarding.utils";
 
 const ALL_CONCERNS = [
@@ -86,10 +87,19 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
 
   // Get current profile to preserve completedSteps
   const userProfileId = getValues("userProfileId");
-  const { data: currentProfile } = trpc.userProfile.getById.useQuery(
-    { id: userProfileId || "" },
-    { enabled: !!userProfileId }
-  );
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+
+  // Fetch profile using TanStack Query
+  const { data: currentProfile } = useQuery({
+    queryKey: ["userProfile", userProfileId],
+    queryFn: async () => {
+      if (!userProfileId) return null;
+      const result = await getUserProfile(userProfileId);
+      return result.success ? result.data : null;
+    },
+    enabled: !!userProfileId,
+  });
 
   // Own the array field; validate "at least one"
   const { field: concernsField } = useController<OnboardingSchema, "concerns">({
@@ -142,20 +152,9 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
     // void trigger("concernOther");
   };
 
-  // tRPC mutation to update profile
-  const updateProfile = trpc.userProfile.update.useMutation({
-    onSuccess: () => {
-      next();
-    },
-    onError: (error) => {
-      setError("concerns", {
-        type: "manual",
-        message: error.message || "Failed to save concerns",
-      });
-    },
-  });
-
   const handleContinue = async () => {
+    setServerError(null);
+
     // Validate only this step's fields
     const ok = await trigger(["concerns", "concernOther"], {
       shouldFocus: true,
@@ -167,10 +166,7 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
       const concernOther = getValues("concernOther");
 
       if (!userProfileId) {
-        setError("concerns", {
-          type: "manual",
-          message: "Profile ID is missing. Please start from Step 1.",
-        });
+        setServerError("Profile ID is missing. Please start from Step 1.");
         return;
       }
 
@@ -187,21 +183,35 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
       );
 
       // Update profile with concerns
-      updateProfile.mutate({
-        id: userProfileId,
-        data: {
-          concerns: finalConcerns,
-          completedSteps,
-        },
+      setIsUpdating(true);
+      const result = await updateUserProfile(userProfileId, {
+        concerns: finalConcerns,
+        completedSteps,
       });
+      setIsUpdating(false);
+
+      if (!result.success) {
+        setServerError(result.error);
+        return;
+      }
+
+      // Navigate to next step on success
+      next();
     }
   };
 
   return (
     <form onSubmit={(e) => e.preventDefault()} noValidate>
+      {/* Server error message */}
+      {serverError && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+          <p className="text-sm text-red-800">{serverError}</p>
+        </div>
+      )}
+
       <hr className="mt-6 border-t-[0.03125rem] border-[#030303]" />
       <p className="mt-6 font-medium text-base leading-[150%] tracking-[-0.01em] text-[#3F4548]">
-        Select as many as you like. Choose “Other” to type your own.
+        Select as many as you like. Choose "Other" to type your own.
       </p>
 
       <fieldset className="w-full">
@@ -261,9 +271,9 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
       <div className="mt-8 flex justify-end">
         <MButton
           type="button"
-          label={updateProfile.isPending ? "Saving..." : "Continue"}
+          label={isUpdating ? "Saving..." : "Continue"}
           onClick={handleContinue}
-          disabled={updateProfile.isPending}
+          disabled={isUpdating}
         />
       </div>
     </form>

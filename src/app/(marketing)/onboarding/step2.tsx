@@ -3,11 +3,12 @@
 
 import { useState } from "react";
 import { useController, useFormContext } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import { MButton } from "./components/button";
 import { MCheckbox } from "./components/checkbox";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { useWizard } from "./wizard.provider";
-import { trpc } from "@/trpc/react";
+import { getUserProfile, updateUserProfile } from "./actions";
 import { mergeCompletedSteps } from "./onboarding.utils";
 
 const SKIN_TYPES = [
@@ -57,28 +58,25 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
 
   // Get current profile to preserve completedSteps
   const userProfileId = getValues("userProfileId");
-  const { data: currentProfile } = trpc.userProfile.getById.useQuery(
-    { id: userProfileId || "" },
-    { enabled: !!userProfileId }
-  );
+  const [isUpdating, setIsUpdating] = useState(false);
+  // Server error state
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  // tRPC mutation to update profile
-  const updateProfile = trpc.userProfile.update.useMutation({
-    onSuccess: () => {
-      // Navigate to next step on success
-      next();
+  // Fetch profile using TanStack Query
+  const { data: currentProfile } = useQuery({
+    queryKey: ["userProfile", userProfileId],
+    queryFn: async () => {
+      if (!userProfileId) return null;
+      const result = await getUserProfile(userProfileId);
+      return result.success ? result.data : null;
     },
-    onError: (error) => {
-      // Show error (generic for now)
-      setError("skinTypes", {
-        type: "manual",
-        message: error.message || "Failed to save skin type selection",
-      });
-    },
+    enabled: !!userProfileId,
   });
 
   const handleContinue = async () => {
     setAttempted(true);
+    setServerError(null);
+
     const ok = await trigger("skinTypes", { shouldFocus: true });
 
     if (ok) {
@@ -86,10 +84,7 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
       const skinTypes = getValues("skinTypes");
 
       if (!userProfileId) {
-        setError("skinTypes", {
-          type: "manual",
-          message: "Profile ID is missing. Please start from Step 1.",
-        });
+        setServerError("Profile ID is missing. Please start from Step 1.");
         return;
       }
 
@@ -100,13 +95,20 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
       );
 
       // Update profile with skin types
-      updateProfile.mutate({
-        id: userProfileId,
-        data: {
-          skinType: skinTypes,
-          completedSteps,
-        },
+      setIsUpdating(true);
+      const result = await updateUserProfile(userProfileId, {
+        skinType: skinTypes,
+        completedSteps,
       });
+      setIsUpdating(false);
+
+      if (!result.success) {
+        setServerError(result.error);
+        return;
+      }
+
+      // Navigate to next step on success
+      next();
     }
   };
 
@@ -114,6 +116,13 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
 
   return (
     <form onSubmit={(e) => e.preventDefault()} noValidate>
+      {/* Server error message */}
+      {serverError && (
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+          <p className="text-sm text-red-800">{serverError}</p>
+        </div>
+      )}
+
       {current?.formInstruction ? (
         <p className="font-medium text-base leading-[150%] tracking-[-0.01em] text-[#3F4548]">
           {current.formInstruction}
@@ -141,10 +150,10 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
 
         <div className="mt-8 flex justify-end">
           <MButton
-            label={updateProfile.isPending ? "Saving..." : "Continue"}
+            label={isUpdating ? "Saving..." : "Continue"}
             type="button"
             onClick={handleContinue}
-            disabled={updateProfile.isPending}
+            disabled={isUpdating}
           />
         </div>
       </div>

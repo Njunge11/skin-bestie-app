@@ -72,9 +72,10 @@ export default function CalendlyInline() {
     if (!base) return "";
     const params = new URLSearchParams({
       hide_event_type_details: "1",
-      hide_gdpr_banner: "1",
-      background_color: "f3ecc7",
-      primary_color: "1a1a1a",
+      // Removed hide_gdpr_banner to avoid conflicts with hide_event_type_details
+      background_color: "F3ECC7",
+      text_color: "000000",
+      primary_color: "000000",
       utm_source: "site",
       utm_medium: "onboarding",
     });
@@ -90,11 +91,11 @@ export default function CalendlyInline() {
       style.id = "calendly-custom-styles";
       style.textContent = `
         .calendly-inline-widget iframe {
-          background-color: #f3ecc7 !important;
+          background-color: #F3ECC7 !important;
         }
         /* Override any white backgrounds inside Calendly iframe content */
         .calendly-inline-widget [style*="background"] {
-          background-color: #f3ecc7 !important;
+          background-color: #F3ECC7 !important;
         }
       `;
       document.head.appendChild(style);

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { anton } from "@/app/fonts";
 import { useWizard } from "./wizard.provider";
@@ -52,6 +53,16 @@ export default function OnboardingForm() {
     STEP_COMPONENTS[current.component as keyof typeof STEP_COMPONENTS] ?? Step1;
 
   const alignLeft = current.align === "left";
+
+  // Track if Step5 is showing success screen (to hide form header)
+  const [hideFormHeader, setHideFormHeader] = useState(false);
+
+  // Reset hideFormHeader when step changes
+  useEffect(() => {
+    if (current.component !== "subscribe") {
+      setHideFormHeader(false);
+    }
+  }, [current.component]);
 
   // ✅ When user presses Back, clear errors for the step we're LEAVING
   const handleBack = () => {
@@ -112,21 +123,29 @@ export default function OnboardingForm() {
 
       {/* Card */}
       <div className="mt-8 mx-auto w-full max-w-[440px] bg-[#F3ECC7] p-6">
-        <h1
-          className={`${anton.className} ${
-            alignLeft ? "text-left" : "text-center"
-          } text-[2rem] uppercase text-[#222118]`}
-        >
-          {current.formTitle}
-        </h1>
-        <p
-          className={`${alignLeft ? "text-left" : "text-center"} text-lg font-medium text-[#3F4548] pt-2`}
-        >
-          {current.formSub}
-        </p>
+        {/* Conditionally hide form header when showing success screen */}
+        {!hideFormHeader && (
+          <>
+            <h1
+              className={`${anton.className} ${
+                alignLeft ? "text-left" : "text-center"
+              } text-[2rem] uppercase text-[#222118]`}
+            >
+              {current.formTitle}
+            </h1>
+            <p
+              className={`${alignLeft ? "text-left" : "text-center"} text-lg font-medium text-[#3F4548] pt-2`}
+            >
+              {current.formSub}
+            </p>
+          </>
+        )}
 
         {/* Each step validates only its own fields */}
-        <StepBody onNext={next} />
+        <StepBody
+          onNext={next}
+          {...(current.component === "subscribe" ? { onShowingSuccess: setHideFormHeader } : {})}
+        />
       </div>
     </div>
   );

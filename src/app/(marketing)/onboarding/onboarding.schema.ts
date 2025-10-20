@@ -21,31 +21,32 @@ export const onboardingSchema = z
     userProfileId: z.string().uuid().optional(),
 
     // --- Step 1 ---
-    firstName: z.string().min(2, "Enter at least 2 characters"),
-    lastName: z.string().min(2, "Enter at least 2 characters"),
-    email: z.string().email("Enter a valid email"),
+    firstName: z.string().min(1, "First name is required").min(2, "Enter at least 2 characters").default(''),
+    lastName: z.string().min(1, "Last name is required").min(2, "Enter at least 2 characters").default(''),
+    email: z.string().min(1, "Email is required").email("Enter a valid email").default(''),
 
     // Let the browser/autofill provide any format; we validate with libphonenumber in superRefine.
-    mobileLocal: z.string().min(1, "Phone number is required"),
-    mobileCountryISO: countryCodeSchema,
+    mobileLocal: z.string().min(1, "Mobile number is required").default(''),
+    mobileCountryISO: countryCodeSchema.default('KE'),
 
     dateOfBirth: z
       .string()
       .min(1, "Date of birth is required")
-      .refine((v) => !Number.isNaN(Date.parse(v)), "Select a valid date"),
+      .refine((v) => !Number.isNaN(Date.parse(v)), "Select a valid date")
+      .default(''),
 
     // --- Optional free text ---
     goal: z.string().optional(),
     routineNote: z.string().optional(),
 
     // --- Step 2 ---
-    skinTypes: z.array(z.string()).min(1, "Select at least one option"),
+    skinTypes: z.array(z.string()).min(1, "Select at least one option").default([]),
 
     // --- Step 3 ---
-    concerns: z.array(z.string()).min(1, "Pick at least one concern"),
-    concernOther: z.string().optional(),
-    hasAllergy: z.enum(["Yes", "No"], { message: "Pick at least one allergy" }),
-    allergy: z.string().optional(),
+    concerns: z.array(z.string()).min(1, "Pick at least one concern").default([]),
+    concernOther: z.string().optional().default(''),
+    hasAllergy: z.enum(["Yes", "No"], { message: "Pick at least one allergy" }).default('No'),
+    allergy: z.string().optional().default(''),
   })
   .superRefine((vals, ctx) => {
     // Phone number validation (strict)
@@ -108,6 +109,7 @@ export type OnboardingSchema = z.input<typeof onboardingSchema>;
 // Helper: normalize phone to E.164 (or null if invalid).
 export function normalizeToE164(values: OnboardingSchema): string | null {
   try {
+    if (!values.mobileLocal) return null;
     const pn = parsePhoneNumber(values.mobileLocal.trim(), {
       defaultCountry: values.mobileCountryISO as CountryCode,
       extract: false,
