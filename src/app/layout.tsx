@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { TRPCProvider } from "@/trpc/react";
 import Footer from "./(marketing)/footer";
 
 const inter = Inter({
@@ -24,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-black scroll-smooth scroll-pt-20">
       <body className={`${inter.className} antialiased`}>
-        <TRPCProvider>{children}</TRPCProvider>
+        {children}
       </body>
     </html>
   );

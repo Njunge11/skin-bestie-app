@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 type LButtonProps = {
   children?: React.ReactNode;
@@ -16,7 +17,7 @@ type LButtonProps = {
   Omit<React.ComponentPropsWithoutRef<"a">, "className">;
 
 export default function LButton({
-  children = "Begin My SkinBestie Journey",
+  children = "Begin My Skin Journey",
   href,
   className = "",
   widthClass = "w-full",
@@ -45,11 +46,32 @@ export default function LButton({
     </>
   );
 
-  return href ? (
-    <a href={href} className={composed} {...(rest as any)}>
-      {Content}
-    </a>
-  ) : (
+  // Determine if href is an internal route (use Link) or external/hash (use <a>)
+  const isInternalRoute = href && href.startsWith('/') && !href.startsWith('//');
+  const isExternalOrSpecial = href && (
+    href.startsWith('http') ||
+    href.startsWith('mailto:') ||
+    href.startsWith('tel:') ||
+    href.startsWith('#')
+  );
+
+  if (isInternalRoute) {
+    return (
+      <Link href={href} className={composed} {...(rest as any)}>
+        {Content}
+      </Link>
+    );
+  }
+
+  if (isExternalOrSpecial) {
+    return (
+      <a href={href} className={composed} {...(rest as any)}>
+        {Content}
+      </a>
+    );
+  }
+
+  return (
     <button className={composed} {...(rest as any)}>
       {Content}
     </button>

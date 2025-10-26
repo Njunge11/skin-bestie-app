@@ -19,6 +19,7 @@ function extractBenefits(home: any) {
   const block = home?.skinbestieBenefits?.[0];
   if (!block) return null;
 
+  const heading = block?.mainHeadline ?? "";
   const imageSrc = block?.backgroundImage?.node?.sourceUrl ?? "";
   const imageAlt = block?.backgroundImage?.node?.altText ?? "";
   const items = (block?.list ?? []).slice(0, 4).map((x: any) => ({
@@ -27,7 +28,7 @@ function extractBenefits(home: any) {
     description: x?.description ?? "",
   }));
 
-  return { imageSrc, imageAlt, items };
+  return { heading, imageSrc, imageAlt, items };
 }
 
 function extractJourney(home: any) {
@@ -74,6 +75,7 @@ function extractValues(home: any) {
   const block = home?.skinbestieValues?.[0];
   if (!block) return null;
 
+  const heading = block?.mainHeadline ?? "";
   const imageSrc = block?.image?.node?.sourceUrl ?? "";
   const imageAlt = block?.image?.node?.altText ?? "";
 
@@ -84,8 +86,8 @@ function extractValues(home: any) {
     description: v?.description ?? "",
   }));
 
-  const hasContent = imageSrc || items.length > 0;
-  return hasContent ? { imageSrc, imageAlt, items } : null;
+  const hasContent = heading || imageSrc || items.length > 0;
+  return hasContent ? { heading, imageSrc, imageAlt, items } : null;
 }
 
 function extractStory(home: any) {
@@ -173,6 +175,7 @@ export default async function MarketingHome() {
 
       {benefits && (
         <Benefits
+          heading={benefits.heading}
           imageSrc={benefits.imageSrc}
           imageAlt={benefits.imageAlt}
           items={benefits.items}
@@ -193,6 +196,7 @@ export default async function MarketingHome() {
 
       {values && (
         <Values
+          heading={values.heading}
           imageSrc={values.imageSrc}
           imageAlt={values.imageAlt}
           items={values.items}

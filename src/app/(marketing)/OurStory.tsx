@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { anton } from "../fonts";
 
 type ValuesItem = {
@@ -20,14 +20,15 @@ function PlayButton({
     <button
       type="button"
       onClick={onClick}
-      aria-label="Play"
-      className={`grid place-items-center w-[60px] h-[60px] rounded-[100px] bg-[#F3EDC6] ${className}`}
+      aria-label="Play video"
+      className={`grid place-items-center w-[60px] h-[60px] rounded-[100px] bg-[#F3EDC6] hover:bg-[#ede7b8] transition-colors ${className}`}
     >
       <svg
         width={22}
         height={25.6959}
         viewBox="0 0 22 25.6959"
         aria-hidden="true"
+        className="ml-[2px]"
       >
         <polygon points="1 1 21 12.8479 1 24.6959" fill="#030303" />
       </svg>
@@ -35,41 +36,95 @@ function PlayButton({
   );
 }
 
-function YouTube({
-  id,
-  title = "YouTube video",
-}: {
-  id: string;
-  title?: string;
-}) {
-  const [playing, setPlaying] = React.useState(false);
-  const src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0&modestbranding=1`;
+function VideoPlayer({ src }: { src: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<any>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Check if HLS is supported natively (Safari)
+    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = src;
+    } else if (typeof window !== "undefined") {
+      // Use HLS.js for other browsers
+      import("hls.js").then(({ default: Hls }) => {
+        if (Hls.isSupported()) {
+          const hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true,
+            debug: false,
+          });
+
+          hlsRef.current = hls;
+
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            console.log("HLS manifest parsed successfully");
+          });
+
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            console.error("HLS error:", data);
+            if (data.fatal) {
+              switch (data.type) {
+                case Hls.ErrorTypes.NETWORK_ERROR:
+                  console.error("Fatal network error, trying to recover");
+                  hls.startLoad();
+                  break;
+                case Hls.ErrorTypes.MEDIA_ERROR:
+                  console.error("Fatal media error, trying to recover");
+                  hls.recoverMediaError();
+                  break;
+                default:
+                  console.error("Fatal error, cannot recover");
+                  hls.destroy();
+                  break;
+              }
+            }
+          });
+
+          hls.loadSource(src);
+          hls.attachMedia(video);
+        }
+      });
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [src]);
+
+  const handlePlay = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.play();
+      setIsPlaying(true);
+    }
+  };
 
   return (
-    <div
-      className="relative overflow-hidden rounded-[8px] w-full
-                aspect-[519/332] sm:aspect-video
-                xl:max-w-[519px] xl:h-[332px] xl:aspect-auto"
-    >
-      {playing ? (
-        <iframe
-          className="absolute inset-0 w-full h-full block"
-          src={src}
-          title={title}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
-      ) : (
+    <div className="relative overflow-hidden rounded-[8px] w-full max-w-[393px] h-[207px] md:max-w-[519px] md:h-[332px]">
+      <video
+        ref={videoRef}
+        className="absolute inset-0 w-full h-full object-contain"
+        controls={isPlaying}
+        preload="metadata"
+        playsInline
+        aria-label="Our story video"
+      >
+        Your browser does not support the video tag.
+      </video>
+
+      {!isPlaying && (
         <>
-          <img
-            src={`https://img.youtube.com/vi/${id}/hqdefault.jpg`}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover block"
-          />
-          <div className="absolute inset-0 bg-black/30" />
+          <div className="absolute inset-0 bg-[#00000066]" />
           <PlayButton
-            onClick={() => setPlaying(true)}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            onClick={handlePlay}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
           />
         </>
       )}
@@ -108,7 +163,15 @@ export default function OurStory({
               <div className="grid grid-cols-1 xl:grid-rows-1">
                 {/* Video */}
                 <div className="pt-10 lg:col-start-1 lg:row-start-1 lg:self-start">
-                  <YouTube id="dQw4w9WgXcQ" />
+                  <Suspense fallback={
+                    <div className="relative overflow-hidden rounded-[8px] w-full max-w-[393px] h-[207px] md:max-w-[519px] md:h-[332px] bg-gray-200 animate-pulse flex items-center justify-center">
+                      <span className="text-gray-400">Loading video...</span>
+                    </div>
+                  }>
+                    <VideoPlayer
+                      src="https://d1druk2o8f2ss7.cloudfront.net/hls/skin-bestie-clip/story_hls/master.m3u8"
+                    />
+                  </Suspense>
                 </div>
               </div>
             </div>

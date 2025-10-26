@@ -30,7 +30,7 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
             formTitle: s.formTitle ?? "",
             formInstruction: s.formInstruction ?? "",
             component: "skinType",
-            align: "left", // this step wants left-aligned headings in your UI
+            align: "center",
           } as StepMeta;
         case "OnboardingStepsSkinConcernsLayout":
           return {

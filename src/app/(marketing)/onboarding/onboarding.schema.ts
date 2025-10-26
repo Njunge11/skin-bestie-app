@@ -33,6 +33,18 @@ export const onboardingSchema = z
       .string()
       .min(1, "Date of birth is required")
       .refine((v) => !Number.isNaN(Date.parse(v)), "Select a valid date")
+      .refine((v) => {
+        const birthDate = new Date(v);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        const dayDiff = today.getDate() - birthDate.getDate();
+
+        // Adjust age if birthday hasn't occurred this year yet
+        const actualAge = (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) ? age - 1 : age;
+
+        return actualAge >= 18;
+      }, "You must be at least 18 years old")
       .default(''),
 
     // --- Optional free text ---
@@ -45,10 +57,19 @@ export const onboardingSchema = z
     // --- Step 3 ---
     concerns: z.array(z.string()).min(1, "Pick at least one concern").default([]),
     concernOther: z.string().optional().default(''),
-    hasAllergy: z.enum(["Yes", "No"], { message: "Pick at least one allergy" }).default('No'),
+    hasAllergy: z.enum(["Yes", "No"]).optional(),
     allergy: z.string().optional().default(''),
   })
   .superRefine((vals, ctx) => {
+    // Allergy selection is required
+    if (!vals.hasAllergy) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["hasAllergy"],
+        message: "Please select an option",
+      });
+    }
+
     // Phone number validation (strict)
     const raw = (vals.mobileLocal ?? "").trim();
     if (raw) {

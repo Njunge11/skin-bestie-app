@@ -27,14 +27,14 @@ export default function Benefits({
   );
 
   const borderByIndex = [
-    // 0: top-left
-    "p-6 box-border bg-[#FFFBE7] border-[0.4px] border-[#959170] md:border-t-0 md:border-l-0 md:border-r-[0.4px] xl:border-r-0 rounded-lg md:rounded-none",
-    // 1: top-right
-    "p-6 box-border bg-[#FFFBE7] border-[0.4px] border-[#959170] md:border-t-0 xl:border-l-[0.4px] rounded-lg md:rounded-none",
-    // 2: bottom-left
-    "p-6 box-border bg-[#FFFBE7] border-[0.4px] border-[#959170] md:border-t-[0.4px] md:border-r-[0.4px] xl:border-r-0 rounded-lg md:rounded-none",
-    // 3: bottom-right
-    "p-6 box-border bg-[#FFFBE7] border-[0.4px] border-[#959170] md:border-t-[0.4px] xl:border-l-[0.4px] rounded-lg md:rounded-none",
+    // 0: top-left - needs right and bottom borders (internal dividers)
+    "p-6 box-border bg-[#FFFBE7] border-[0.4px] border-[#959170] md:border-0 md:border-r-[0.4px] md:border-b-[0.4px] md:border-[#959170] rounded-lg md:rounded-none",
+    // 1: top-right - needs bottom border only
+    "p-6 box-border bg-[#FFFBE7] border-[0.4px] border-[#959170] md:border-0 md:border-b-[0.4px] md:border-[#959170] rounded-lg md:rounded-none",
+    // 2: bottom-left - needs right border only
+    "p-6 box-border bg-[#FFFBE7] border-[0.4px] border-[#959170] md:border-0 md:border-r-[0.4px] md:border-[#959170] rounded-lg md:rounded-none",
+    // 3: bottom-right - no internal borders needed
+    "p-6 box-border bg-[#FFFBE7] border-[0.4px] border-[#959170] md:border-0 rounded-lg md:rounded-none",
   ] as const;
 
   return (
@@ -50,7 +50,7 @@ export default function Benefits({
             {heading}
           </h1>
 
-          <div className="mt-6 flex flex-col min-[1200px]:flex-row md:border-[0.4px] md:border-[#959170] md:rounded-lg md:overflow-hidden md:bg-[#FFFBE7] w-full">
+          <div className="mt-6 flex flex-col min-[1200px]:flex-row md:rounded-lg md:overflow-hidden md:bg-[#FFFBE7] md:border md:border-[#959170] w-full">
             <div className="hidden md:block relative bg-gray-50 w-full min-[1200px]:w-[420px] min-[1200px]:flex-none">
               <div className="relative w-full overflow-hidden h-[clamp(220px,60vw,395px)] min-[1200px]:h-[395px]">
                 <Image

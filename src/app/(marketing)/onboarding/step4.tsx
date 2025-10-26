@@ -153,7 +153,7 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
               htmlFor={DETAIL_FIELD}
               className="inline-flex items-center capitalize font-medium text-[1rem] leading-[150%] tracking-[-0.01em] text-[#272B2D]"
             >
-              Allergy
+              Message
             </label>
 
             <textarea

@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const base = process.env.NEXT_PUBLIC_WORDPRESS_API_URL; // your current IP/base
+  const base = process.env.WORDPRESS_API_URL; // your current IP/base
   if (!base) return NextResponse.next();
 
   // Normalize path (remove trailing slash, but keep "/" for homepage)

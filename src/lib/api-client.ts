@@ -77,15 +77,15 @@ function createApiError(
 // ============================================================================
 
 function getDefaultConfig(): ApiConfig {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+  const baseUrl = process.env.API_BASE_URL;
+  const apiKey = process.env.API_KEY;
 
   if (!baseUrl) {
-    throw new Error('NEXT_PUBLIC_API_BASE_URL is not configured');
+    throw new Error('API_BASE_URL is not configured');
   }
 
   if (!apiKey) {
-    throw new Error('NEXT_PUBLIC_API_KEY is not configured');
+    throw new Error('API_KEY is not configured');
   }
 
   return { baseUrl, apiKey };
@@ -159,13 +159,28 @@ export async function apiRequest<T = any>(
       data = await response.json();
     } else {
       const text = await response.text();
-      data = { error: text || response.statusText };
+
+      // Check if we received HTML (likely a Next.js error page)
+      if (text.includes('<!DOCTYPE html>') || text.includes('<html')) {
+        data = {
+          error: response.status === 404
+            ? 'The requested endpoint was not found. Please contact support.'
+            : 'The server returned an unexpected response. Please try again or contact support.'
+        };
+      } else {
+        data = { error: text || response.statusText };
+      }
     }
 
     // Handle errors
     if (!response.ok) {
+      const errorMessage = data.error ||
+        (response.status === 404
+          ? 'The requested endpoint was not found. Please contact support.'
+          : `Server error (${response.status}). Please try again.`);
+
       throw createApiError(
-        data.error || `HTTP ${response.status}: ${response.statusText}`,
+        errorMessage,
         response.status,
         data
       );

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { anton } from "../fonts";
 
@@ -53,13 +54,13 @@ const HeroSection = () => {
           </p>
 
           {/* CTA Button */}
-          <a
+          <Link
             href="/onboarding"
             className="mt-10 w-full sm:w-auto group inline-flex items-center justify-center gap-2 font-semibold text-[1rem] sm:text-[1.125rem] leading-[150%] tracking-[-0.01em] text-[#FDFAEB] border-[0.8px] border-[#FDFAEB] rounded-xl py-4 px-6 bg-transparent transition-all duration-300 hover:opacity-90"
           >
-            <span>Step Into Skin Bestie</span>
+            <span>Begin My Skin Journey</span>
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </a>
+          </Link>
         </div>
       </div>
     </div>

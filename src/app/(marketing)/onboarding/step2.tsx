@@ -124,7 +124,7 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
       )}
 
       {current?.formInstruction ? (
-        <p className="font-medium text-base leading-[150%] tracking-[-0.01em] text-[#3F4548]">
+        <p className="font-medium text-base leading-[150%] tracking-[-0.01em] text-[#3F4548] text-center">
           {current.formInstruction}
         </p>
       ) : null}

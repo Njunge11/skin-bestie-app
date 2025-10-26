@@ -68,6 +68,11 @@ describe('Step 2: Skin Type - User Workflows', () => {
     await user.click(screen.getByRole('button', { name: /continue/i }));
 
     expect(await screen.findByRole('button', { name: /saving/i })).toBeInTheDocument();
+
+    // Wait for save to complete
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
   });
 
   it('user can select and deselect skin types', async () => {
@@ -108,6 +113,11 @@ describe('Step 2: Skin Type - User Workflows', () => {
 
     // Should save successfully
     expect(await screen.findByRole('button', { name: /saving/i })).toBeInTheDocument();
+
+    // Wait for save to complete
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
   });
 
   it('button is disabled while saving skin type', async () => {
@@ -123,5 +133,10 @@ describe('Step 2: Skin Type - User Workflows', () => {
 
     const savingButton = await screen.findByRole('button', { name: /saving/i });
     expect(savingButton).toBeDisabled();
+
+    // Wait for save to complete
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
   });
 });

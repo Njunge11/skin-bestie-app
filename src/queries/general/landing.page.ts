@@ -8,6 +8,7 @@ export const GetLandingPage = gql(/* GraphQL */ `
       home {
         skinbestieBenefits {
           ... on HomeSkinbestieBenefitsContentLayout {
+            mainHeadline
             backgroundImage {
               node {
                 altText
@@ -64,6 +65,7 @@ export const GetLandingPage = gql(/* GraphQL */ `
         }
         skinbestieValues {
           ... on HomeSkinbestieValuesContentLayout {
+            mainHeadline
             image {
               node {
                 altText

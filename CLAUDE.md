@@ -19,20 +19,11 @@ npm run codegen    # Generate TypeScript types from WordPress GraphQL schema
 
 This runs `graphql-codegen` to pull the schema from your WordPress installation and generate types in `src/gql/`. The `add-ts-nocheck.js` script adds `// @ts-nocheck` to generated files to suppress type errors.
 
-### Database (Drizzle ORM)
-```bash
-npm run db:generate  # Generate migration files from schema changes
-npm run db:migrate   # Apply migrations to database
-npm run db:studio    # Open Drizzle Studio (database GUI)
-```
-
-Database schema is defined in `src/db/schema.ts`. After modifying the schema, run `db:generate` to create migration files, then `db:migrate` to apply them.
-
 ## Architecture
 
 This is a Next.js 14 App Router application with:
 - **Headless WordPress CMS** via WPGraphQL for marketing content
-- **PostgreSQL database** with Drizzle ORM for user accounts
+- **External API backend** for user profile management
 - **Stripe** for subscription payments
 - **shadcn/ui + Tailwind CSS** for UI components
 
@@ -47,7 +38,7 @@ WordPress serves as the headless CMS for all marketing content. The integration 
 - **ACF Flexible Content**: Marketing pages use ACF flexible content blocks for dynamic layouts
 
 Environment variables required:
-- `NEXT_PUBLIC_WORDPRESS_API_URL` - WordPress GraphQL endpoint
+- `WORDPRESS_API_URL` - WordPress GraphQL endpoint (server-side only)
 - `HEADLESS_SECRET` - Shared secret for cache revalidation
 - `WP_USER` + `WP_APP_PASS` - WordPress credentials for draft/preview mode
 
@@ -69,23 +60,25 @@ Multi-step wizard at `/onboarding`:
 - Server component fetches steps from WordPress ACF
 - Maps WordPress layouts to step components (personal details, skin type, concerns, allergies, subscription, booking)
 - Client-side wizard uses React Hook Form + Zod validation
-- Final submission creates account via `/api/account` POST endpoint
+- Account creation and updates handled via Server Actions in `onboarding/actions.ts`
 - Stripe payment handled in step 5 via `/api/checkout/session`
 
 The wizard state is managed by `wizard.provider.tsx` and persisted across steps.
 
-### Database Layer
+### User Profile Management
 
-Drizzle ORM with PostgreSQL (`src/db/`):
-- **Schema**: `accounts` table with user profile data, skin type, concerns, subscription status
-- **Types**: `Account`, `NewAccount`, `SubscriptionStatus` exported from schema
-- **Connection**: Database URL from `DATABASE_URL` env var
+Account creation and updates are handled via Server Actions that call an external API backend:
 
-Account creation flow:
-1. Frontend posts to `/api/account`
-2. Validates input with Zod schema
-3. Checks uniqueness by email/phone
-4. Inserts into database with normalized data
+1. Frontend calls Server Action `createUserProfile()` from `onboarding/actions.ts`
+2. Server Action makes API request to external backend at `API_BASE_URL`
+3. Backend validates input, checks uniqueness, and manages database
+4. Returns user profile with ID to track onboarding progress
+
+API endpoints used:
+- `POST /api/user-profiles` - Create profile
+- `GET /api/user-profiles/:id` - Get profile
+- `PATCH /api/user-profiles/:id` - Update profile
+- `GET /api/user-profiles/check` - Check if email/phone exists
 
 ### Stripe Integration
 
@@ -98,6 +91,72 @@ Subscription payment flow:
 
 Uses Stripe API version `2025-08-27.basil` with flexible billing mode.
 
+## CI/CD Pipeline
+
+The project uses GitHub Actions with Vercel for continuous integration and deployment.
+
+### Workflow Strategy
+
+**Branch Structure:**
+- `main` - Production branch
+- Feature branches - Development work
+
+**Deployment Flow:**
+
+1. **Feature Branch PR** → Run tests + Deploy preview
+   - Tests run via GitHub Actions
+   - Preview deployment to Vercel with Preview environment variables
+   - Preview URL automatically commented on PR
+   - Uses `vercel deploy` with `--environment=preview`
+
+2. **Merge to main** → Run tests + Deploy production
+   - Tests run via GitHub Actions
+   - Production deployment to Vercel with Production environment variables
+   - Deploys to main domain
+   - Uses `vercel deploy --prod` with `--environment=production`
+
+### Environment Variables
+
+Configure environment variables in Vercel Dashboard (Project Settings → Environment Variables):
+
+**Production Environment** (main branch):
+```bash
+API_BASE_URL=https://api.skinbestie.com
+API_KEY=your-production-api-key
+WORDPRESS_API_URL=https://cms.skinbestie.com
+STRIPE_SECRET_KEY=sk_live_...
+# ... other production values
+```
+
+**Preview Environment** (all feature branches):
+```bash
+API_BASE_URL=https://staging-api.skinbestie.com
+API_KEY=your-staging-api-key
+WORDPRESS_API_URL=https://staging-cms.skinbestie.com
+STRIPE_SECRET_KEY=sk_test_...
+# ... other staging/test values
+```
+
+**Branch-Specific Variables** (optional):
+You can override specific Preview variables for individual branches by selecting the branch name when adding environment variables in Vercel.
+
+### Required GitHub Secrets
+
+Add these secrets in GitHub repository settings (Settings → Secrets and variables → Actions):
+
+- `VERCEL_TOKEN` - Vercel API token (Account Settings → Tokens)
+- `VERCEL_ORG_ID` - Vercel organization ID (from `.vercel/project.json`)
+- `VERCEL_PROJECT_ID` - Vercel project ID (from `.vercel/project.json`)
+
+### Workflow File
+
+Location: `.github/workflows/ci-cd.yml`
+
+The workflow includes three jobs:
+1. **test** - Runs on all PRs and main pushes
+2. **deploy-production** - Runs on main pushes (after tests pass)
+3. **deploy-preview** - Runs on PRs (after tests pass, comments preview URL)
+
 ## Directory Structure
 
 ```
@@ -105,10 +164,9 @@ src/
 ├── app/
 │   ├── (marketing)/        # Marketing site pages
 │   │   ├── page.tsx        # Landing page
-│   │   ├── onboarding/     # Multi-step onboarding wizard
+│   │   ├── onboarding/     # Multi-step onboarding wizard (uses Server Actions)
 │   │   └── [components]    # Section components (hero, benefits, etc.)
 │   ├── api/                # API routes
-│   │   ├── account/        # Account creation endpoint
 │   │   ├── checkout/       # Stripe checkout session
 │   │   └── revalidate/     # Cache revalidation webhook
 │   └── [...slug]/          # WordPress dynamic page catch-all
@@ -116,16 +174,17 @@ src/
 │   ├── ui/                 # shadcn/ui components
 │   ├── Templates/          # WordPress content type templates
 │   └── Globals/            # Shared components (nav, preview notice)
-├── db/
-│   ├── schema.ts           # Drizzle database schema
-│   └── index.ts            # Database connection
 ├── gql/                    # Auto-generated GraphQL types (do not edit)
+├── lib/                    # Utility functions and configs
+│   └── api-client.ts      # REST API client for external backend
 ├── queries/                # GraphQL query definitions
-├── utils/                  # Helper functions
-│   ├── wp.ts              # WordPress fetch with ISR
-│   ├── fetchGraphQL.ts    # WordPress fetch with draft mode
-│   └── seoData.ts         # SEO metadata helpers
-└── lib/                    # Utility functions and configs
+├── test/                   # Test utilities
+│   ├── setup.ts           # MSW server setup
+│   └── setup-rtl.ts       # React Testing Library config
+└── utils/                  # Helper functions
+    ├── wp.ts              # WordPress fetch with ISR
+    ├── fetchGraphQL.ts    # WordPress fetch with draft mode
+    └── seoData.ts         # SEO metadata helpers
 ```
 
 ## Environment Setup
@@ -136,15 +195,15 @@ Create `.env` file with these variables:
 # Frontend base URL
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
-# WordPress
-NEXT_PUBLIC_WORDPRESS_API_URL=https://your-wp-site.com
-NEXT_PUBLIC_WORDPRESS_API_HOSTNAME=your-wp-site.com
+# WordPress (server-side only)
+WORDPRESS_API_URL=https://your-wp-site.com
 HEADLESS_SECRET=your-secret-key
 WP_USER=wordpress-username
 WP_APP_PASS="wordpress-app-password"
 
-# Database
-DATABASE_URL=postgresql://user:pass@host:5432/dbname
+# External API Backend (for user profiles - SERVER ONLY, not exposed to browser)
+API_BASE_URL=http://localhost:3001
+API_KEY=your-api-key
 
 # Stripe
 STRIPE_SECRET_KEY=sk_test_...
@@ -156,13 +215,16 @@ See `.env.local.example` for reference.
 ## Key Files
 
 - `codegen.ts` - GraphQL codegen config (generates types from WordPress schema)
-- `drizzle.config.ts` - Drizzle ORM config
 - `add-ts-nocheck.js` - Script to add `@ts-nocheck` to generated GraphQL files
 - `apollo.config.js` - Apollo extension config for GraphQL autocomplete in VS Code
+- `src/lib/api-client.ts` - REST API client for external backend
+- `src/app/(marketing)/onboarding/actions.ts` - Server Actions for user profile management
 
 ## Development Notes
 
 - GraphQL types are regenerated on every `npm run dev` and `npm run build`
 - Marketing pages cache for 60s by default (configurable in `wpFetch()` calls)
-- Database migrations are NOT auto-applied; run `npm run db:migrate` after schema changes
+- User profiles are managed by external API backend at `API_BASE_URL` (server-side only)
+- Tests use MSW (Mock Service Worker) to mock API responses
 - Stripe integration uses confirmation_secret flow (Basil API version)
+- **Security Note**: Never use `NEXT_PUBLIC_` prefix for API keys, secrets, or backend URLs - only for truly public client-side values (e.g., Stripe publishable key, Google Analytics ID)

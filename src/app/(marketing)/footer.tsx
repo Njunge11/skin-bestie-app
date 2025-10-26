@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { anton } from "../fonts";
 export default function Footer() {
   return (
@@ -19,16 +20,19 @@ export default function Footer() {
             <div className="pt-9">
               <ul className="flex flex-col md:flex-row gap-6 font-semibold text-sm leading-[150%] tracking-normal text-[#FAFAFA]">
                 <li>
-                  <a href="">HOW IT WORKS</a>
+                  <a href="#how">HOW IT WORKS</a>
                 </li>
                 <li>
-                  <a href="">PRICING</a>
+                  <a href="#pricing">PRICING</a>
                 </li>
                 <li>
-                  <a href="">TERMS & CONDITIONS</a>
+                  <Link href="/terms-and-conditions">TERMS & CONDITIONS</Link>
                 </li>
                 <li>
-                  <a href="">PRIVACY POLICY</a>
+                  <Link href="/privacy-policy">PRIVACY POLICY</Link>
+                </li>
+                <li>
+                  <Link href="/terms-of-use">TERMS OF USE</Link>
                 </li>
               </ul>
             </div>

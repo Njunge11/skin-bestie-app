@@ -1,5 +1,5 @@
 // utils/wp.ts
-const WP_URL = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/graphql`;
+const WP_URL = `${process.env.WORDPRESS_API_URL}/graphql`;
 
 type WPInit = {
   /** ISR seconds; set to 0 if you want to opt out and still keep this helper */

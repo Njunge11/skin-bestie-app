@@ -1,5 +1,6 @@
 // app/(marketing)/pricing.tsx
 import React from "react";
+import Link from "next/link";
 import { anton } from "../fonts";
 import { ArrowRight } from "lucide-react";
 
@@ -56,23 +57,23 @@ export default function Pricing({
                   className="box-border h-20 bg-[#F3ECC7] rounded-lg flex items-center border-[0.6px] border-[#C4BC8E] p-5"
                 >
                   <span
-                    className={`${anton.className} font-normal text-[1.375rem] leading-[1.2] tracking-[-0.01em] uppercase text-[#2A2E30]`}
+                    className={`${anton.className} font-normal text-xl leading-[1.2] tracking-[-0.01em] uppercase text-[#2A2E30]`}
                   >
                     {b}
                   </span>
                 </div>
               ))}
             </div>
-            <a
-              href="#"
+            <Link
+              href="/onboarding"
               className="flex w-full py-4.5 items-center justify-center gap-2.5
                rounded-xl border-2 border-white bg-black px-5"
             >
               <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap text-center">
-                Begin My SkinBestie Journey
+                Begin My Skin Journey
               </span>
               <ArrowRight className="w-6 h-6 text-white" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
