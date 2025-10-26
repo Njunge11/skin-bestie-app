@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Footer from "./(marketing)/footer";
 import { Providers } from "./providers";
 
 const inter = Inter({
