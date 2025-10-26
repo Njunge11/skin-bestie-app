@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { anton } from "../fonts";
 
@@ -41,16 +42,16 @@ export default function Journey({
           </p>
           {/* Button hidden on mobile, shown on lg+ */}
           <div className="flex justify-center min-[1440px]:justify-start">
-            <a
-              href="#"
+            <Link
+              href="/onboarding"
               className="mt-9 hidden py-4.5 lg:grid w-[328px] grid-cols-[1fr_auto] items-center gap-[10px]
              rounded-xl border-2 border-white bg-black px-5"
             >
               <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap">
-                Begin My SkinBestie Journey
+                Begin My Skin Journey
               </span>
               <ArrowRight className="w-6 h-6 text-white" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>
@@ -92,16 +93,16 @@ export default function Journey({
 
       {/* Button for mobile only - order-3 */}
       <div className="order-3 lg:hidden px-4">
-        <a
-          href="#"
+        <Link
+          href="/onboarding"
           className="mt-6 flex w-full py-4.5 items-center justify-center gap-2.5
                rounded-xl border-2 border-white bg-black px-5"
         >
           <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap text-center">
-            Begin My SkinBestie Journey
+            Begin My Skin Journey
           </span>
           <ArrowRight className="w-6 h-6 text-white" />
-        </a>
+        </Link>
       </div>
     </section>
   );

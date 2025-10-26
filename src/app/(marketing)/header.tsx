@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,7 +16,7 @@ const Header = () => {
   const navLinks = [
     { href: "#story", label: "Our Story" },
     { href: "#how", label: "How It Works" },
-    { href: "#community", label: "Community" },
+    { href: "#community", label: "Testimonials" },
     { href: "#pricing", label: "Pricing" },
   ];
 
@@ -30,13 +31,13 @@ const Header = () => {
           <nav className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <a href="/" className="block">
+              <Link href="/" className="block">
                 <img
                   src="/skinbestie-logo.png"
                   alt="Logo"
                   className="object-contain h-8 sm:h-10 lg:h-[42px] w-auto max-w-[160px] sm:max-w-[180px] lg:max-w-[206px]"
                 />
-              </a>
+              </Link>
             </div>
 
             {/* Desktop Navigation - ONLY SHOWS WHEN EVERYTHING FITS */}

@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 async function getTotalCounts() {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp-json/sitemap/v1/totalpages`,
+    `${process.env.WORDPRESS_API_URL}/wp-json/sitemap/v1/totalpages`,
   );
   const data = await response.json();
   if (!data) return [];
@@ -30,7 +30,7 @@ async function getPostsUrls({
   perPage: number;
 }) {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp-json/sitemap/v1/posts?pageNo=${page}&postType=${type}&perPage=${perPage}`,
+    `${process.env.WORDPRESS_API_URL}/wp-json/sitemap/v1/posts?pageNo=${page}&postType=${type}&perPage=${perPage}`,
   );
 
   const data = await response.json();

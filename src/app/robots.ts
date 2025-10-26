@@ -4,7 +4,7 @@ export const revalidate = 0;
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/robots.txt`,
+    `${process.env.WORDPRESS_API_URL}/robots.txt`,
     { cache: "no-store" },
   );
 

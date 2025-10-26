@@ -27,6 +27,11 @@ describe('Step 4: Allergies - User Workflows', () => {
     await user.click(screen.getByRole('button', { name: /continue/i }));
 
     expect(await screen.findByRole('button', { name: /saving/i })).toBeInTheDocument();
+
+    // Wait for save to complete
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
   });
 
   it('user submits with default "No" selection', async () => {
@@ -42,6 +47,11 @@ describe('Step 4: Allergies - User Workflows', () => {
 
     // Should save successfully
     expect(await screen.findByRole('button', { name: /saving/i })).toBeInTheDocument();
+
+    // Wait for save to complete
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
   });
 
   it('user selects "Yes" and text field appears with validation', async () => {
@@ -49,13 +59,13 @@ describe('Step 4: Allergies - User Workflows', () => {
     render(<Step4WithProfile />);
 
     // Text field should not be visible initially
-    expect(screen.queryByLabelText(/allergy/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/message/i)).not.toBeInTheDocument();
 
     // Select "Yes"
     await user.click(screen.getByLabelText(/^yes$/i));
 
     // Text field appears
-    expect(screen.getByLabelText(/allergy/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
 
     // Submit without filling text
     await user.click(screen.getByRole('button', { name: /continue/i }));
@@ -64,13 +74,18 @@ describe('Step 4: Allergies - User Workflows', () => {
     expect(await screen.findByText(/please describe your allergy/i)).toBeInTheDocument();
 
     // Fill in the allergy details
-    const allergyTextarea = screen.getByLabelText(/allergy/i);
+    const allergyTextarea = screen.getByLabelText(/message/i);
     await user.type(allergyTextarea, 'Allergic to fragrance and parabens');
 
     // Submit successfully
     await user.click(screen.getByRole('button', { name: /continue/i }));
 
     expect(await screen.findByRole('button', { name: /saving/i })).toBeInTheDocument();
+
+    // Wait for save to complete
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
   });
 
   it('user switches from "Yes" to "No" and text field disappears', async () => {
@@ -79,20 +94,25 @@ describe('Step 4: Allergies - User Workflows', () => {
 
     // Select "Yes"
     await user.click(screen.getByLabelText(/^yes$/i));
-    expect(screen.getByLabelText(/allergy/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/message/i)).toBeInTheDocument();
 
     // Type something
-    await user.type(screen.getByLabelText(/allergy/i), 'Some allergy');
+    await user.type(screen.getByLabelText(/message/i), 'Some allergy');
 
     // Switch to "No"
     await user.click(screen.getByLabelText(/^no$/i));
 
     // Text field disappears
-    expect(screen.queryByLabelText(/allergy/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/message/i)).not.toBeInTheDocument();
 
     // Can submit successfully
     await user.click(screen.getByRole('button', { name: /continue/i }));
     expect(await screen.findByRole('button', { name: /saving/i })).toBeInTheDocument();
+
+    // Wait for save to complete
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
   });
 
   it('button is disabled while saving', async () => {
@@ -108,5 +128,10 @@ describe('Step 4: Allergies - User Workflows', () => {
 
     const savingButton = await screen.findByRole('button', { name: /saving/i });
     expect(savingButton).toBeDisabled();
+
+    // Wait for save to complete
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
+    });
   });
 });

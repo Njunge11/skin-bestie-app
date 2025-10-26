@@ -3,7 +3,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import type { OnboardingSchema } from "./onboarding.schema";
+import { getUserProfile, updateUserProfile } from "./actions";
+import { mergeCompletedSteps } from "./onboarding.utils";
 
 declare global {
   interface Window {
@@ -76,6 +79,20 @@ export default function CalendlyInline() {
   const MIN_SKELETON_MS = 400; // prevent blink
   const FALLBACK_READY_MS = 3000; // if no postMessage comes
 
+  // Get user profile ID
+  const userProfileId = getValues("userProfileId");
+
+  // Get current profile data
+  const { data: currentProfile } = useQuery({
+    queryKey: ["userProfile", userProfileId],
+    queryFn: async () => {
+      if (!userProfileId) return null;
+      const result = await getUserProfile(userProfileId);
+      return result.success ? result.data : null;
+    },
+    enabled: !!userProfileId,
+  });
+
   const base = process.env.NEXT_PUBLIC_CALENDLY_EVENT_URL || "";
   const url = useMemo(() => {
     if (!base) return "";
@@ -126,12 +143,14 @@ export default function CalendlyInline() {
     };
   }, []);
 
-  // hide skeleton only once Calendly paints
+  // hide skeleton only once Calendly paints + listen for booking completion
   useEffect(() => {
-    function onMsg(e: MessageEvent) {
+    async function onMsg(e: MessageEvent) {
       if (typeof e.origin !== "string" || !e.origin.includes("calendly.com"))
         return;
       const evt = (e.data && (e.data.event as string)) || "";
+
+      // Show calendar when it's ready
       if (
         evt === "calendly.profile_page_viewed" ||
         evt === "calendly.event_type_viewed"
@@ -142,10 +161,43 @@ export default function CalendlyInline() {
           if (mountedRef.current) setReady(true);
         }, wait);
       }
+
+      // Handle successful booking
+      if (evt === "calendly.event_scheduled") {
+        if (!userProfileId || !currentProfile) return;
+
+        try {
+          // Extract Calendly event details from payload (if needed for future use)
+          const payload = e.data?.payload;
+          const calendlyEventUri = payload?.event?.uri;
+          const calendlyInviteeUri = payload?.invitee?.uri;
+
+          console.log("Calendly booking completed:", {
+            eventUri: calendlyEventUri,
+            inviteeUri: calendlyInviteeUri,
+          });
+
+          const completedSteps = mergeCompletedSteps(
+            currentProfile.completedSteps,
+            ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE", "BOOKING"]
+          );
+
+          await updateUserProfile(userProfileId, {
+            hasCompletedBooking: true,
+            completedSteps,
+            isCompleted: true,
+            completedAt: new Date().toISOString(),
+          });
+
+          console.log("Booking completed and saved to database");
+        } catch (error) {
+          console.error("Failed to save booking completion:", error);
+        }
+      }
     }
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
-  }, []);
+  }, [userProfileId, currentProfile]);
 
   // load calendly assets and init (StrictMode-safe)
   useEffect(() => {

@@ -40,7 +40,7 @@ export const appearance = {
 type IntentType = "payment" | "setup";
 
 // One place to control the vertical space (skeleton + Stripe share it)
-const HEIGHT_CLS = "min-h-[21rem] sm:min-h-[21rem] md:min-h-[21rem]";
+const HEIGHT_CLS = "";
 
 export default function Step5({ onNext, onShowingSuccess }: { onNext?: () => void; onShowingSuccess?: (showing: boolean) => void }) {
   const { getValues } = useFormContext<OnboardingSchema>();
@@ -200,29 +200,16 @@ function Form({
     kind: "success" | "error";
     text: string;
   } | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
-  // Stripe element readiness & visibility
+  // Stripe element readiness
   const [peReady, setPeReady] = useState(false);
-  const [peVisible, setPeVisible] = useState(false); // used only for the fade
-
-  const prefersReduced =
-    typeof window !== "undefined" &&
-    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
   const onPEReady = () => {
-    // Stripe iframe reported ready.
-    setPeReady(true); // ✅ gate button + secure copy on THIS
-    if (prefersReduced) {
-      setPeVisible(true); // no animation
-      return;
-    }
-    // Smoothly fade the iframe in (no timers)
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => setPeVisible(true));
-    });
+    setPeReady(true);
   };
 
-  const canSubmit = !!stripe && !!elements && peReady && !loading;
+  const canSubmit = !!stripe && !!elements && peReady && !loading && termsAccepted;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -323,27 +310,21 @@ function Form({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {/* Stable height in both states */}
-      <div className={`relative w-full ${HEIGHT_CLS}`} aria-busy={!peReady}>
-        {/* Stripe element (fades in) */}
-        <div
-          data-visible={peVisible || undefined}
-          className="h-full opacity-0 data-[visible]:opacity-100 transition-opacity duration-300"
-          style={{ visibility: peVisible ? "visible" : "hidden" }}
-        >
+      {/* Show skeleton while loading, payment element when ready */}
+      <div className={`relative w-full ${HEIGHT_CLS}`}>
+        {!peReady && <PaymentSkeleton />}
+        <div style={{ display: peReady ? 'block' : 'none' }}>
           <PaymentElement
             id="payment-element"
-            options={{ layout: "tabs" }}
+            options={{
+              layout: "tabs",
+              terms: {
+                card: "never",
+              },
+            }}
             onReady={onPEReady}
           />
         </div>
-
-        {/* Skeleton overlay until visible */}
-        {!peVisible && (
-          <div className="pointer-events-none absolute inset-0">
-            <PaymentSkeleton />
-          </div>
-        )}
       </div>
 
       {notice && (
@@ -368,6 +349,38 @@ function Form({
       {/* ✅ Render button + secure copy ONLY after the element is actually ready */}
       {peReady && (
         <>
+          {/* Terms and Conditions Checkbox */}
+          <div className="flex items-start gap-3 p-4 bg-[#FFFBE5] border border-[#030303] rounded">
+            <input
+              type="checkbox"
+              id="terms-checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-[#030303] text-[#030303] focus:ring-[#030303] focus:ring-offset-0 cursor-pointer"
+              aria-required="true"
+            />
+            <label htmlFor="terms-checkbox" className="text-sm text-[#3F4548] cursor-pointer">
+              I agree to the{" "}
+              <a
+                href="/terms-and-conditions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#030303] transition-opacity"
+              >
+                Terms & Conditions
+              </a>{" "}
+              and{" "}
+              <a
+                href="/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#030303] transition-opacity"
+              >
+                Privacy Policy
+              </a>
+            </label>
+          </div>
+
           <MButton type="submit" disabled={!canSubmit} showIcon={false}>
             {loading ? "Processing..." : buttonText}
           </MButton>
@@ -375,7 +388,7 @@ function Form({
           <div className="mt-1 flex items-center gap-2 text-xs text-[#3F4548]">
             <Lock className="h-3.5 w-3.5" aria-hidden="true" />
             <span>
-              Payments are securely processed by Stripe. We don’t store your
+              Payments are securely processed by Stripe. We don't store your
               card details.
             </span>
           </div>

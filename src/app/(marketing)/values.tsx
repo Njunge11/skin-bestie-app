@@ -10,10 +10,12 @@ type ValuesItem = {
 };
 
 export default function Values({
+  heading = "Our Values",
   imageSrc,
   imageAlt,
   items,
 }: {
+  heading?: string;
   imageSrc: string;
   imageAlt: string;
   items: ValuesItem[];
@@ -34,7 +36,7 @@ export default function Values({
             <h1
               className={`${anton.className} text-center sm:text-left text-[#222118] text-4xl sm:text-5xl leading-[1.1] tracking-[-0.02em] uppercase font-normal`}
             >
-              Our Values
+              {heading}
             </h1>
 
             <div className="pt-10 space-y-10">

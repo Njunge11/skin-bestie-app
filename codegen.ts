@@ -7,7 +7,7 @@ loadEnvConfig(projectDir);
 const config: CodegenConfig = {
   overwrite: true,
   schema: {
-    [`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/graphql`]: {
+    [`${process.env.WORDPRESS_API_URL}/graphql`]: {
       headers: {
         "User-Agent": "Codegen",
       },
