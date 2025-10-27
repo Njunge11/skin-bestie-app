@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { anton } from "@/app/fonts";
 import { useWizard } from "./wizard.provider";
@@ -45,6 +46,7 @@ const FIELDS_BY_STEP: Record<
 };
 
 export default function OnboardingForm() {
+  const router = useRouter();
   const { stepIndex, total, next, back, current } = useWizard();
   const { clearErrors, resetField, getValues } =
     useFormContext<OnboardingSchema>();
@@ -68,7 +70,7 @@ export default function OnboardingForm() {
   const handleBack = () => {
     // If on step 1, navigate to home page
     if (stepIndex === 0) {
-      window.location.href = "/";
+      router.push("/");
       return;
     }
 
