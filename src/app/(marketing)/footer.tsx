@@ -53,9 +53,9 @@ export default function Footer() {
             </div>
             <div className="pt-6">
               <p className="font-inter font-medium text-[15px] leading-[150%] tracking-[-0.01em] text-[#FAFAFA]">
-                By providing your email, you agree to receive promotional and
-                marketing and customer service communications from SkinBestie.
-                You can unsubscribe anytime.
+                Stay in the SkinBestie Loop. Sign up for our monthly newsletter
+                for behind-the-scenes updates, a dose of skincare wisdom each
+                month, and community stories. Unsubscribe anytime.
               </p>
             </div>
           </div>

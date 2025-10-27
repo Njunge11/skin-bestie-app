@@ -66,7 +66,7 @@ export default function Testimonials({
                   className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 flex"
                 >
                   <div className="p-6 rounded-xl bg-[#EDEDED05] border-[0.3px] border-[#FDFAEB4D] w-full max-w-[413px] h-full flex flex-col">
-                    <div>
+                    {/* <div>
                       <h2
                         className={`${anton.className} font-normal text-2xl text-[#FFF7D4] uppercase leading-[1.2] tracking-[-0.02em]`}
                       >
@@ -95,14 +95,14 @@ export default function Testimonials({
                       <p className="mt-2 font-medium text-base text-[#DFDBD2] leading-[1.5] tracking-[-0.01em]">
                         {card.timeline}
                       </p>
-                    </div>
-                    <div className="pt-8 flex-grow">
-                      <h2
+                    </div> */}
+                    <div className="flex-grow">
+                      {/* <h2
                         className={`${anton.className} font-normal text-2xl text-[#FFF7D4] uppercase leading-[1.2] tracking-[-0.02em]`}
                       >
                         TESTIMONIAL
-                      </h2>
-                      <p className="mt-2 font-medium text-base text-[#DFDBD2] leading-[1.5] tracking-[-0.01em]">
+                      </h2> */}
+                      <p className="font-medium text-base text-[#DFDBD2] leading-[1.5] tracking-[-0.01em]">
                         {card.testimonial}
                       </p>
                     </div>

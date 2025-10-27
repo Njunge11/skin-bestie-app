@@ -68,7 +68,6 @@ export default function Step5({ onNext, onShowingSuccess }: { onNext?: () => voi
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          priceId: "price_1SAsSTIbiE06ZB2bOXj4Ce1P",
           customerEmail: currentProfile.email,
           metadata: {
             userProfileId: currentProfile.id,

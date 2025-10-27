@@ -106,7 +106,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 type Body = {
-  priceId: string;
   quantity?: number;
   customerEmail?: string;
   metadata?: Record<string, string>;
@@ -115,14 +114,15 @@ type Body = {
 export async function POST(req: Request) {
   try {
     const {
-      priceId,
       quantity = 1,
       customerEmail,
       metadata = {},
     } = (await req.json()) as Body;
 
+    // Read price ID from environment variable
+    const priceId = process.env.STRIPE_PRICE_ID;
     if (!priceId) {
-      return NextResponse.json({ error: "Missing priceId" }, { status: 400 });
+      return NextResponse.json({ error: "Server configuration error: Missing Stripe price ID" }, { status: 500 });
     }
 
     // Ensure a Customer
