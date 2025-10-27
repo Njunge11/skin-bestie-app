@@ -26,7 +26,9 @@ export default function Footer() {
                   <a href="#pricing">PRICING</a>
                 </li>
                 <li>
-                  <Link href="/terms-and-conditions">TERMS & CONDITIONS</Link>
+                  <Link href="/terms-and-conditions">
+                    CLIENT TERMS & CONDITIONS
+                  </Link>
                 </li>
                 <li>
                   <Link href="/privacy-policy">PRIVACY POLICY</Link>
