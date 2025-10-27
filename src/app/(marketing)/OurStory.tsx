@@ -121,6 +121,12 @@ function VideoPlayer({ src }: { src: string }) {
 
       {!isPlaying && (
         <>
+          {/* 16:9 Poster - fills container */}
+          <img
+            src="/story-poster-16-9.jpg"
+            alt="Video thumbnail"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-[#00000066]" />
           <PlayButton
             onClick={handlePlay}
