@@ -63,9 +63,9 @@ export default function Testimonials({
               {items.map((card, idx) => (
                 <CarouselItem
                   key={`${card.customerName}-${idx}`}
-                  className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3"
+                  className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 flex"
                 >
-                  <div className="p-6 rounded-xl bg-[#EDEDED05] border-[0.3px] border-[#FDFAEB4D] w-full max-w-[413px]">
+                  <div className="p-6 rounded-xl bg-[#EDEDED05] border-[0.3px] border-[#FDFAEB4D] w-full max-w-[413px] h-full flex flex-col">
                     <div>
                       <h2
                         className={`${anton.className} font-normal text-2xl text-[#FFF7D4] uppercase leading-[1.2] tracking-[-0.02em]`}
@@ -96,7 +96,7 @@ export default function Testimonials({
                         {card.timeline}
                       </p>
                     </div>
-                    <div className="pt-8">
+                    <div className="pt-8 flex-grow">
                       <h2
                         className={`${anton.className} font-normal text-2xl text-[#FFF7D4] uppercase leading-[1.2] tracking-[-0.02em]`}
                       >
