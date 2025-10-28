@@ -17,9 +17,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  auth,
+  guest,
 }: {
   children: React.ReactNode;
+  auth: React.ReactNode;
+  guest: React.ReactNode;
 }) {
+  // We're using conditional rendering in page.tsx, so just render children
+  // The auth and guest props are required by Next.js but we don't use them
   return (
     <html lang="en" className="bg-black scroll-smooth scroll-pt-20">
       <body className={`${inter.className} antialiased`}>
