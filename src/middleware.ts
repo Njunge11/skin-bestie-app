@@ -2,6 +2,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Note: We cannot use auth() from NextAuth directly in middleware
+// as it requires edge runtime compatibility. Authentication checks
+// are handled in the route layouts instead.
+
 export async function middleware(request: NextRequest) {
   // Skip if creds aren't present
   if (!process.env.WP_USER || !process.env.WP_APP_PASS) {

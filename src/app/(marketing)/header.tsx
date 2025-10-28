@@ -55,16 +55,22 @@ const Header = () => {
 
             {/* Desktop Sign In Button - ONLY WITH DESKTOP NAV */}
             <div className="hidden xl:block">
-              <button className="text-[#FAFAFA] rounded-xl px-4 py-3 2xl:p-4 bg-[#EDEDED]/[0.05] border border-[#FDFAEB]/30 font-medium text-base 2xl:text-[1.0625rem] leading-[1.5] tracking-tighter transition-all duration-300 hover:bg-white/10 whitespace-nowrap">
+              <Link
+                href="/login"
+                className="text-[#FAFAFA] rounded-xl px-4 py-3 2xl:p-4 bg-[#EDEDED]/[0.05] border border-[#FDFAEB]/30 font-medium text-base 2xl:text-[1.0625rem] leading-[1.5] tracking-tighter transition-all duration-300 hover:bg-white/10 whitespace-nowrap inline-block"
+              >
                 Sign into your account
-              </button>
+              </Link>
             </div>
 
             {/* Mobile Sign In Button - Replaces hamburger menu */}
             <div className="xl:hidden">
-              <button className="bg-[#1D1414B2] text-[#FDFAEB] rounded-xl p-4 border border-[#FDFAEB4D] font-semibold text-lg leading-[1.5] tracking-tight text-center transition-all duration-300 hover:opacity-90 whitespace-nowrap">
+              <Link
+                href="/login"
+                className="bg-[#1D1414B2] text-[#FDFAEB] rounded-xl p-4 border border-[#FDFAEB4D] font-semibold text-lg leading-[1.5] tracking-tight text-center transition-all duration-300 hover:opacity-90 whitespace-nowrap inline-block"
+              >
                 Sign in
-              </button>
+              </Link>
             </div>
           </nav>
         </div>

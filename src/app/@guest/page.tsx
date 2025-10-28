@@ -2,15 +2,15 @@
 import { print } from "graphql";
 import { wpFetch } from "@/utils/wp";
 import { GetLandingPage } from "@/queries/general/landing.page";
-import Benefits from "./benefits";
-import Journey from "./journey";
-import Testimonials from "./testimonials"; // Community
-import Values from "./values";
-import Pricing from "./pricing";
-import Faqs from "./faqs";
-import OurStory from "./OurStory";
-import Header from "./header";
-import HeroSection from "./hero";
+import Benefits from "../(marketing)/benefits";
+import Journey from "../(marketing)/journey";
+import Testimonials from "../(marketing)/testimonials"; // Community
+import Values from "../(marketing)/values";
+import Pricing from "../(marketing)/pricing";
+import Faqs from "../(marketing)/faqs";
+import OurStory from "../(marketing)/OurStory";
+import Header from "../(marketing)/header";
+import HeroSection from "../(marketing)/hero";
 
 export const revalidate = 60;
 
