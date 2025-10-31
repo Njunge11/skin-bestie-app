@@ -19,13 +19,12 @@ const SKIN_TYPES = [
   "I'm Not Sure",
 ] as const;
 
-export default function Step2({ onNext }: { onNext?: () => void }) {
+export default function Step2() {
   const {
     control,
     setValue,
     getValues,
     trigger,
-    setError,
     formState: { errors },
   } = useFormContext<OnboardingSchema>();
   const { current, next } = useWizard();
@@ -91,7 +90,7 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
       // Merge completed steps (preserve existing progress)
       const completedSteps = mergeCompletedSteps(
         currentProfile?.completedSteps,
-        ["PERSONAL", "SKIN_TYPE"]
+        ["PERSONAL", "SKIN_TYPE"],
       );
 
       // Update profile with skin types
@@ -118,7 +117,10 @@ export default function Step2({ onNext }: { onNext?: () => void }) {
     <form onSubmit={(e) => e.preventDefault()} noValidate>
       {/* Server error message */}
       {serverError && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+        <div
+          className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md"
+          role="alert"
+        >
           <p className="text-sm text-red-800">{serverError}</p>
         </div>
       )}

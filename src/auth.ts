@@ -18,6 +18,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // User is created during onboarding, not during auth
       return !!user.email;
     },
+    async jwt({ token, user }) {
+      // Add user ID to JWT token on sign-in
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Add user ID from JWT token to session
+      if (token.id) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
     async redirect({ url, baseUrl }) {
       // Redirect to home after successful sign-in (will show @auth slot)
       if (url.startsWith("/")) return `${baseUrl}${url}`;

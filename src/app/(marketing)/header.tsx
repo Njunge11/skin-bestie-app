@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-// Hide login CTA only in production (show in dev and preview)
-const SHOW_LOGIN = process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_VERCEL_ENV !== 'production';
+// Hide login CTA only in production (show in dev)
+const SHOW_LOGIN = process.env.NODE_ENV !== "production";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -35,9 +36,11 @@ const Header = () => {
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="block">
-                <img
+                <Image
                   src="/skinbestie-logo.png"
                   alt="Logo"
+                  width={206}
+                  height={42}
                   className="object-contain h-8 sm:h-10 lg:h-[42px] w-auto max-w-[160px] sm:max-w-[180px] lg:max-w-[206px]"
                 />
               </Link>

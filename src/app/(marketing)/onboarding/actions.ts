@@ -1,7 +1,7 @@
 // src/features/onboarding/actions.ts
 "use server";
 
-import { api, isApiError } from "@/lib/api-client";
+import { api, ApiError } from "@/lib/api-client";
 
 // ============================================================================
 // Types
@@ -96,23 +96,20 @@ const defaultDeps: OnboardingActionsDeps = {
  */
 export async function createUserProfile(
   input: UserProfileCreateInput,
-  deps: OnboardingActionsDeps = defaultDeps
+  deps: OnboardingActionsDeps = defaultDeps,
 ): Promise<Result<UserProfile>> {
   try {
-    const profile = await deps.api.post<UserProfile>(
-      "/api/user-profiles",
-      input
-    );
+    const profile = await deps.api.post("/api/user-profiles", input);
 
     return {
       success: true,
       data: profile,
     };
   } catch (error) {
-    if (isApiError(error)) {
+    if ((error as ApiError).status) {
       return {
         success: false,
-        error: error.message,
+        error: (error as ApiError).message,
       };
     }
 
@@ -128,22 +125,20 @@ export async function createUserProfile(
  */
 export async function getUserProfile(
   id: string,
-  deps: OnboardingActionsDeps = defaultDeps
+  deps: OnboardingActionsDeps = defaultDeps,
 ): Promise<Result<UserProfile>> {
   try {
-    const profile = await deps.api.get<UserProfile>(
-      `/api/user-profiles/${id}`
-    );
+    const profile = await deps.api.get(`/api/user-profiles/${id}`);
 
     return {
       success: true,
       data: profile,
     };
   } catch (error) {
-    if (isApiError(error)) {
+    if ((error as ApiError).status) {
       return {
         success: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
 
@@ -162,23 +157,20 @@ export async function getUserProfile(
 export async function updateUserProfile(
   id: string,
   updates: UserProfileUpdateInput,
-  deps: OnboardingActionsDeps = defaultDeps
+  deps: OnboardingActionsDeps = defaultDeps,
 ): Promise<Result<UserProfile>> {
   try {
-    const profile = await deps.api.patch<UserProfile>(
-      `/api/user-profiles/${id}`,
-      updates
-    );
+    const profile = await deps.api.patch(`/api/user-profiles/${id}`, updates);
 
     return {
       success: true,
       data: profile,
     };
   } catch (error) {
-    if (isApiError(error)) {
+    if ((error as ApiError).status) {
       return {
         success: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
 
@@ -194,7 +186,7 @@ export async function updateUserProfile(
  */
 export async function checkUserExists(
   params: CheckExistsInput,
-  deps: OnboardingActionsDeps = defaultDeps
+  deps: OnboardingActionsDeps = defaultDeps,
 ): Promise<Result<CheckExistsResponse>> {
   try {
     const query = new URLSearchParams();
@@ -207,8 +199,8 @@ export async function checkUserExists(
       query.set("phoneNumber", params.phoneNumber);
     }
 
-    const result = await deps.api.get<CheckExistsResponse>(
-      `/api/user-profiles/check?${query.toString()}`
+    const result = await deps.api.get(
+      `/api/user-profiles/check?${query.toString()}`,
     );
 
     return {
@@ -216,10 +208,10 @@ export async function checkUserExists(
       data: result,
     };
   } catch (error) {
-    if (isApiError(error)) {
+    if ((error as ApiError).status) {
       return {
         success: false,
-        error: error.message,
+        error: (error as Error).message,
       };
     }
 

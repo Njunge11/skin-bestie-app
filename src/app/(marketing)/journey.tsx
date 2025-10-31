@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { anton } from "../fonts";
 
@@ -74,10 +75,12 @@ export default function Journey({
                       : "h-auto lg:max-[1439px]:h-[400px] min-[1440px]:h-[323px]"
                 }`}
               >
-                <img
+                <Image
                   src={s.iconSrc}
                   alt={s.iconAlt}
                   className="w-[40px] h-[40px]"
+                  width={40}
+                  height={40}
                 />
                 <h2
                   className={`mt-6 ${anton.className} font-normal text-2xl sm:text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}

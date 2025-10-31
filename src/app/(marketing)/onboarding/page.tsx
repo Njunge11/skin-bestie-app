@@ -4,9 +4,22 @@ import { GET_ONBOARDING_PAGE } from "@/queries/general/onboarding";
 import type { StepMeta } from "./onboarding.types";
 import OnboardingClient from "./onboarding.client";
 // Map WP steps -> your StepMeta
-function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
+type WPStep = {
+  __typename: string;
+  mainHeadline?: string;
+  subHeadline?: string;
+  backgroundImage?: { node?: { sourceUrl?: string } };
+  formTitle?: string;
+  formDescription?: string;
+  formInstruction?: string;
+  subscriptionHeadline?: string;
+  subscriptionSubHeadline?: string;
+  subscriptionBenefits?: Array<{ benefit?: string }>;
+};
+
+function mapWpStepsToStepMeta(steps: WPStep[]): StepMeta[] {
   return steps
-    .map((s: any, idx: number) => {
+    .map((s, idx: number) => {
       switch (s.__typename) {
         case "OnboardingStepsPersonalDetailsLayout":
           return {
@@ -69,7 +82,7 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
             subscriptionHeadline: s.subscriptionHeadline ?? "",
             subscriptionSubHeadline: s.subscriptionSubHeadline ?? "",
             subscriptionBenefits: (s.subscriptionBenefits ?? [])
-              .map((b: any) => b?.benefit)
+              .map((b) => b?.benefit)
               .filter(Boolean),
             component: "subscribe",
             align: "center",
@@ -86,7 +99,7 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
             subscriptionHeadline: s.subscriptionHeadline ?? "",
             subscriptionSubHeadline: s.subscriptionSubHeadline ?? "",
             subscriptionBenefits: (s.subscriptionBenefits ?? [])
-              .map((b: any) => b?.benefit)
+              .map((b) => b?.benefit)
               .filter(Boolean),
             component: "book",
             align: "center",
@@ -100,7 +113,13 @@ function mapWpStepsToStepMeta(steps: any[]): StepMeta[] {
 
 async function getOnboardingSteps(): Promise<StepMeta[]> {
   const query = print(GET_ONBOARDING_PAGE);
-  const data = await wpFetch(query);
+  const data = await wpFetch<{
+    page?: {
+      onboarding?: {
+        steps?: WPStep[];
+      };
+    };
+  }>(query);
   const rawSteps = data?.page?.onboarding?.steps ?? [];
   const mapped = mapWpStepsToStepMeta(rawSteps);
 

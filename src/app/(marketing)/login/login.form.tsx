@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Mail } from "lucide-react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { anton } from "@/app/fonts";
 import { signIn } from "next-auth/react";
 
@@ -11,6 +11,8 @@ interface LoginFormProps {
   email: string;
   onEmailSent: (email: string) => void;
   onBackToLogin: () => void;
+  formHeading: string;
+  formSubheading: string;
 }
 
 export default function LoginForm({
@@ -18,6 +20,8 @@ export default function LoginForm({
   email,
   onEmailSent,
   onBackToLogin,
+  formHeading,
+  formSubheading,
 }: LoginFormProps) {
   const router = useRouter();
 
@@ -52,14 +56,26 @@ export default function LoginForm({
         {emailSent ? (
           <SuccessScreen email={email} onResend={() => onEmailSent(email)} />
         ) : (
-          <EmailForm onEmailSent={onEmailSent} />
+          <EmailForm
+            onEmailSent={onEmailSent}
+            formHeading={formHeading}
+            formSubheading={formSubheading}
+          />
         )}
       </div>
     </div>
   );
 }
 
-function EmailForm({ onEmailSent }: { onEmailSent: (email: string) => void }) {
+function EmailForm({
+  onEmailSent,
+  formHeading,
+  formSubheading,
+}: {
+  onEmailSent: (email: string) => void;
+  formHeading: string;
+  formSubheading: string;
+}) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,7 +100,7 @@ function EmailForm({ onEmailSent }: { onEmailSent: (email: string) => void }) {
       } else {
         onEmailSent(email);
       }
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
     }
@@ -95,10 +111,10 @@ function EmailForm({ onEmailSent }: { onEmailSent: (email: string) => void }) {
       <h1
         className={`${anton.className} text-center text-[2rem] uppercase text-[#222118]`}
       >
-        Welcome back, bestie
+        {formHeading}
       </h1>
       <p className="text-center text-lg font-medium text-[#3F4548] pt-2">
-        Enter your email to receive a sign-in link
+        {formSubheading}
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -142,13 +158,7 @@ function EmailForm({ onEmailSent }: { onEmailSent: (email: string) => void }) {
   );
 }
 
-function SuccessScreen({
-  email,
-  onResend,
-}: {
-  email: string;
-  onResend: () => void;
-}) {
+function SuccessScreen({ email }: { email: string; onResend: () => void }) {
   const [resending, setResending] = useState(false);
   const [resendError, setResendError] = useState<string | null>(null);
   const [resendSuccess, setResendSuccess] = useState(false);
@@ -171,7 +181,7 @@ function SuccessScreen({
         setResendSuccess(true);
         setTimeout(() => setResendSuccess(false), 3000);
       }
-    } catch (err) {
+    } catch {
       setResendError("Something went wrong. Please try again.");
     } finally {
       setResending(false);
@@ -218,7 +228,7 @@ function SuccessScreen({
 
       {/* Resend Button */}
       <div className="text-center">
-        <span className="text-sm text-[#3F4548]">Didn't receive it? </span>
+        <span className="text-sm text-[#3F4548]">Didn&apos;t receive it? </span>
         <button
           type="button"
           onClick={handleResend}

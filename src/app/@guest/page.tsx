@@ -14,15 +14,87 @@ import HeroSection from "../(marketing)/hero";
 
 export const revalidate = 60;
 
+// --- types ---
+type HomeData = {
+  skinbestieBenefits?: Array<{
+    mainHeadline?: string;
+    backgroundImage?: { node?: { sourceUrl?: string; altText?: string } };
+    list?: Array<{
+      icon?: { node?: { sourceUrl?: string; altText?: string } };
+      description?: string;
+    }>;
+  }>;
+  skinbestieJourney?: Array<{
+    mainHeadline?: string;
+    subHeadline?: string;
+    list?: Array<{
+      icon?: { node?: { sourceUrl?: string; altText?: string } };
+      title?: string;
+      description?: string;
+    }>;
+  }>;
+  skinbestieTestimonials?: Array<{
+    mainHeadline?: string;
+    subHeadline?: string;
+    image?: { node?: { sourceUrl?: string; altText?: string } };
+    carousel?: Array<{
+      cardContent?: Array<{
+        concern?: string;
+        goal?: string;
+        timeline?: string;
+        testimonial?: string;
+        customerName?: string;
+      }>;
+    }>;
+  }>;
+  skinbestieValues?: Array<{
+    mainHeadline?: string;
+    image?: { node?: { sourceUrl?: string; altText?: string } };
+    values?: Array<{
+      icon?: { node?: { sourceUrl?: string; altText?: string } };
+      title?: string;
+      description?: string;
+    }>;
+  }>;
+  skinbestieStory?: Array<{
+    mainHeadline?: string;
+    values?: Array<{
+      icon?: { node?: { sourceUrl?: string; altText?: string } };
+      title?: string;
+      description?: string;
+    }>;
+  }>;
+  skinbestiePricing?: Array<{
+    mainHeadline?: string;
+    subHeadline?: string;
+    valueProp?: Array<{
+      mainHeadline?: string;
+      subHeadline?: string;
+      benefits?: Array<{ benefit?: string }>;
+    }>;
+  }>;
+  skinbestieFaqs?: Array<{
+    mainHeadline?: string;
+    mainHeadline2?: string;
+    subHeadline?: string;
+    faqs?: Array<{
+      question?: string;
+      answerType?: string[];
+      answerText?: string;
+      answerList?: Array<{ item?: string }>;
+    }>;
+  }>;
+};
+
 // --- extractors ---
-function extractBenefits(home: any) {
+function extractBenefits(home: HomeData) {
   const block = home?.skinbestieBenefits?.[0];
   if (!block) return null;
 
   const heading = block?.mainHeadline ?? "";
   const imageSrc = block?.backgroundImage?.node?.sourceUrl ?? "";
   const imageAlt = block?.backgroundImage?.node?.altText ?? "";
-  const items = (block?.list ?? []).slice(0, 4).map((x: any) => ({
+  const items = (block?.list ?? []).slice(0, 4).map((x) => ({
     iconSrc: x?.icon?.node?.sourceUrl ?? "",
     iconAlt: x?.icon?.node?.altText ?? "",
     description: x?.description ?? "",
@@ -31,13 +103,13 @@ function extractBenefits(home: any) {
   return { heading, imageSrc, imageAlt, items };
 }
 
-function extractJourney(home: any) {
+function extractJourney(home: HomeData) {
   const block = home?.skinbestieJourney?.[0];
   if (!block) return null;
 
   const heading = block?.mainHeadline ?? "";
   const subheading = block?.subHeadline ?? "";
-  const steps = (block?.list ?? []).slice(0, 3).map((s: any) => ({
+  const steps = (block?.list ?? []).slice(0, 3).map((s) => ({
     iconSrc: s?.icon?.node?.sourceUrl ?? "",
     iconAlt: s?.icon?.node?.altText ?? "",
     title: s?.title ?? "",
@@ -48,7 +120,7 @@ function extractJourney(home: any) {
   return hasContent ? { heading, subheading, steps } : null;
 }
 
-function extractTestimonials(home: any) {
+function extractTestimonials(home: HomeData) {
   const block = home?.skinbestieTestimonials?.[0];
   if (!block) return null;
 
@@ -58,8 +130,8 @@ function extractTestimonials(home: any) {
   const imageAlt = block?.image?.node?.altText ?? "";
 
   const items = (block?.carousel ?? [])
-    .flatMap((slide: any) => slide?.cardContent ?? [])
-    .map((c: any) => ({
+    .flatMap((slide) => slide?.cardContent ?? [])
+    .map((c) => ({
       concern: c?.concern ?? "",
       goal: c?.goal ?? "",
       timeline: c?.timeline ?? "",
@@ -71,7 +143,7 @@ function extractTestimonials(home: any) {
   return hasContent ? { heading, subheading, imageSrc, imageAlt, items } : null;
 }
 
-function extractValues(home: any) {
+function extractValues(home: HomeData) {
   const block = home?.skinbestieValues?.[0];
   if (!block) return null;
 
@@ -79,7 +151,7 @@ function extractValues(home: any) {
   const imageSrc = block?.image?.node?.sourceUrl ?? "";
   const imageAlt = block?.image?.node?.altText ?? "";
 
-  const items = (block?.values ?? []).map((v: any) => ({
+  const items = (block?.values ?? []).map((v) => ({
     iconSrc: v?.icon?.node?.sourceUrl ?? "",
     iconAlt: v?.icon?.node?.altText ?? "",
     title: v?.title ?? "",
@@ -90,12 +162,12 @@ function extractValues(home: any) {
   return hasContent ? { heading, imageSrc, imageAlt, items } : null;
 }
 
-function extractStory(home: any) {
+function extractStory(home: HomeData) {
   const block = home?.skinbestieStory?.[0];
   if (!block) return null;
 
   const heading = block?.mainHeadline ?? "";
-  const items = (block?.values ?? []).map((v: any) => ({
+  const items = (block?.values ?? []).map((v) => ({
     iconSrc: v?.icon?.node?.sourceUrl ?? "",
     iconAlt: v?.icon?.node?.altText ?? "",
     title: v?.title ?? "",
@@ -106,7 +178,7 @@ function extractStory(home: any) {
   return hasContent ? { heading, items } : null;
 }
 
-function extractPricing(home: any) {
+function extractPricing(home: HomeData) {
   const block = home?.skinbestiePricing?.[0];
   if (!block) return null;
 
@@ -117,7 +189,7 @@ function extractPricing(home: any) {
   const priceHeadline = plan?.mainHeadline ?? "";
   const priceSub = plan?.subHeadline ?? "";
   const benefits: string[] = (plan?.benefits ?? [])
-    .map((b: any) => b?.benefit ?? "")
+    .map((b) => b?.benefit ?? "")
     .filter(Boolean);
 
   const hasContent =
@@ -127,7 +199,7 @@ function extractPricing(home: any) {
     : null;
 }
 
-function extractFaqs(home: any) {
+function extractFaqs(home: HomeData) {
   const block = home?.skinbestieFaqs?.[0];
   if (!block) return null;
 
@@ -135,12 +207,16 @@ function extractFaqs(home: any) {
   const heading2 = block?.mainHeadline2 ?? "";
   const subheading = block?.subHeadline ?? "";
 
-  const items = (block?.faqs ?? []).map((f: any) => ({
-    question: f?.question ?? "",
-    type: String(f?.answerType?.[0] ?? "text").toLowerCase(), // 'text' | 'list'
-    text: f?.answerText ?? "",
-    list: (f?.answerList ?? []).map((x: any) => x?.item ?? "").filter(Boolean),
-  }));
+  const items = (block?.faqs ?? []).map((f) => {
+    const answerType = String(f?.answerType?.[0] ?? "text").toLowerCase();
+    const type: "text" | "list" = answerType === "list" ? "list" : "text";
+    return {
+      question: f?.question ?? "",
+      type,
+      text: f?.answerText ?? "",
+      list: (f?.answerList ?? []).map((x) => x?.item ?? "").filter(Boolean),
+    };
+  });
 
   const hasContent = heading || heading2 || subheading || items.length > 0;
   return hasContent ? { heading, heading2, subheading, items } : null;
@@ -148,17 +224,19 @@ function extractFaqs(home: any) {
 
 // --- data loader ---
 async function getLanding() {
-  const data = await wpFetch(print(GetLandingPage));
+  const data = await wpFetch<{ page?: { home?: HomeData } }>(
+    print(GetLandingPage),
+  );
   const home = data?.page?.home;
 
   return {
-    benefits: extractBenefits(home),
-    journey: extractJourney(home),
-    testimonials: extractTestimonials(home),
-    values: extractValues(home),
-    story: extractStory(home),
-    pricing: extractPricing(home),
-    faqs: extractFaqs(home),
+    benefits: home ? extractBenefits(home) : null,
+    journey: home ? extractJourney(home) : null,
+    testimonials: home ? extractTestimonials(home) : null,
+    values: home ? extractValues(home) : null,
+    story: home ? extractStory(home) : null,
+    pricing: home ? extractPricing(home) : null,
+    faqs: home ? extractFaqs(home) : null,
   };
 }
 
@@ -191,7 +269,10 @@ export default async function MarketingHome() {
       )}
 
       {testimonials && (
-        <Testimonials heading={testimonials.heading} items={testimonials.items} />
+        <Testimonials
+          heading={testimonials.heading}
+          items={testimonials.items}
+        />
       )}
 
       {values && (

@@ -20,7 +20,8 @@ const HeroSection = () => {
       <div
         className="absolute inset-0 lg:hidden"
         style={{
-          background: 'linear-gradient(18.93deg, rgba(245, 67, 61, 0.15) 16.65%, rgba(0, 0, 0, 0.5) 38.77%, rgba(0, 0, 0, 0.5) 50.4%, rgba(0, 0, 0, 0.5) 65.39%, rgba(245, 67, 61, 0.05) 80.55%)',
+          background:
+            "linear-gradient(18.93deg, rgba(245, 67, 61, 0.15) 16.65%, rgba(0, 0, 0, 0.5) 38.77%, rgba(0, 0, 0, 0.5) 50.4%, rgba(0, 0, 0, 0.5) 65.39%, rgba(245, 67, 61, 0.05) 80.55%)",
         }}
       ></div>
 
@@ -28,7 +29,8 @@ const HeroSection = () => {
       <div
         className="absolute inset-0 hidden lg:block"
         style={{
-          background: 'linear-gradient(264.19deg, rgba(0, 0, 0, 0.6) 38.02%, rgba(245, 67, 61, 0.12) 96.07%)',
+          background:
+            "linear-gradient(264.19deg, rgba(0, 0, 0, 0.6) 38.02%, rgba(245, 67, 61, 0.12) 96.07%)",
         }}
       ></div>
 
@@ -49,8 +51,8 @@ const HeroSection = () => {
 
           {/* Subheading */}
           <p className="mt-5 font-medium text-[1.125rem] sm:text-[1.25rem] leading-[150%] tracking-[-0.01em] text-[#FAFAFA] w-full max-w-[594px]">
-            We collaborate with you to curate a simple routine that's tailored
-            to your lifestyle, your budget, and your skin goals.
+            We collaborate with you to curate a simple routine that&apos;s
+            tailored to your lifestyle, your budget, and your skin goals.
           </p>
 
           {/* CTA Button */}

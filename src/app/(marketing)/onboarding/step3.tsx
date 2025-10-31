@@ -62,7 +62,7 @@ function ConcernTile({
           "peer-checked:border-[#030303] peer-checked:bg-[#FFFBE5]",
           // focus ring for keyboard
           "outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[#222118]/30",
-          className
+          className,
         )}
       >
         {label}
@@ -71,13 +71,12 @@ function ConcernTile({
   );
 }
 
-export default function Step3({ onNext }: { onNext?: () => void }) {
+export default function Step3() {
   const {
     control,
     register,
     setValue,
     getValues,
-    setError,
     clearErrors,
     trigger,
     formState: { errors },
@@ -171,7 +170,7 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
       }
 
       // Keep "Other" in array AND add custom text (Option B)
-      let finalConcerns = [...(concerns || [])];
+      const finalConcerns = [...(concerns || [])];
       if (concerns?.includes("Other") && concernOther?.trim()) {
         finalConcerns.push(concernOther.trim());
       }
@@ -179,7 +178,7 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
       // Merge completed steps (preserve existing progress)
       const completedSteps = mergeCompletedSteps(
         currentProfile?.completedSteps,
-        ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS"]
+        ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS"],
       );
 
       // Update profile with concerns
@@ -204,14 +203,17 @@ export default function Step3({ onNext }: { onNext?: () => void }) {
     <form onSubmit={(e) => e.preventDefault()} noValidate>
       {/* Server error message */}
       {serverError && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+        <div
+          className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md"
+          role="alert"
+        >
           <p className="text-sm text-red-800">{serverError}</p>
         </div>
       )}
 
       <hr className="mt-6 border-t-[0.03125rem] border-[#030303]" />
       <p className="mt-6 font-medium text-base leading-[150%] tracking-[-0.01em] text-[#3F4548]">
-        Select as many as you like. Choose "Other" to type your own.
+        Select as many as you like. Choose &quot;Other&quot; to type your own.
       </p>
 
       <fieldset className="w-full">

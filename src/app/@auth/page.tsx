@@ -1,69 +1,123 @@
-import { auth } from "@/auth";
+"use client";
 
-export default async function AuthenticatedHomePage() {
-  const session = await auth();
+import { useOptimistic } from "react";
+import Link from "next/link";
+import {
+  ProgressTracker,
+  ProgressTrackerSkeleton,
+  StepCardSkeleton,
+  WhatHappensNextCardSkeleton,
+  DashboardContent,
+} from "./dashboard/components";
+import { useDashboard } from "./dashboard/hooks/use-dashboard";
+
+export default function AuthenticatedHomePage() {
+  const { data: dashboard, isLoading, error } = useDashboard();
+
+  // Optimistic UI state for nickname
+  const [optimisticNickname, setOptimisticNickname] = useOptimistic(
+    (dashboard?.user as { nickname?: string | null; firstName?: string })
+      ?.nickname ||
+      dashboard?.user.firstName ||
+      "",
+    (state, newNickname: string) => newNickname,
+  );
+
+  // Optimistic UI state for skin test completion
+  const [optimisticSkinTest, setOptimisticSkinTest] = useOptimistic(
+    {
+      completed: dashboard?.setupProgress.steps.hasCompletedSkinTest || false,
+      skinType: (() => {
+        const skinTypeArray = (dashboard?.user as { skinType?: string[] })
+          ?.skinType;
+        if (Array.isArray(skinTypeArray) && skinTypeArray.length > 0) {
+          const skinType = skinTypeArray[0];
+          return skinType.charAt(0).toUpperCase() + skinType.slice(1);
+        }
+        return null;
+      })(),
+    },
+    (state, update: { completed: boolean; skinType: string | null }) => update,
+  );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Welcome to Your Dashboard</h1>
+    <div className="space-y-6">
+      {/* Header */}
+      <header className="pt-4">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Welcome to Skinbestie, {optimisticNickname || "there"}!
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Let&apos;s set up your personalized skin transformation journey
+        </p>
+      </header>
 
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Welcome back!</h2>
-          <p className="text-gray-600">
-            You're signed in as: {session?.user?.email}
-          </p>
+      {/* Error State */}
+      {error ? (
+        <div className="text-center p-8">
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <p className="text-red-600 mb-4">
+              {error instanceof Error
+                ? error.message
+                : "Failed to load dashboard data"}
+            </p>
+            {error instanceof Error &&
+            error.message.includes("Unauthorized") ? (
+              <>
+                <p className="text-gray-600 mb-6">
+                  Please log out and log back in to continue.
+                </p>
+                <Link
+                  href="/logout"
+                  className="inline-block bg-red-400 hover:bg-red-500 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                >
+                  Log Out
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={() => window.location.reload()}
+                className="inline-block bg-red-400 hover:bg-red-500 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              >
+                Retry
+              </button>
+            )}
+          </div>
         </div>
+      ) : isLoading ? (
+        <>
+          {/* Loading Skeleton */}
+          <ProgressTrackerSkeleton />
+          <section>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Essential Setup Steps
+            </h2>
+            <div className="space-y-4">
+              <StepCardSkeleton />
+              <StepCardSkeleton />
+              <StepCardSkeleton />
+              <StepCardSkeleton />
+            </div>
+          </section>
+          <WhatHappensNextCardSkeleton />
+        </>
+      ) : dashboard ? (
+        <>
+          {/* Progress */}
+          <ProgressTracker
+            completed={dashboard.setupProgress.completed}
+            total={dashboard.setupProgress.total}
+          />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Dashboard content for authenticated users */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold mb-2">Your Profile</h3>
-            <p className="text-gray-600">View and edit your profile information</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold mb-2">Skin Journey</h3>
-            <p className="text-gray-600">Track your skin care progress</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold mb-2">Appointments</h3>
-            <p className="text-gray-600">Manage your consultations</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold mb-2">Products</h3>
-            <p className="text-gray-600">View recommended products</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold mb-2">Resources</h3>
-            <p className="text-gray-600">Access skin care guides and tips</p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold mb-2">Settings</h3>
-            <p className="text-gray-600">Manage your account preferences</p>
-          </div>
-        </div>
-
-        {/* Sign out button */}
-        <div className="mt-8">
-          <form action={async () => {
-            'use server';
-            const { signOut } = await import("@/auth");
-            await signOut({ redirectTo: "/" });
-          }}>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
-            >
-              Sign Out
-            </button>
-          </form>
-        </div>
-      </div>
+          {/* Dashboard Content with Interactive Elements */}
+          <DashboardContent
+            dashboard={dashboard}
+            setOptimisticNickname={setOptimisticNickname}
+            optimisticSkinTest={optimisticSkinTest}
+            setOptimisticSkinTest={setOptimisticSkinTest}
+          />
+        </>
+      ) : null}
     </div>
   );
 }

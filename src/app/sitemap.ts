@@ -11,7 +11,7 @@ async function getTotalCounts() {
   const propertyNames = Object.keys(data);
 
   const excludeItems = ["page", "user", "category", "tag"];
-  let totalArray = propertyNames
+  const totalArray = propertyNames
     .filter((name) => !excludeItems.includes(name))
     .map((name) => {
       return { name, total: data[name] };
@@ -37,14 +37,16 @@ async function getPostsUrls({
 
   if (!data) return [];
 
-  const posts = data.map((post: any) => {
-    return {
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}${post.url}`,
-      lastModified: new Date(post.post_modified_date)
-        .toISOString()
-        .split("T")[0],
-    };
-  });
+  const posts = data.map(
+    (post: { url: string; post_modified_date: string }) => {
+      return {
+        url: `${process.env.NEXT_PUBLIC_BASE_URL}${post.url}`,
+        lastModified: new Date(post.post_modified_date)
+          .toISOString()
+          .split("T")[0],
+      };
+    },
+  );
 
   return posts;
 }

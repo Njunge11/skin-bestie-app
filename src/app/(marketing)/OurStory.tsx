@@ -1,5 +1,6 @@
 "use client";
 import React, { Suspense, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { anton } from "../fonts";
 
 type ValuesItem = {
@@ -38,7 +39,7 @@ function PlayButton({
 
 function VideoPlayer({ src }: { src: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<any>(null);
+  const hlsRef = useRef<{ destroy: () => void } | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
@@ -122,10 +123,12 @@ function VideoPlayer({ src }: { src: string }) {
       {!isPlaying && (
         <>
           {/* 16:9 Poster - fills container */}
-          <img
+          <Image
             src="/story-poster-16-9.jpg"
             alt="Video thumbnail"
             className="absolute inset-0 w-full h-full object-cover"
+            fill
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-[#00000066]" />
           <PlayButton
@@ -169,14 +172,14 @@ export default function OurStory({
               <div className="grid grid-cols-1 xl:grid-rows-1">
                 {/* Video */}
                 <div className="pt-10 lg:col-start-1 lg:row-start-1 lg:self-start">
-                  <Suspense fallback={
-                    <div className="relative overflow-hidden rounded-[8px] w-full max-w-[393px] h-[207px] md:max-w-[519px] md:h-[332px] bg-gray-200 animate-pulse flex items-center justify-center">
-                      <span className="text-gray-400">Loading video...</span>
-                    </div>
-                  }>
-                    <VideoPlayer
-                      src="https://d1druk2o8f2ss7.cloudfront.net/hls/skin-bestie-clip/story_hls/master.m3u8"
-                    />
+                  <Suspense
+                    fallback={
+                      <div className="relative overflow-hidden rounded-[8px] w-full max-w-[393px] h-[207px] md:max-w-[519px] md:h-[332px] bg-gray-200 animate-pulse flex items-center justify-center">
+                        <span className="text-gray-400">Loading video...</span>
+                      </div>
+                    }
+                  >
+                    <VideoPlayer src="https://d1druk2o8f2ss7.cloudfront.net/hls/skin-bestie-clip/story_hls/master.m3u8" />
                   </Suspense>
                 </div>
               </div>
@@ -189,10 +192,12 @@ export default function OurStory({
                   <div key={`${v.title}-${i}`} className="flex items-start">
                     <div className="shrink-0 overflow-hidden flex justify-center pr-4">
                       {v.iconSrc ? (
-                        <img
+                        <Image
                           src={v.iconSrc}
                           alt={v.iconAlt || v.title}
                           className="object-contain"
+                          width={48}
+                          height={48}
                         />
                       ) : null}
                     </div>

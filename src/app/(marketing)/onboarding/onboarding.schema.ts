@@ -11,8 +11,8 @@ const countryCodeSchema = z
   .string()
   .transform((s) => s.toUpperCase())
   .refine(
-    (iso): iso is CountryCode => isSupportedCountry(iso as any),
-    "Unsupported country"
+    (iso): iso is CountryCode => isSupportedCountry(iso as CountryCode),
+    "Unsupported country",
   );
 
 export const onboardingSchema = z
@@ -21,13 +21,25 @@ export const onboardingSchema = z
     userProfileId: z.string().uuid().optional(),
 
     // --- Step 1 ---
-    firstName: z.string().min(1, "First name is required").min(2, "Enter at least 2 characters").default(''),
-    lastName: z.string().min(1, "Last name is required").min(2, "Enter at least 2 characters").default(''),
-    email: z.string().min(1, "Email is required").email("Enter a valid email").default(''),
+    firstName: z
+      .string()
+      .min(1, "First name is required")
+      .min(2, "Enter at least 2 characters")
+      .default(""),
+    lastName: z
+      .string()
+      .min(1, "Last name is required")
+      .min(2, "Enter at least 2 characters")
+      .default(""),
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Enter a valid email")
+      .default(""),
 
     // Let the browser/autofill provide any format; we validate with libphonenumber in superRefine.
-    mobileLocal: z.string().min(1, "Mobile number is required").default(''),
-    mobileCountryISO: countryCodeSchema.default('KE'),
+    mobileLocal: z.string().min(1, "Mobile number is required").default(""),
+    mobileCountryISO: countryCodeSchema.default("KE"),
 
     dateOfBirth: z
       .string()
@@ -36,29 +48,41 @@ export const onboardingSchema = z
       .refine((v) => {
         const birthDate = new Date(v);
         const today = new Date();
+        return birthDate <= today;
+      }, "Date of birth cannot be in the future")
+      .refine((v) => {
+        const birthDate = new Date(v);
+        const today = new Date();
         const age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
         const dayDiff = today.getDate() - birthDate.getDate();
 
         // Adjust age if birthday hasn't occurred this year yet
-        const actualAge = (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) ? age - 1 : age;
+        const actualAge =
+          monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
 
         return actualAge >= 18;
       }, "You must be at least 18 years old")
-      .default(''),
+      .default(""),
 
     // --- Optional free text ---
     goal: z.string().optional(),
     routineNote: z.string().optional(),
 
     // --- Step 2 ---
-    skinTypes: z.array(z.string()).min(1, "Select at least one option").default([]),
+    skinTypes: z
+      .array(z.string())
+      .min(1, "Select at least one option")
+      .default([]),
 
     // --- Step 3 ---
-    concerns: z.array(z.string()).min(1, "Pick at least one concern").default([]),
-    concernOther: z.string().optional().default(''),
+    concerns: z
+      .array(z.string())
+      .min(1, "Pick at least one concern")
+      .default([]),
+    concernOther: z.string().optional().default(""),
     hasAllergy: z.enum(["Yes", "No"]).optional(),
-    allergy: z.string().optional().default(''),
+    allergy: z.string().optional().default(""),
   })
   .superRefine((vals, ctx) => {
     // Allergy selection is required

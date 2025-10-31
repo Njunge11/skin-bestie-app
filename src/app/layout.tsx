@@ -17,8 +17,6 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  auth,
-  guest,
 }: {
   children: React.ReactNode;
   auth: React.ReactNode;
