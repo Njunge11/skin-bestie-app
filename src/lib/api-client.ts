@@ -1,10 +1,7 @@
 // Simple API client for coach app backend
 
-const BASE_URL =
-  process.env.COACH_APP_URL ||
-  process.env.API_BASE_URL ||
-  "http://localhost:3001";
-const API_KEY = process.env.CONSUMER_APP_API_KEY || process.env.API_KEY || "";
+const BASE_URL = process.env.API_BASE_URL || "http://localhost:3001";
+const API_KEY = process.env.API_KEY || "";
 
 export type ApiError = Error & {
   status: number;
