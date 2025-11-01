@@ -77,15 +77,15 @@ export default function OnboardingForm() {
     const currentKey = current.component as keyof typeof STEP_COMPONENTS;
     const fields = FIELDS_BY_STEP[currentKey] ?? [];
 
-    clearErrors(fields as any);
+    clearErrors(fields as (keyof OnboardingSchema)[]);
 
     // Optional UX: mark fields untouched so errors don't flash immediately next time
     fields.forEach((name) => {
-      resetField(name as any, {
+      resetField(name as keyof OnboardingSchema, {
         keepDirty: true,
         keepError: false,
         keepTouched: false,
-        defaultValue: getValues(name as any),
+        defaultValue: getValues(name as keyof OnboardingSchema),
       });
     });
 
@@ -146,7 +146,9 @@ export default function OnboardingForm() {
         {/* Each step validates only its own fields */}
         <StepBody
           onNext={next}
-          {...(current.component === "subscribe" ? { onShowingSuccess: setHideFormHeader } : {})}
+          {...(current.component === "subscribe"
+            ? { onShowingSuccess: setHideFormHeader }
+            : {})}
         />
       </div>
     </div>

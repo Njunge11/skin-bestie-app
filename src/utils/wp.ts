@@ -15,10 +15,10 @@ type WPResponse<T> = {
   errors?: Array<{ message: string }>;
 };
 
-export async function wpFetch<T = any>(
+export async function wpFetch<T = unknown>(
   query: string,
-  variables?: Record<string, any>,
-  init: WPInit = {}
+  variables?: Record<string, unknown>,
+  init: WPInit = {},
 ): Promise<T> {
   const { revalidate = 60, tags = ["wordpress"], headers = {} } = init;
 
@@ -43,10 +43,12 @@ export async function wpFetch<T = any>(
   let json: WPResponse<T>;
   try {
     json = (await res.json()) as WPResponse<T>;
-  } catch (parseError) {
+  } catch {
     const text = await safeText(res.clone());
     console.error(`[wpFetch] JSON parse error. Response text:`, text);
-    throw new Error(`Failed to parse JSON response. Got: ${text?.substring(0, 200)}`);
+    throw new Error(
+      `Failed to parse JSON response. Got: ${text?.substring(0, 200)}`,
+    );
   }
 
   if (json.errors?.length) {

@@ -47,17 +47,22 @@ export default function LButton({
   );
 
   // Determine if href is an internal route (use Link) or external/hash (use <a>)
-  const isInternalRoute = href && href.startsWith('/') && !href.startsWith('//');
-  const isExternalOrSpecial = href && (
-    href.startsWith('http') ||
-    href.startsWith('mailto:') ||
-    href.startsWith('tel:') ||
-    href.startsWith('#')
-  );
+  const isInternalRoute =
+    href && href.startsWith("/") && !href.startsWith("//");
+  const isExternalOrSpecial =
+    href &&
+    (href.startsWith("http") ||
+      href.startsWith("mailto:") ||
+      href.startsWith("tel:") ||
+      href.startsWith("#"));
 
   if (isInternalRoute) {
     return (
-      <Link href={href} className={composed} {...(rest as any)}>
+      <Link
+        href={href}
+        className={composed}
+        {...(rest as React.ComponentPropsWithoutRef<"a">)}
+      >
         {Content}
       </Link>
     );
@@ -65,14 +70,21 @@ export default function LButton({
 
   if (isExternalOrSpecial) {
     return (
-      <a href={href} className={composed} {...(rest as any)}>
+      <a
+        href={href}
+        className={composed}
+        {...(rest as React.ComponentPropsWithoutRef<"a">)}
+      >
         {Content}
       </a>
     );
   }
 
   return (
-    <button className={composed} {...(rest as any)}>
+    <button
+      className={composed}
+      {...(rest as React.ComponentPropsWithoutRef<"button">)}
+    >
       {Content}
     </button>
   );

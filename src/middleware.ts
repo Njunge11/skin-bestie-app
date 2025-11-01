@@ -2,6 +2,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Note: We cannot use auth() from NextAuth directly in middleware
+// as it requires edge runtime compatibility. Authentication checks
+// are handled in the route layouts instead.
+
 export async function middleware(request: NextRequest) {
   // Skip if creds aren't present
   if (!process.env.WP_USER || !process.env.WP_APP_PASS) {
@@ -26,7 +30,7 @@ export async function middleware(request: NextRequest) {
 
   // Basic auth for WP application password
   const auth = `Basic ${Buffer.from(
-    `${process.env.WP_USER}:${process.env.WP_APP_PASS}`
+    `${process.env.WP_USER}:${process.env.WP_APP_PASS}`,
   ).toString("base64")}`;
 
   try {
@@ -58,13 +62,19 @@ export async function middleware(request: NextRequest) {
     if (!data?.items?.length) return NextResponse.next();
 
     // Find an exact match for the current path
-    const redirect = data.items.find((item: any) => item?.url === pathname);
+    const redirect = (
+      data.items as Array<{
+        url?: string;
+        action_data?: { url?: string };
+        action_code?: number;
+      }>
+    ).find((item) => item?.url === pathname);
     if (!redirect?.action_data?.url) return NextResponse.next();
 
     // Build absolute target URL against the current request origin
     const target = new URL(
       redirect.action_data.url,
-      request.nextUrl.origin
+      request.nextUrl.origin,
     ).toString();
 
     // Map WP 301 → 308 (preserve method); else use 307

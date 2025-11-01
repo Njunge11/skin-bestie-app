@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -9,7 +9,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { useFormContext } from "react-hook-form";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MButton } from "./components/button";
 import { PaymentSkeleton } from "./components/payment.skeleton";
 import { Lock, CheckCircle2 } from "lucide-react";
@@ -19,7 +19,7 @@ import { getUserProfile, updateUserProfile } from "./actions";
 import { mergeCompletedSteps } from "./onboarding.utils";
 
 const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
 );
 
 // Keep your appearance rules
@@ -42,7 +42,12 @@ type IntentType = "payment" | "setup";
 // One place to control the vertical space (skeleton + Stripe share it)
 const HEIGHT_CLS = "";
 
-export default function Step5({ onNext, onShowingSuccess }: { onNext?: () => void; onShowingSuccess?: (showing: boolean) => void }) {
+export default function Step5({
+  onShowingSuccess,
+}: {
+  onNext?: () => void;
+  onShowingSuccess?: (showing: boolean) => void;
+}) {
   const { getValues } = useFormContext<OnboardingSchema>();
   const { next } = useWizard();
 
@@ -96,12 +101,13 @@ export default function Step5({ onNext, onShowingSuccess }: { onNext?: () => voi
   });
 
   // Calculate button text from checkout session
-  const buttonText = checkoutSession?.planUnitAmount && checkoutSession?.planCurrency
-    ? `Subscribe ${new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: String(checkoutSession.planCurrency).toUpperCase(),
-      }).format(checkoutSession.planUnitAmount / 100)}`
-    : "Subscribe";
+  const buttonText =
+    checkoutSession?.planUnitAmount && checkoutSession?.planCurrency
+      ? `Subscribe ${new Intl.NumberFormat(undefined, {
+          style: "currency",
+          currency: String(checkoutSession.planCurrency).toUpperCase(),
+        }).format(checkoutSession.planUnitAmount / 100)}`
+      : "Subscribe";
 
   // Notify parent when showing success screen (stable callback with useEffect)
   const isShowingSuccess = !!currentProfile?.isSubscribed;
@@ -122,9 +128,14 @@ export default function Step5({ onNext, onShowingSuccess }: { onNext?: () => voi
     <div className="relative p-3">
       {/* Server error message */}
       {checkoutError && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+        <div
+          className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md"
+          role="alert"
+        >
           <p className="text-sm text-red-800">
-            {checkoutError instanceof Error ? checkoutError.message : "Something went wrong"}
+            {checkoutError instanceof Error
+              ? checkoutError.message
+              : "Something went wrong"}
           </p>
         </div>
       )}
@@ -134,12 +145,15 @@ export default function Step5({ onNext, onShowingSuccess }: { onNext?: () => voi
           <PaymentSkeleton />
         </div>
       ) : (
-        <Elements stripe={stripePromise} options={{ clientSecret: checkoutSession.clientSecret, appearance }}>
+        <Elements
+          stripe={stripePromise}
+          options={{ clientSecret: checkoutSession.clientSecret, appearance }}
+        >
           <Form
             intentType={checkoutSession.intentType}
             buttonText={buttonText}
             userProfileId={userProfileId}
-            currentProfile={currentProfile}
+            currentProfile={currentProfile || null}
           />
         </Elements>
       )}
@@ -163,7 +177,7 @@ function SuccessScreen({ onNext }: { onNext: () => void }) {
       {/* Title and Description */}
       <div className="text-center space-y-3">
         <h2 className="text-2xl font-semibold text-[#272B2D]">
-          You're all set!
+          You&apos;re all set!
         </h2>
         <p className="text-base text-[#3F4548] max-w-md">
           Your subscription is active. Finish by booking your first session.
@@ -187,11 +201,13 @@ function Form({
   intentType: IntentType;
   buttonText: string;
   userProfileId?: string;
-  currentProfile: any;
+  currentProfile: {
+    stripeCustomerId?: string;
+    completedSteps?: string[];
+  } | null;
 }) {
   const stripe = useStripe();
   const elements = useElements();
-  const { next } = useWizard();
   const queryClient = useQueryClient();
 
   const [loading, setLoading] = useState(false);
@@ -208,7 +224,8 @@ function Form({
     setPeReady(true);
   };
 
-  const canSubmit = !!stripe && !!elements && peReady && !loading && termsAccepted;
+  const canSubmit =
+    !!stripe && !!elements && peReady && !loading && termsAccepted;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -233,7 +250,13 @@ function Form({
           if (userProfileId) {
             const completedSteps = mergeCompletedSteps(
               currentProfile?.completedSteps,
-              ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE"]
+              [
+                "PERSONAL",
+                "SKIN_TYPE",
+                "SKIN_CONCERNS",
+                "ALLERGIES",
+                "SUBSCRIBE",
+              ],
             );
 
             const result = await updateUserProfile(userProfileId, {
@@ -272,7 +295,13 @@ function Form({
           if (userProfileId) {
             const completedSteps = mergeCompletedSteps(
               currentProfile?.completedSteps,
-              ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE"]
+              [
+                "PERSONAL",
+                "SKIN_TYPE",
+                "SKIN_CONCERNS",
+                "ALLERGIES",
+                "SUBSCRIBE",
+              ],
             );
 
             const result = await updateUserProfile(userProfileId, {
@@ -297,10 +326,14 @@ function Form({
           text: `Setup status: ${setupIntent?.status ?? "processing"}`,
         });
       }
-    } catch (err: any) {
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Payment failed. Please try again.";
       setNotice({
         kind: "error",
-        text: err?.message || "Payment failed. Please try again.",
+        text: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -312,7 +345,7 @@ function Form({
       {/* Show skeleton while loading, payment element when ready */}
       <div className={`relative w-full ${HEIGHT_CLS}`}>
         {!peReady && <PaymentSkeleton />}
-        <div style={{ display: peReady ? 'block' : 'none' }}>
+        <div style={{ display: peReady ? "block" : "none" }}>
           <PaymentElement
             id="payment-element"
             options={{
@@ -337,7 +370,9 @@ function Form({
         >
           <p
             className={
-              notice.kind === "error" ? "text-sm text-red-800" : "text-sm text-green-800"
+              notice.kind === "error"
+                ? "text-sm text-red-800"
+                : "text-sm text-green-800"
             }
           >
             {notice.text}
@@ -358,7 +393,10 @@ function Form({
               className="mt-0.5 h-4 w-4 rounded border-[#030303] text-[#030303] focus:ring-[#030303] focus:ring-offset-0 cursor-pointer"
               aria-required="true"
             />
-            <label htmlFor="terms-checkbox" className="text-sm text-[#3F4548] cursor-pointer">
+            <label
+              htmlFor="terms-checkbox"
+              className="text-sm text-[#3F4548] cursor-pointer"
+            >
               I agree to the{" "}
               <a
                 href="/terms-and-conditions"
@@ -387,8 +425,8 @@ function Form({
           <div className="mt-1 flex items-center gap-2 text-xs text-[#3F4548]">
             <Lock className="h-3.5 w-3.5" aria-hidden="true" />
             <span>
-              Payments are securely processed by Stripe. We don't store your
-              card details.
+              Payments are securely processed by Stripe. We don&apos;t store
+              your card details.
             </span>
           </div>
         </>

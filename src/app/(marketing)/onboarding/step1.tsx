@@ -12,9 +12,12 @@ import type { OnboardingSchema } from "./onboarding.schema";
 import { normalizeToE164 } from "./onboarding.schema";
 import { useWizard } from "./wizard.provider";
 import { createUserProfile } from "./actions";
-import { getIncompleteStepIndex, populateFormFromProfile } from "./onboarding.utils";
+import {
+  getIncompleteStepIndex,
+  populateFormFromProfile,
+} from "./onboarding.utils";
 
-export default function Step1({ onNext }: { onNext?: () => void }) {
+export default function Step1() {
   const {
     register,
     control,
@@ -29,7 +32,12 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
 
   // Date input helpers
   const dateInputRef = useRef<HTMLInputElement | null>(null);
-  const openNativePicker = () => (dateInputRef.current as any)?.showPicker?.();
+  const openNativePicker = () => {
+    const input = dateInputRef.current as HTMLInputElement & {
+      showPicker?: () => void;
+    };
+    input?.showPicker?.();
+  };
   const todayLocal = (() => {
     const d = new Date();
     const y = d.getFullYear();
@@ -65,7 +73,7 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
         "mobileCountryISO",
         "dateOfBirth",
       ],
-      { shouldFocus: true }
+      { shouldFocus: true },
     );
 
     if (ok) {
@@ -73,9 +81,9 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
       const phoneNumber = normalizeToE164(values);
 
       if (!phoneNumber) {
-        setError('mobileLocal', {
-          type: 'manual',
-          message: 'Invalid phone number'
+        setError("mobileLocal", {
+          type: "manual",
+          message: "Invalid phone number",
         });
         return;
       }
@@ -102,12 +110,21 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
 
       if (completedSteps.length > 1) {
         // Existing profile - populate form and navigate to incomplete step
-        populateFormFromProfile(result.data, setValue);
+        populateFormFromProfile(
+          {
+            id: result.data.id,
+            skinType: result.data.skinType,
+            concerns: result.data.concerns,
+            hasAllergies: result.data.hasAllergies,
+            allergyDetails: result.data.allergyDetails,
+          },
+          setValue,
+        );
         const incompleteIndex = getIncompleteStepIndex(completedSteps);
         setStepIndex(incompleteIndex);
       } else {
         // New profile - go to next step
-        setValue('userProfileId', result.data.id);
+        setValue("userProfileId", result.data.id);
         next();
       }
     }
@@ -117,7 +134,10 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
     <form onSubmit={(e) => e.preventDefault()} noValidate autoComplete="on">
       {/* Server error message */}
       {serverError && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+        <div
+          className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md"
+          role="alert"
+        >
           <p className="text-sm text-red-800">{serverError}</p>
         </div>
       )}
@@ -129,10 +149,15 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             placeholder="First Name"
             autoComplete="given-name"
             aria-invalid={!!errors.firstName || undefined}
+            aria-describedby={errors.firstName ? "firstName-error" : undefined}
             {...register("firstName")}
           />
           {errors.firstName && (
-            <p className="mt-1 text-sm text-red-600">
+            <p
+              id="firstName-error"
+              role="alert"
+              className="mt-1 text-sm text-red-600"
+            >
               {errors.firstName.message}
             </p>
           )}
@@ -144,10 +169,15 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             placeholder="Last Name"
             autoComplete="family-name"
             aria-invalid={!!errors.lastName || undefined}
+            aria-describedby={errors.lastName ? "lastName-error" : undefined}
             {...register("lastName")}
           />
           {errors.lastName && (
-            <p className="mt-1 text-sm text-red-600">
+            <p
+              id="lastName-error"
+              role="alert"
+              className="mt-1 text-sm text-red-600"
+            >
               {errors.lastName.message}
             </p>
           )}
@@ -162,10 +192,17 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
           inputMode="email"
           autoComplete="email"
           aria-invalid={!!errors.email || undefined}
+          aria-describedby={errors.email ? "email-error" : undefined}
           {...register("email")}
         />
         {errors.email && (
-          <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+          <p
+            id="email-error"
+            role="alert"
+            className="mt-1 text-sm text-red-600"
+          >
+            {errors.email.message}
+          </p>
         )}
       </div>
 
@@ -181,7 +218,7 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
               onBlur={field.onBlur}
               inputRef={field.ref}
               name={field.name}
-              // Keep the ISO in your component’s state via form state:
+              // Keep the ISO in your component's state via form state:
               countryISO={getValues("mobileCountryISO")}
               onCountryISOChange={async (newIso) => {
                 // update ISO
@@ -200,11 +237,18 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
               aria-invalid={
                 !!(fieldState.error || errors.mobileLocal) || undefined
               }
+              aria-describedby={
+                errors.mobileLocal ? "mobileLocal-error" : undefined
+              }
             />
           )}
         />
         {errors.mobileLocal && (
-          <p className="mt-1 text-sm text-red-600">
+          <p
+            id="mobileLocal-error"
+            role="alert"
+            className="mt-1 text-sm text-red-600"
+          >
             {errors.mobileLocal.message}
           </p>
         )}
@@ -230,6 +274,9 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
             onChange={dobOnChange}
             onBlur={dobOnBlur}
             aria-invalid={!!errors.dateOfBirth || undefined}
+            aria-describedby={
+              errors.dateOfBirth ? "dateOfBirth-error" : undefined
+            }
             ref={(el: HTMLInputElement | null) => {
               dateInputRef.current = el;
               dobRef(el);
@@ -239,12 +286,16 @@ export default function Step1({ onNext }: { onNext?: () => void }) {
               "focus-visible:ring-0 focus-visible:ring-offset-0",
               "[&::-webkit-calendar-picker-indicator]:opacity-0",
               "[&::-webkit-inner-spin-button]:appearance-none",
-              "[&::-webkit-clear-button]:hidden"
+              "[&::-webkit-clear-button]:hidden",
             )}
           />
         </div>
         {errors.dateOfBirth && (
-          <p className="mt-1 text-sm text-red-600">
+          <p
+            id="dateOfBirth-error"
+            role="alert"
+            className="mt-1 text-sm text-red-600"
+          >
             {errors.dateOfBirth.message}
           </p>
         )}

@@ -44,10 +44,12 @@ export default function Values({
                 <div key={`${v.title}-${i}`} className="flex items-start">
                   <div className="shrink-0 overflow-hidden flex justify-center pr-4">
                     {v.iconSrc ? (
-                      <img
+                      <Image
                         src={v.iconSrc}
                         alt={v.iconAlt || v.title}
                         className="object-contain"
+                        width={48}
+                        height={48}
                       />
                     ) : null}
                   </div>

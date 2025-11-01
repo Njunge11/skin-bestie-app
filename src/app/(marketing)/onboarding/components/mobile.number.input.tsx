@@ -31,7 +31,7 @@ function flagFromISO(iso: string) {
     ...iso
       .toUpperCase()
       .split("")
-      .map((c) => 127397 + c.charCodeAt(0))
+      .map((c) => 127397 + c.charCodeAt(0)),
   );
 }
 
@@ -129,7 +129,7 @@ export function MobileNumberInput({
         <MInput
           id={inputId} // give this to help autofill if you want later
           name={name}
-          ref={inputRef as any}
+          ref={inputRef as React.Ref<HTMLInputElement>}
           type="tel"
           value={value ?? ""}
           onChange={(e) => onChange?.(e.target.value)}
@@ -137,7 +137,7 @@ export function MobileNumberInput({
           placeholder={placeholder}
           className={cn(
             "flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pr-4",
-            "pl-[0.8125rem]"
+            "pl-[0.8125rem]",
           )}
           inputMode="tel"
           autoComplete="tel"

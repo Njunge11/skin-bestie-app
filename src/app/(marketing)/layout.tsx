@@ -1,8 +1,6 @@
 // app/(marketing)/layout.tsx
 import type { Metadata } from "next";
 
-import Header from "./header";
-import HeroSection from "./hero";
 import Footer from "./footer";
 // If you have app/fonts.ts exporting fonts, import them here
 // import { anton } from "@/app/fonts";

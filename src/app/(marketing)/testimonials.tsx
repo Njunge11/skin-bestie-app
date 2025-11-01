@@ -26,13 +26,15 @@ export default function Testimonials({
   heading?: string;
   items: TestimonialItem[];
 }) {
-  const [carouselApi, setCarouselApi] = React.useState<any>(null);
+  const [carouselApi, setCarouselApi] = React.useState<
+    { scrollPrev: () => void; scrollNext: () => void } | undefined
+  >(undefined);
   const autoplay = React.useRef(
     Autoplay({
       delay: 3000,
       stopOnInteraction: false,
       stopOnMouseEnter: true,
-    })
+    }),
   );
   return (
     // OUTER fills the scene (100dvh from wrapper)

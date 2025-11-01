@@ -179,7 +179,14 @@ export default function CalendlyInline() {
 
           const completedSteps = mergeCompletedSteps(
             currentProfile.completedSteps,
-            ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE", "BOOKING"]
+            [
+              "PERSONAL",
+              "SKIN_TYPE",
+              "SKIN_CONCERNS",
+              "ALLERGIES",
+              "SUBSCRIBE",
+              "BOOKING",
+            ],
           );
 
           await updateUserProfile(userProfileId, {
@@ -201,7 +208,9 @@ export default function CalendlyInline() {
 
   // load calendly assets and init (StrictMode-safe)
   useEffect(() => {
-    if (!url || !containerRef.current) return;
+    // Copy ref value at the start of the effect for cleanup
+    const container = containerRef.current;
+    if (!url || !container) return;
 
     if (!document.querySelector('link[data-calendly-style="true"]')) {
       const link = document.createElement("link");
@@ -212,17 +221,16 @@ export default function CalendlyInline() {
     }
 
     const init = () => {
-      if (didInitRef.current || !window.Calendly || !containerRef.current)
-        return;
+      if (didInitRef.current || !window.Calendly || !container) return;
       didInitRef.current = true;
 
-      containerRef.current.innerHTML = "";
+      container.innerHTML = "";
       skeletonShownAtRef.current = Date.now();
       if (mountedRef.current) setReady(false);
 
       window.Calendly.initInlineWidget({
         url,
-        parentElement: containerRef.current,
+        parentElement: container,
         prefill: prefillData,
       });
 
@@ -254,7 +262,7 @@ export default function CalendlyInline() {
 
     return () => {
       didInitRef.current = false;
-      if (containerRef.current) containerRef.current.innerHTML = "";
+      if (container) container.innerHTML = "";
       if (cleanupFallback) cleanupFallback();
     };
   }, [url, prefillData]);

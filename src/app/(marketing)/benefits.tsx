@@ -23,7 +23,7 @@ export default function Benefits({
 }: BenefitsProps) {
   const cells: (BenefitItem | null)[] = Array.from(
     { length: 4 },
-    (_, i) => items[i] ?? null
+    (_, i) => items[i] ?? null,
   );
 
   const borderByIndex = [
@@ -71,10 +71,12 @@ export default function Benefits({
                       <div className="flex flex-row md:flex-col items-start gap-3 md:gap-0">
                         {item.iconSrc && (
                           <div className="md:mb-3 shrink-0">
-                            <img
+                            <Image
                               src={item.iconSrc}
                               alt={item.iconAlt || ""}
                               className="w-[23px] h-[23px] md:w-[33px] md:h-[33px] object-contain"
+                              width={33}
+                              height={33}
                             />
                           </div>
                         )}

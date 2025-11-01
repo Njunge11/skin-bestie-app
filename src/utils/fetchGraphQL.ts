@@ -1,9 +1,9 @@
 import { draftMode, cookies } from "next/headers";
 
-export async function fetchGraphQL<T = any>(
+export async function fetchGraphQL<T = unknown>(
   query: string,
-  variables?: Record<string, any>,
-  headers?: Record<string, string>
+  variables?: Record<string, unknown>,
+  headers?: Record<string, string>,
 ): Promise<T> {
   const { isEnabled: preview } = await draftMode();
 
@@ -22,26 +22,23 @@ export async function fetchGraphQL<T = any>(
       variables: { preview, ...variables },
     });
 
-    const response = await fetch(
-      `${process.env.WORDPRESS_API_URL}/graphql`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(authHeader && { Authorization: authHeader }),
-          ...headers,
-        },
-        body,
-        cache: preview ? "no-cache" : "default",
-        next: { tags: ["wordpress"] },
-      }
-    );
+    const response = await fetch(`${process.env.WORDPRESS_API_URL}/graphql`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(authHeader && { Authorization: authHeader }),
+        ...headers,
+      },
+      body,
+      cache: preview ? "no-cache" : "default",
+      next: { tags: ["wordpress"] },
+    });
 
     if (!response.ok) {
       console.error(
         "Response Status1:",
         response.status,
-        await response.text()
+        await response.text(),
       );
       throw new Error(response.statusText);
     }

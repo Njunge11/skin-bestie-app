@@ -1,5 +1,5 @@
 // src/features/onboarding/__tests__/actions.test.ts
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createUserProfile,
   getUserProfile,
@@ -10,9 +10,9 @@ import {
 
 describe("Onboarding Actions - Unit Tests", () => {
   let deps: OnboardingActionsDeps;
-  let apiGetStub: any;
-  let apiPostStub: any;
-  let apiPatchStub: any;
+  let apiGetStub: ReturnType<typeof vi.fn>;
+  let apiPostStub: ReturnType<typeof vi.fn>;
+  let apiPatchStub: ReturnType<typeof vi.fn>;
 
   // Test data
   const validProfileInput = {
@@ -44,9 +44,9 @@ describe("Onboarding Actions - Unit Tests", () => {
   };
 
   beforeEach(() => {
-    apiGetStub = async () => mockProfileResponse;
-    apiPostStub = async () => mockProfileResponse;
-    apiPatchStub = async () => mockProfileResponse;
+    apiGetStub = vi.fn(async () => mockProfileResponse);
+    apiPostStub = vi.fn(async () => mockProfileResponse);
+    apiPatchStub = vi.fn(async () => mockProfileResponse);
 
     deps = {
       api: {
@@ -71,9 +71,9 @@ describe("Onboarding Actions - Unit Tests", () => {
 
     it("create_withValidData_callsApiPostWithCorrectEndpoint", async () => {
       let capturedEndpoint = "";
-      let capturedBody: any;
+      let capturedBody: unknown;
 
-      deps.api.post = async (endpoint: string, body: any) => {
+      deps.api.post = async (endpoint: string, body: unknown) => {
         capturedEndpoint = endpoint;
         capturedBody = body;
         return mockProfileResponse;
@@ -105,7 +105,9 @@ describe("Onboarding Actions - Unit Tests", () => {
 
     it("create_withConflictError_returnsErrorWithMessage", async () => {
       deps.api.post = async () => {
-        const error: any = new Error("Email is already registered with different details");
+        const error = new Error(
+          "Email is already registered with different details",
+        ) as Error & { status: number };
         error.status = 409;
         throw error;
       };
@@ -114,13 +116,17 @@ describe("Onboarding Actions - Unit Tests", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Email is already registered with different details");
+        expect(result.error).toBe(
+          "Email is already registered with different details",
+        );
       }
     });
 
     it("create_withValidationError_returnsErrorWithMessage", async () => {
       deps.api.post = async () => {
-        const error: any = new Error("Invalid email format");
+        const error = new Error("Invalid email format") as Error & {
+          status: number;
+        };
         error.status = 400;
         throw error;
       };
@@ -175,7 +181,9 @@ describe("Onboarding Actions - Unit Tests", () => {
 
     it("get_withNotFoundError_returnsErrorWithMessage", async () => {
       deps.api.get = async () => {
-        const error: any = new Error("Profile not found");
+        const error = new Error("Profile not found") as Error & {
+          status: number;
+        };
         error.status = 404;
         throw error;
       };
@@ -230,9 +238,9 @@ describe("Onboarding Actions - Unit Tests", () => {
 
     it("update_withSkinType_callsApiPatchWithCorrectData", async () => {
       let capturedEndpoint = "";
-      let capturedBody: any;
+      let capturedBody: unknown;
 
-      deps.api.patch = async (endpoint: string, body: any) => {
+      deps.api.patch = async (endpoint: string, body: unknown) => {
         capturedEndpoint = endpoint;
         capturedBody = body;
         return mockProfileResponse;
@@ -299,13 +307,25 @@ describe("Onboarding Actions - Unit Tests", () => {
     it("update_withSubscription_returnsSuccessWithUpdatedProfile", async () => {
       const updates = {
         isSubscribed: true,
-        completedSteps: ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE"],
+        completedSteps: [
+          "PERSONAL",
+          "SKIN_TYPE",
+          "SKIN_CONCERNS",
+          "ALLERGIES",
+          "SUBSCRIBE",
+        ],
       };
 
       const updatedProfile = {
         ...mockProfileResponse,
         isSubscribed: true,
-        completedSteps: ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE"],
+        completedSteps: [
+          "PERSONAL",
+          "SKIN_TYPE",
+          "SKIN_CONCERNS",
+          "ALLERGIES",
+          "SUBSCRIBE",
+        ],
       };
 
       deps.api.patch = async () => updatedProfile;
@@ -321,13 +341,27 @@ describe("Onboarding Actions - Unit Tests", () => {
     it("update_withBooking_returnsSuccessWithUpdatedProfile", async () => {
       const updates = {
         hasCompletedBooking: true,
-        completedSteps: ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE", "BOOKING"],
+        completedSteps: [
+          "PERSONAL",
+          "SKIN_TYPE",
+          "SKIN_CONCERNS",
+          "ALLERGIES",
+          "SUBSCRIBE",
+          "BOOKING",
+        ],
       };
 
       const updatedProfile = {
         ...mockProfileResponse,
         hasCompletedBooking: true,
-        completedSteps: ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES", "SUBSCRIBE", "BOOKING"],
+        completedSteps: [
+          "PERSONAL",
+          "SKIN_TYPE",
+          "SKIN_CONCERNS",
+          "ALLERGIES",
+          "SUBSCRIBE",
+          "BOOKING",
+        ],
       };
 
       deps.api.patch = async () => updatedProfile;
@@ -342,12 +376,18 @@ describe("Onboarding Actions - Unit Tests", () => {
 
     it("update_withNotFoundError_returnsErrorWithMessage", async () => {
       deps.api.patch = async () => {
-        const error: any = new Error("Profile not found");
+        const error = new Error("Profile not found") as Error & {
+          status: number;
+        };
         error.status = 404;
         throw error;
       };
 
-      const result = await updateUserProfile(userId, { skinType: ["Dry"] }, deps);
+      const result = await updateUserProfile(
+        userId,
+        { skinType: ["Dry"] },
+        deps,
+      );
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -357,7 +397,7 @@ describe("Onboarding Actions - Unit Tests", () => {
 
     it("update_withValidationError_returnsErrorWithMessage", async () => {
       deps.api.patch = async () => {
-        const error: any = new Error("Invalid data");
+        const error = new Error("Invalid data") as Error & { status: number };
         error.status = 400;
         throw error;
       };
@@ -375,7 +415,11 @@ describe("Onboarding Actions - Unit Tests", () => {
         throw new Error("Connection timeout");
       };
 
-      const result = await updateUserProfile(userId, { skinType: ["Dry"] }, deps);
+      const result = await updateUserProfile(
+        userId,
+        { skinType: ["Dry"] },
+        deps,
+      );
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -451,7 +495,7 @@ describe("Onboarding Actions - Unit Tests", () => {
 
       await checkUserExists(
         { email: "test@example.com", phoneNumber: "+1234567890" },
-        deps
+        deps,
       );
 
       expect(capturedEndpoint).toContain("email=test%40example.com");
@@ -475,7 +519,9 @@ describe("Onboarding Actions - Unit Tests", () => {
   describe("Error Handling", () => {
     it("create_withApiError_preservesErrorMessage", async () => {
       deps.api.post = async () => {
-        const error: any = new Error("Custom API error message");
+        const error = new Error("Custom API error message") as Error & {
+          status: number;
+        };
         error.status = 500;
         throw error;
       };
@@ -490,7 +536,9 @@ describe("Onboarding Actions - Unit Tests", () => {
 
     it("update_withApiError_preservesErrorMessage", async () => {
       deps.api.patch = async () => {
-        const error: any = new Error("Custom update error");
+        const error = new Error("Custom update error") as Error & {
+          status: number;
+        };
         error.status = 500;
         throw error;
       };
@@ -498,7 +546,7 @@ describe("Onboarding Actions - Unit Tests", () => {
       const result = await updateUserProfile(
         "550e8400-e29b-41d4-a716-446655440000",
         { skinType: ["Dry"] },
-        deps
+        deps,
       );
 
       expect(result.success).toBe(false);

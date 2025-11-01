@@ -15,13 +15,12 @@ const OPTIONS = ["No", "Yes"] as const;
 const FIELD = "hasAllergy" as const; // radio field
 const DETAIL_FIELD = "allergy" as const; // textarea field
 
-export default function Step4({ onNext }: { onNext?: () => void }) {
+export default function Step4() {
   const {
     watch,
     register,
     trigger,
     getValues,
-    setError,
     formState: { errors },
   } = useFormContext<OnboardingSchema>();
 
@@ -74,7 +73,7 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
 
     // Only validate textarea when "Yes" is selected
     const fields = [FIELD, selected === "Yes" ? DETAIL_FIELD : null].filter(
-      Boolean
+      Boolean,
     ) as (keyof OnboardingSchema)[];
     const ok = await trigger(fields, { shouldFocus: true });
 
@@ -91,14 +90,15 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
       // Merge completed steps (preserve existing progress)
       const completedSteps = mergeCompletedSteps(
         currentProfile?.completedSteps,
-        ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES"]
+        ["PERSONAL", "SKIN_TYPE", "SKIN_CONCERNS", "ALLERGIES"],
       );
 
       // Update profile with allergy info
       setIsUpdating(true);
       const result = await updateUserProfile(userProfileId, {
         hasAllergies: hasAllergy === "Yes",
-        allergyDetails: hasAllergy === "Yes" ? allergyDetails?.trim() || null : null,
+        allergyDetails:
+          hasAllergy === "Yes" ? allergyDetails?.trim() || null : null,
         completedSteps,
       });
       setIsUpdating(false);
@@ -122,7 +122,10 @@ export default function Step4({ onNext }: { onNext?: () => void }) {
     <form onSubmit={(e) => e.preventDefault()} noValidate>
       {/* Server error message */}
       {serverError && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md" role="alert">
+        <div
+          className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md"
+          role="alert"
+        >
           <p className="text-sm text-red-800">{serverError}</p>
         </div>
       )}
