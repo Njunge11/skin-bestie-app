@@ -352,7 +352,7 @@ export function DashboardContent({
       <ViewRoutineModal
         open={showViewRoutineModal}
         onOpenChange={setShowViewRoutineModal}
-        todayRoutine={dashboard.todayRoutine}
+        routine={dashboard.routine}
       />
     </section>
   );

@@ -15,22 +15,42 @@ import { TodayRoutine } from "@/types/routine";
 interface ViewRoutineModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  todayRoutine?: TodayRoutine;
+  routine?: {
+    morning?: Array<{
+      id?: string;
+      name?: string;
+      productName?: string;
+      instructions?: string;
+      description?: string;
+      routineStep?: string;
+      productUrl?: string;
+      order?: number;
+    }>;
+    evening?: Array<{
+      id?: string;
+      name?: string;
+      productName?: string;
+      instructions?: string;
+      description?: string;
+      routineStep?: string;
+      productUrl?: string;
+      order?: number;
+    }>;
+  };
 }
 
 export function ViewRoutineModal({
   open,
   onOpenChange,
-  todayRoutine = [],
+  routine,
 }: ViewRoutineModalProps) {
-  // Filter routines by time of day and sort by order
-  const morningRoutine = todayRoutine
-    .filter((item) => item.timeOfDay === "morning")
-    .sort((a, b) => a.order - b.order);
-
-  const eveningRoutine = todayRoutine
-    .filter((item) => item.timeOfDay === "evening")
-    .sort((a, b) => a.order - b.order);
+  // Get routines from the object structure and sort by order
+  const morningRoutine = (routine?.morning || []).sort(
+    (a, b) => (a.order || 0) - (b.order || 0),
+  );
+  const eveningRoutine = (routine?.evening || []).sort(
+    (a, b) => (a.order || 0) - (b.order || 0),
+  );
 
   const hasRoutines = morningRoutine.length > 0 || eveningRoutine.length > 0;
   return (
@@ -72,13 +92,13 @@ export function ViewRoutineModal({
                   <span>Morning Routine</span>
                 </h3>
                 <div className="space-y-3">
-                  {morningRoutine.map((item) => (
+                  {morningRoutine.map((item, index) => (
                     <RoutineItemCard
-                      key={item.id}
-                      productName={item.productName}
-                      description={item.instructions}
-                      category={item.routineStep}
-                      productUrl={item.productUrl}
+                      key={item.id || `morning-${index}`}
+                      productName={item.productName || item.name || ""}
+                      description={item.instructions || item.description || ""}
+                      category={item.routineStep || ""}
+                      productUrl={item.productUrl || ""}
                       showCheckbox={false}
                     />
                   ))}
@@ -94,13 +114,13 @@ export function ViewRoutineModal({
                   <span>Evening Routine</span>
                 </h3>
                 <div className="space-y-3">
-                  {eveningRoutine.map((item) => (
+                  {eveningRoutine.map((item, index) => (
                     <RoutineItemCard
-                      key={item.id}
-                      productName={item.productName}
-                      description={item.instructions}
-                      category={item.routineStep}
-                      productUrl={item.productUrl}
+                      key={item.id || `evening-${index}`}
+                      productName={item.productName || item.name || ""}
+                      description={item.instructions || item.description || ""}
+                      category={item.routineStep || ""}
+                      productUrl={item.productUrl || ""}
                       showCheckbox={false}
                     />
                   ))}
