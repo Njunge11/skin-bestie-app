@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Trash2, GripVertical, Star, Pencil } from "lucide-react";
+import { Trash2, GripVertical, Star, Pencil, Check } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ interface GoalItemProps {
   onDelete: (id: string) => Promise<void>;
   showNumberBadge?: boolean;
   showCheckbox?: boolean;
+  backgroundColor?: string;
 }
 
 export function GoalItem({
@@ -30,6 +31,7 @@ export function GoalItem({
   onDelete,
   showNumberBadge = false,
   showCheckbox = false,
+  backgroundColor,
 }: GoalItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<GoalFormData>({
@@ -140,85 +142,91 @@ export function GoalItem({
       {...listeners}
       onClick={handleStartEdit}
       className={cn(
-        "flex items-center gap-3 rounded-lg border border-gray-200 p-3 transition-all hover:border-gray-300 cursor-pointer",
+        "flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border border-gray-200 p-6 transition-all hover:border-gray-300 cursor-pointer",
         isDragging && "opacity-50 cursor-grabbing",
+        backgroundColor && backgroundColor,
       )}
     >
-      {/* Drag Handle - Visual indicator */}
-      <div className="text-gray-400">
-        <GripVertical className="w-5 h-5" />
-      </div>
-
-      {/* Priority Badge - Only show if enabled */}
-      {showNumberBadge && (
-        <Badge className="bg-skinbestie-primary text-white rounded-full w-7 h-7 p-0 flex items-center justify-center">
-          {index + 1}
-        </Badge>
-      )}
-
-      {/* Checkbox - Only show if enabled */}
-      {showCheckbox && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggle(goal.id);
-          }}
-          className={cn(
-            "w-5 h-5 rounded border-2 transition-colors",
-            goal.complete
-              ? "bg-emerald-500 border-emerald-500"
-              : "border-gray-300 hover:border-gray-400",
-          )}
-          aria-label={goal.complete ? "Mark as incomplete" : "Mark as complete"}
-        >
-          {goal.complete && <Check className="w-3 h-3 text-white" />}
-        </button>
-      )}
-
-      {/* Goal Content */}
-      <div className="flex-1">
-        <div key="description" className="flex items-center gap-3">
-          <p
-            className={cn(
-              "text-sm flex-1",
-              goal.complete && "line-through text-gray-400",
-            )}
-          >
-            {goal.description}
-          </p>
+      <div className="flex items-center gap-3 flex-1">
+        {/* Drag Handle - Visual indicator */}
+        <div className="text-gray-400">
+          <GripVertical className="w-5 h-5" />
         </div>
 
-        {/* Main focus badge below description */}
-        {goal.isPrimaryGoal && (
-          <div
-            key="primary-badge"
-            className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-skinbestie-primary mt-2 w-fit"
-          >
-            <Star className="w-4 h-4 text-white fill-white" />
-            <span className="text-xs font-medium text-white">Main Focus</span>
-          </div>
+        {/* Priority Badge - Only show if enabled */}
+        {showNumberBadge && (
+          <Badge className="bg-skinbestie-primary text-white rounded-full w-7 h-7 p-0 flex items-center justify-center">
+            {index + 1}
+          </Badge>
         )}
 
-        {goal.completedAt && (
-          <p key="completed-date" className="text-xs text-gray-400 mt-1">
-            Completed {new Date(goal.completedAt).toLocaleDateString()}
-          </p>
+        {/* Checkbox - Only show if enabled */}
+        {showCheckbox && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggle(goal.id);
+            }}
+            className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer ${
+              goal.complete
+                ? "bg-skinbestie-primary border-skinbestie-primary"
+                : "bg-white border-gray-300"
+            }`}
+            aria-label={
+              goal.complete ? "Mark as incomplete" : "Mark as complete"
+            }
+          >
+            {goal.complete && <Check className="h-4 w-4 text-white" />}
+          </button>
         )}
+
+        {/* Goal Content */}
+        <div className="flex-1">
+          <div key="description" className="flex items-center gap-3">
+            <p
+              className={cn(
+                "text-sm flex-1",
+                goal.complete && "line-through text-gray-400",
+              )}
+            >
+              {goal.description}
+            </p>
+          </div>
+
+          {/* Main focus badge below description */}
+          {goal.isPrimaryGoal && (
+            <div
+              key="primary-badge"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-skinbestie-primary mt-2 w-fit"
+            >
+              <Star className="w-4 h-4 text-white fill-white" />
+              <span className="text-xs font-medium text-white">Main Focus</span>
+            </div>
+          )}
+
+          {goal.completedAt && (
+            <p key="completed-date" className="text-xs text-gray-400 mt-1">
+              Completed {new Date(goal.completedAt).toLocaleDateString()}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2 sm:gap-1 pl-8 sm:pl-0">
         {/* Edit Button */}
         <Button
-          size="icon"
+          size="sm"
           variant="ghost"
           onClick={(e) => {
             e.stopPropagation();
             handleStartEdit();
           }}
-          className="text-gray-500 hover:text-gray-700"
+          className="flex-1 sm:flex-none sm:h-9 sm:w-7 sm:p-0 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
         >
-          <Pencil className="w-4 h-4" />
+          <Pencil className="w-4 h-4 sm:mr-0 mr-2" />
+          <span className="sm:hidden">Edit</span>
         </Button>
 
         {/* Delete Button */}
@@ -229,9 +237,10 @@ export function GoalItem({
             e.stopPropagation();
             onDelete(goal.id);
           }}
-          className="text-gray-400 hover:text-red-600"
+          className="flex-1 sm:flex-none sm:h-9 sm:w-7 sm:p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
         >
-          <Trash2 className="w-4 h-4" />
+          <Trash2 className="w-4 h-4 sm:mr-0 mr-2" />
+          <span className="sm:hidden">Delete</span>
         </Button>
       </div>
     </div>

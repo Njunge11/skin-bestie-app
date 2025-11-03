@@ -40,10 +40,16 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-skinbestie-primary: #f8817d;
-  --color-skinbestie-primary-light: #fdd8d7;
+  --color-skinbestie-primary-light: #FEF2F2;
   --color-skinbestie-success: #e9f4f0;
   --color-skinbestie-success-dark: #6db399;
   --color-skinbestie-neutral: #f9f9fb;
+  --color-skinbestie-neutral-border: #f1f2f3;
+  --color-skinbestie-pink: #fa7ca1;
+  --color-skinbestie-yellow: #fbe047;
+  --color-skinbestie-blue: #235588;
+  --color-skinbestie-red: #fa7ca1;
+  --color-skinbestie-green: #53967b;
 }
 
 :root {

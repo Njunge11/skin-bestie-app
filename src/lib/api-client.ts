@@ -37,6 +37,8 @@ async function request(endpoint: string, method: string, body?: unknown) {
       throw error;
     }
 
+    console.log("API Response:", JSON.stringify(data, null, 2));
+
     return data;
   } catch (error) {
     if (error instanceof Error && "status" in error) {

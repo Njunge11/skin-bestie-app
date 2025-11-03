@@ -33,6 +33,7 @@ interface GoalsSectionProps {
   onReorderGoals: (goals: Goal[]) => Promise<void>;
   showNumberBadges?: boolean;
   showCheckboxes?: boolean;
+  backgroundColor?: string;
 }
 
 export function GoalsSection({
@@ -44,6 +45,7 @@ export function GoalsSection({
   onReorderGoals,
   showNumberBadges = false,
   showCheckboxes = false,
+  backgroundColor,
 }: GoalsSectionProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [newGoalData, setNewGoalData] = useState<GoalFormData>({
@@ -160,6 +162,7 @@ export function GoalsSection({
                   onDelete={onDeleteGoal}
                   showNumberBadge={showNumberBadges}
                   showCheckbox={showCheckboxes}
+                  backgroundColor={backgroundColor}
                 />
               ))}
 

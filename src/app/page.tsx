@@ -1,19 +1,15 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import GuestPage from "./@guest/page";
-import AuthPage from "./@auth/page";
-import AuthLayout from "./@auth/layout";
+import MarketingHome from "./(marketing)/page";
 
 export default async function HomePage() {
   const session = await auth();
 
-  // Conditionally render based on authentication
-  if (session) {
-    return (
-      <AuthLayout>
-        <AuthPage />
-      </AuthLayout>
-    );
+  // Redirect authenticated users to dashboard
+  if (session?.user) {
+    redirect("/dashboard");
   }
 
-  return <GuestPage />;
+  // Show marketing page for unauthenticated users
+  return <MarketingHome />;
 }

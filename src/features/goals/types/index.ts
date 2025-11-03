@@ -1,14 +1,5 @@
-export interface Goal {
-  id: string;
-  templateId: string;
-  description: string;
-  isPrimaryGoal: boolean;
-  complete: boolean;
-  completedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  order: number;
-}
+// Re-export Goal from global schemas
+export type { Goal } from "@/lib/schemas";
 
 export interface GoalFormData {
   description: string;

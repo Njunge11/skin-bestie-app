@@ -22,7 +22,7 @@ import {
   deleteGoalAction,
   reorderGoalsAction,
   acknowledgeGoalsAction,
-} from "@/app/@auth/dashboard/goal-actions";
+} from "@/app/(application)/dashboard/goal-actions";
 
 interface ReviewGoalsModalProps {
   open: boolean;
@@ -89,7 +89,7 @@ export function ReviewGoalsModal({
               ? {
                   ...g,
                   complete: !g.complete,
-                  completedAt: !g.complete ? new Date() : null,
+                  completedAt: !g.complete ? new Date().toISOString() : null,
                 }
               : g,
           );
