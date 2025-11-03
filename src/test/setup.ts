@@ -27,18 +27,21 @@ vi.mock("react", async () => {
   const actual = await vi.importActual<typeof import("react")>("react");
   return {
     ...actual,
-    useOptimistic: <State, Action>(
+    useOptimistic: <State, Action = State>(
       initialValue: State,
       reducer?: (state: State, action: Action) => State,
     ): [State, (action: Action) => void] => {
       const [value, setValue] = actual.useState<State>(initialValue);
 
-      // Create a dispatch function that applies the reducer if provided
-      const dispatch = reducer
-        ? (action: Action) => {
-            setValue((currentValue: State) => reducer(currentValue, action));
-          }
-        : (action: Action) => setValue(action as State);
+      // Create a dispatch function that applies the reducer
+      const dispatch = (action: Action) => {
+        if (reducer) {
+          setValue((currentValue: State) => reducer(currentValue, action));
+        } else {
+          // When no reducer is provided, Action should be State
+          setValue(action as unknown as State);
+        }
+      };
 
       return [value, dispatch];
     },
