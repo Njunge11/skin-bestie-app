@@ -11,7 +11,14 @@ import { LinkNode, AutoLinkNode } from "@lexical/link";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { $getRoot, $createParagraphNode, $createTextNode } from "lexical";
+import { useEffect } from "react";
 import ToolbarPlugin from "./toolbar-plugin";
+import ImagesPlugin from "./lexical/plugins/ImagesPlugin";
+import { ImageNode } from "./lexical/nodes/ImageNode";
+import "./lexical/ui/ImageResizer.css";
 
 const theme = {
   paragraph: "mb-2",
@@ -28,12 +35,14 @@ const theme = {
     ul: "list-disc ml-6 mb-2",
     listitem: "mb-1",
   },
-  link: "text-blue-600 underline cursor-pointer",
+  link: "text-skinbestie-primary underline cursor-pointer hover:text-skinbestie-primary/80",
   text: {
     bold: "font-bold",
     italic: "italic",
     underline: "underline",
   },
+  quote: "border-l-4 border-gray-300 pl-4 italic text-gray-700 my-4",
+  image: "my-4",
 };
 
 interface LexicalEditorProps {
@@ -42,7 +51,37 @@ interface LexicalEditorProps {
   placeholder?: string;
 }
 
+// Plugin to initialize content
+function InitialContentPlugin({ content }: { content?: string }) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (content) {
+      editor.update(() => {
+        const root = $getRoot();
+        root.clear();
+
+        // Split content by newlines to create paragraphs
+        const paragraphs = content.split("\n\n");
+
+        paragraphs.forEach((paragraphText) => {
+          if (paragraphText.trim()) {
+            const paragraph = $createParagraphNode();
+            const text = $createTextNode(paragraphText.trim());
+            paragraph.append(text);
+            root.append(paragraph);
+          }
+        });
+      });
+    }
+  }, [editor, content]);
+
+  return null;
+}
+
 export default function LexicalEditor({
+  initialContent,
+  onChange,
   placeholder = "Start writing...",
 }: LexicalEditorProps) {
   const initialConfig = {
@@ -58,6 +97,7 @@ export default function LexicalEditor({
       ListItemNode,
       LinkNode,
       AutoLinkNode,
+      ImageNode,
     ],
   };
 
@@ -82,6 +122,19 @@ export default function LexicalEditor({
         <AutoFocusPlugin />
         <ListPlugin />
         <LinkPlugin />
+        <ImagesPlugin />
+        <InitialContentPlugin content={initialContent} />
+        {onChange && (
+          <OnChangePlugin
+            onChange={(editorState) => {
+              editorState.read(() => {
+                const root = $getRoot();
+                const text = root.getTextContent();
+                onChange(text);
+              });
+            }}
+          />
+        )}
       </div>
     </LexicalComposer>
   );

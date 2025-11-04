@@ -15,6 +15,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 const navigation = [
@@ -24,14 +25,24 @@ const navigation = [
   { name: "Privacy", href: "/privacy", icon: Shield },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-  console.log("Current pathname:", pathname);
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        <Link href="/" className="flex items-center px-4 py-3">
+        <Link
+          href="/"
+          className="flex items-center px-4 py-3"
+          onClick={handleLinkClick}
+        >
           <Image
             src="/logo.svg"
             alt="Skinbestie"
@@ -58,7 +69,7 @@ export function AppSidebar() {
                       isActive={isActive}
                       className="py-6 data-[active=true]:bg-skinbestie-primary-light data-[active=true]:text-skinbestie-primary"
                     >
-                      <Link href={item.href}>
+                      <Link href={item.href} onClick={handleLinkClick}>
                         <item.icon />
                         <span>{item.name}</span>
                       </Link>

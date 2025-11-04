@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchDashboardAction } from "../actions/setup-dashboard-actions";
+import { fetchDashboardAction } from "../setup-dashboard/setup-dashboard-actions";
 
 export function useDashboard() {
   return useQuery({

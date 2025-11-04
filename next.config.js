@@ -8,6 +8,11 @@ const nextConfig = {
         hostname: "dhur3fak4lnqy.cloudfront.net",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "dpmg08zn22q82.cloudfront.net",
+        port: "",
+      },
     ],
   },
   serverExternalPackages: [

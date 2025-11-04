@@ -162,6 +162,25 @@ The workflow includes three jobs:
 ```
 src/
 ├── app/
+│   ├── (application)/      # Authenticated user pages
+│   │   ├── dashboard/      # Dashboard feature
+│   │   │   ├── components/ # Dashboard components (organized by feature)
+│   │   │   │   ├── setup-dashboard/      # Setup dashboard components
+│   │   │   │   ├── subscriber-dashboard/ # Active subscriber components
+│   │   │   │   ├── dashboard-skeleton.tsx
+│   │   │   │   ├── progress-tracker.tsx
+│   │   │   │   ├── what-you-get-modal.tsx
+│   │   │   │   └── index.ts              # Barrel exports
+│   │   │   ├── actions/    # Server actions
+│   │   │   ├── schemas/    # Zod validation schemas
+│   │   │   └── page.tsx    # Dashboard page
+│   │   └── my-profile/     # User profile feature
+│   │       ├── components/ # Profile components (organized by feature)
+│   │       │   ├── progress-photos/  # Progress photos feature
+│   │       │   ├── profile-header.tsx
+│   │       │   ├── profile-tabs.tsx
+│   │       │   └── index.ts          # Barrel exports
+│   │       └── page.tsx    # Profile page
 │   ├── (marketing)/        # Marketing site pages
 │   │   ├── page.tsx        # Landing page
 │   │   ├── onboarding/     # Multi-step onboarding wizard (uses Server Actions)
@@ -185,6 +204,97 @@ src/
     ├── wp.ts              # WordPress fetch with ISR
     ├── fetchGraphQL.ts    # WordPress fetch with draft mode
     └── seoData.ts         # SEO metadata helpers
+```
+
+## Component Organization
+
+### Application Features
+
+Application features (`(application)` route group) follow a consistent component organization pattern:
+
+**Structure Pattern:**
+```
+feature-name/
+├── components/
+│   ├── sub-feature-1/    # Folder for complex sub-features
+│   │   ├── index.tsx     # Main component (default export)
+│   │   ├── component-a.tsx
+│   │   ├── component-b.tsx
+│   │   └── component-c.tsx
+│   ├── shared-component.tsx
+│   └── index.ts          # Barrel exports
+├── actions/              # Server actions (if needed)
+├── schemas/              # Zod schemas (if needed)
+└── page.tsx              # Route page
+```
+
+**Guidelines:**
+
+1. **Consistency**: All features use the same nesting pattern (`feature/components/sub-feature/`)
+2. **Sub-features**: Group related components into folders when they form a cohesive feature
+3. **Index files**: Use `index.tsx` for main component and `index.ts` for barrel exports
+4. **Imports**: Always use trailing slash for folder imports (`./progress-photos/` not `./progress-photos`)
+5. **Separation**: Keep Server Actions, schemas, and components in separate directories
+
+**Example: Dashboard Feature**
+
+```
+dashboard/
+├── components/
+│   ├── setup-dashboard/           # Sub-feature for onboarding users
+│   │   ├── index.tsx              # SetupDashboard component
+│   │   ├── coach-card.tsx
+│   │   ├── onboarding-checklist.tsx
+│   │   ├── view-routine-modal.tsx
+│   │   └── what-happens-next-card.tsx
+│   ├── subscriber-dashboard/      # Sub-feature for active users
+│   │   ├── index.tsx              # SubscriberDashboard component
+│   │   ├── metric-card.tsx
+│   │   ├── routine-tabs.tsx
+│   │   ├── goals-section.tsx
+│   │   └── weekly-summary.tsx
+│   ├── dashboard-skeleton.tsx     # Shared loading state
+│   ├── what-you-get-modal.tsx     # Shared modal
+│   └── index.ts                   # Barrel exports
+├── actions/
+│   ├── goal-actions.ts
+│   └── routine-step-actions.ts
+├── schemas/
+│   └── dashboard.schema.ts
+└── page.tsx
+```
+
+**Example: My Profile Feature**
+
+```
+my-profile/
+├── components/
+│   ├── progress-photos/           # Sub-feature for photo management
+│   │   ├── index.tsx              # ProgressPhotos main component
+│   │   ├── photo-upload-area.tsx  # Upload UI
+│   │   ├── photo-card.tsx         # Individual photo display
+│   │   ├── photo-grid.tsx         # Grid layout
+│   │   ├── zoom-controls.tsx      # Zoom UI controls
+│   │   ├── photo-view-modal.tsx   # Single photo viewer
+│   │   └── compare-photos-modal.tsx # Side-by-side comparison
+│   ├── profile-header.tsx         # Shared component
+│   ├── profile-tabs.tsx           # Shared component
+│   └── index.ts                   # Barrel exports
+└── page.tsx
+```
+
+**Import Pattern:**
+
+```typescript
+// ✅ Correct - folder import with trailing slash
+import { ProgressPhotos } from "./progress-photos/";
+import { SetupDashboard } from "./setup-dashboard/";
+
+// ❌ Incorrect - missing trailing slash
+import { ProgressPhotos } from "./progress-photos";
+
+// ✅ Correct - barrel export usage
+import { ProfileHeader, ProfileTabs } from "./components";
 ```
 
 ## Environment Setup

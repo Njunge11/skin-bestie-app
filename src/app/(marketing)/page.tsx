@@ -11,6 +11,7 @@ import Faqs from "./faqs";
 import OurStory from "./OurStory";
 import Header from "./header";
 import HeroSection from "./hero";
+import Footer from "./footer";
 
 export const revalidate = 60;
 
@@ -302,6 +303,8 @@ export default async function MarketingHome() {
           items={faqs.items}
         />
       )}
+
+      <Footer />
     </main>
   );
 }

@@ -1,12 +1,9 @@
 "use client";
 
 import { useOptimistic } from "react";
-import {
-  DashboardSkeleton,
-  ProgressTracker,
-  SetupDashboard,
-  SubscriberDashboard,
-} from "./components";
+import { DashboardSkeleton, ProgressTracker } from "./components";
+import { SetupDashboard } from "./setup-dashboard";
+import { SubscriberDashboard } from "./subscriber-dashboard";
 import { ErrorFeedback } from "../components";
 import { useDashboard } from "./hooks/use-dashboard";
 import { type DashboardResponse, type User } from "./schemas";
@@ -93,6 +90,7 @@ export default function DashboardPage() {
         <SubscriberDashboard
           userName={optimisticNickname}
           todayRoutine={dashboard.todayRoutine}
+          catchupSteps={dashboard.catchupSteps}
           goals={dashboard.goals || []}
         />
       );

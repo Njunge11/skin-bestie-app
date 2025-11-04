@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { MetricCardSkeleton } from "./metric-card-skeleton";
+import { MetricCardSkeleton } from "../shared/stats";
 
 export function DashboardSkeleton() {
   return (

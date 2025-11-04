@@ -28,7 +28,14 @@ export const todayRoutineStepSchema = z.object({
   instructions: z.string(),
   timeOfDay: z.enum(["morning", "evening"]),
   order: z.number(),
-  status: z.enum(["pending", "completed", "skipped"]),
+  status: z.enum([
+    "pending",
+    "on-time",
+    "late",
+    "missed",
+    "completed",
+    "skipped",
+  ]),
   completedAt: z.string().nullable(),
 });
 
@@ -41,7 +48,7 @@ export const routineTemplateStepSchema = z.object({
   productName: z.string(),
   productUrl: z.string(),
   instructions: z.string(),
-  frequency: z.enum(["daily", "specific_days"]),
+  frequency: z.enum(["daily", "2x per week", "3x per week", "specific_days"]),
   days: z.array(z.string()).nullable(),
   timeOfDay: z.enum(["morning", "evening"]),
   order: z.number(),

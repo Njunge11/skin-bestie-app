@@ -5,6 +5,8 @@ import { z } from "zod";
  * Used across: Dashboard, Profile, Journal, Goals
  */
 export const userSchema = z.object({
+  userId: z.string(),
+  userProfileId: z.string(),
   firstName: z.string(),
   lastName: z.string(),
   email: z.string().email(),

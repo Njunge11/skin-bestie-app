@@ -23,6 +23,7 @@ import { $getNearestNodeOfType, mergeRegister } from "@lexical/utils";
 import {
   $isHeadingNode,
   $createHeadingNode,
+  $createQuoteNode,
   HeadingTagType,
 } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
@@ -39,8 +40,13 @@ import {
   Heading3,
   Undo2,
   Redo2,
+  Quote,
+  Image as ImageIcon,
+  Link as LinkIcon,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { INSERT_IMAGE_COMMAND } from "./lexical/plugins/ImagesPlugin";
+import { TOGGLE_LINK_COMMAND } from "@lexical/link";
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -51,6 +57,8 @@ export default function ToolbarPlugin() {
   const [blockType, setBlockType] = useState("paragraph");
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -144,6 +152,55 @@ export default function ToolbarPlugin() {
       editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
     } else {
       editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
+    }
+  };
+
+  const formatQuote = () => {
+    if (blockType !== "quote") {
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createQuoteNode());
+        }
+      });
+    } else {
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createParagraphNode());
+        }
+      });
+    }
+  };
+
+  const insertImage = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const src = event.target?.result as string;
+          editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+            altText: file.name,
+            src: src,
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
+
+  const insertLink = () => {
+    if (!showLinkInput) {
+      setShowLinkInput(true);
+    } else if (linkUrl) {
+      editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
+      setLinkUrl("");
+      setShowLinkInput(false);
     }
   };
 
@@ -266,6 +323,68 @@ export default function ToolbarPlugin() {
         aria-label="Numbered List"
       >
         <ListOrdered className="h-4 w-4" />
+      </Button>
+
+      <Separator orientation="vertical" className="mx-1 h-6" />
+
+      {/* Block Quote */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={formatQuote}
+        className={`h-8 w-8 p-0 ${blockType === "quote" ? "bg-muted" : ""}`}
+        aria-label="Block Quote"
+      >
+        <Quote className="h-4 w-4" />
+      </Button>
+
+      <Separator orientation="vertical" className="mx-1 h-6" />
+
+      {/* Link */}
+      <div className="relative">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={insertLink}
+          className="h-8 w-8 p-0"
+          aria-label="Insert Link"
+        >
+          <LinkIcon className="h-4 w-4" />
+        </Button>
+        {showLinkInput && (
+          <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg p-2 z-20 flex gap-2">
+            <input
+              type="url"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="https://example.com"
+              className="border rounded px-2 py-1 text-sm w-48"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  insertLink();
+                } else if (e.key === "Escape") {
+                  setShowLinkInput(false);
+                  setLinkUrl("");
+                }
+              }}
+            />
+            <Button size="sm" onClick={insertLink}>
+              Add
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Image */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={insertImage}
+        className="h-8 w-8 p-0"
+        aria-label="Insert Image"
+      >
+        <ImageIcon className="h-4 w-4" />
       </Button>
     </div>
   );

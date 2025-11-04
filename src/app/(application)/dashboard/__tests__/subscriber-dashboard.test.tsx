@@ -4,21 +4,29 @@ import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SubscriberDashboard } from "../subscriber-dashboard";
 import type { TodayRoutineStep } from "../schemas/dashboard.schema";
-import type { Goal } from "@/features/goals/types";
+import type { Goal } from "../shared/goals";
 
 // Mock server actions
-vi.mock("../goal-actions", () => ({
-  createGoalAction: vi.fn(),
-  updateGoalAction: vi.fn(),
-  toggleGoalAction: vi.fn(),
-  deleteGoalAction: vi.fn(),
-  reorderGoalsAction: vi.fn(),
-}));
+vi.mock("../shared/goals", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../shared/goals")>();
+  return {
+    ...actual,
+    createGoalAction: vi.fn(),
+    updateGoalAction: vi.fn(),
+    toggleGoalAction: vi.fn(),
+    deleteGoalAction: vi.fn(),
+    reorderGoalsAction: vi.fn(),
+  };
+});
 
-vi.mock("../actions/routine-step-actions", () => ({
-  toggleRoutineStepAction: vi.fn(),
-  toggleMultipleStepsAction: vi.fn(),
-}));
+vi.mock("../shared/routine", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../shared/routine")>();
+  return {
+    ...actual,
+    toggleRoutineStepAction: vi.fn(),
+    toggleMultipleStepsAction: vi.fn(),
+  };
+});
 
 vi.mock("../hooks/use-stats", () => ({
   useStats: vi.fn(),
@@ -36,11 +44,11 @@ import {
   createGoalAction,
   toggleGoalAction,
   deleteGoalAction,
-} from "../goal-actions";
+} from "../shared/goals";
 import {
   toggleRoutineStepAction,
   toggleMultipleStepsAction,
-} from "../actions/routine-step-actions";
+} from "../shared/routine";
 import { useStats } from "../hooks/use-stats";
 import { toast } from "sonner";
 
@@ -258,21 +266,13 @@ describe("Subscriber Dashboard - UI Tests", () => {
       );
 
       // Find the product name
-      const productHeading = screen.getByText("CeraVe Hydrating Cleanser");
-      expect(productHeading).toBeInTheDocument();
+      expect(screen.getByText("CeraVe Hydrating Cleanser")).toBeInTheDocument();
 
-      // Find the checkbox button (it's a button styled as checkbox)
-      // Look for the button near the product name
-      const card = productHeading.closest(".border");
-      expect(card).toBeInTheDocument();
-
-      const checkboxButton = card?.querySelector("button[type='button']");
-      expect(checkboxButton).toBeInTheDocument();
-
-      // User clicks the checkbox
-      if (checkboxButton) {
-        await user.click(checkboxButton as HTMLElement);
-      }
+      // User clicks the checkbox button (using accessible label)
+      const checkboxButton = screen.getByRole("button", {
+        name: /mark cerave hydrating cleanser as complete/i,
+      });
+      await user.click(checkboxButton);
 
       // Server action should be called
       await waitFor(() => {
@@ -310,14 +310,13 @@ describe("Subscriber Dashboard - UI Tests", () => {
         />,
       );
 
-      const productHeading = screen.getByText("Vitamin C Serum");
-      const card = productHeading.closest(".border");
-      const checkboxButton = card?.querySelector("button[type='button']");
+      expect(screen.getByText("Vitamin C Serum")).toBeInTheDocument();
 
       // User clicks the checkbox
-      if (checkboxButton) {
-        await user.click(checkboxButton as HTMLElement);
-      }
+      const checkboxButton = screen.getByRole("button", {
+        name: /mark vitamin c serum as complete/i,
+      });
+      await user.click(checkboxButton);
 
       // Wait for error toast
       await waitFor(() => {
@@ -373,15 +372,11 @@ describe("Subscriber Dashboard - UI Tests", () => {
         />,
       );
 
-      // Find "Mark all as done" checkbox button (it's adjacent to the text)
-      const markAllText = screen.getByText(/mark all as done/i);
-      // The checkbox button is the previous sibling button element
-      const markAllButton = markAllText.closest("div")?.querySelector("button");
-      expect(markAllButton).toBeInTheDocument();
-
-      if (markAllButton) {
-        await user.click(markAllButton as HTMLElement);
-      }
+      // Click "Mark all as done" button
+      const markAllButton = screen.getByRole("button", {
+        name: /mark all as done/i,
+      });
+      await user.click(markAllButton);
 
       // Server action should be called with both step IDs
       await waitFor(() => {
@@ -416,13 +411,11 @@ describe("Subscriber Dashboard - UI Tests", () => {
         />,
       );
 
-      const markAllText = screen.getByText(/mark all as done/i);
-      const markAllButton = markAllText.closest("div")?.querySelector("button");
-      expect(markAllButton).toBeInTheDocument();
-
-      if (markAllButton) {
-        await user.click(markAllButton as HTMLElement);
-      }
+      // Click "Mark all as done" button
+      const markAllButton = screen.getByRole("button", {
+        name: /mark all as done/i,
+      });
+      await user.click(markAllButton);
 
       // Wait for error
       await waitFor(() => {
@@ -490,6 +483,406 @@ describe("Subscriber Dashboard - UI Tests", () => {
       expect(
         screen.queryByText("Morning Cleanser Product"),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Routine Steps - Progress Bar Updates", () => {
+    it("progress bar updates as user checks individual steps", async () => {
+      const user = userEvent.setup();
+      const morningRoutine = [
+        createMockRoutineStep({
+          id: "step-1",
+          routineStep: "Cleanser",
+          productName: "Step 1",
+          timeOfDay: "morning",
+        }),
+        createMockRoutineStep({
+          id: "step-2",
+          routineStep: "Moisturizer",
+          productName: "Step 2",
+          timeOfDay: "morning",
+        }),
+        createMockRoutineStep({
+          id: "step-3",
+          routineStep: "Sunscreen",
+          productName: "Step 3",
+          timeOfDay: "morning",
+        }),
+      ];
+
+      vi.mocked(toggleRoutineStepAction).mockResolvedValue({
+        success: true,
+        data: {
+          id: "completion-1",
+          routineProductId: "step-1",
+          userProfileId: "user-1",
+          scheduledDate: new Date().toISOString(),
+          scheduledTimeOfDay: "morning",
+          onTimeDeadline: new Date().toISOString(),
+          gracePeriodEnd: new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          status: "on-time",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      });
+
+      renderWithQueryClient(
+        <SubscriberDashboard
+          userName="Alex"
+          todayRoutine={morningRoutine}
+          goals={[]}
+        />,
+      );
+
+      // User sees initial progress 0/3
+      expect(screen.getByText("0 / 3")).toBeInTheDocument();
+
+      // Check first step
+      const step1Checkbox = screen.getByRole("button", {
+        name: /mark step 1 as complete/i,
+      });
+      await user.click(step1Checkbox);
+
+      // Progress updates to 1/3
+      await waitFor(() => {
+        expect(screen.getByText("1 / 3")).toBeInTheDocument();
+      });
+
+      // Check second step
+      const step2Checkbox = screen.getByRole("button", {
+        name: /mark step 2 as complete/i,
+      });
+      await user.click(step2Checkbox);
+
+      // Progress updates to 2/3
+      await waitFor(() => {
+        expect(screen.getByText("2 / 3")).toBeInTheDocument();
+      });
+
+      // Check third step
+      const step3Checkbox = screen.getByRole("button", {
+        name: /mark step 3 as complete/i,
+      });
+      await user.click(step3Checkbox);
+
+      // Progress updates to 3/3 (complete)
+      await waitFor(() => {
+        expect(screen.getByText("3 / 3")).toBeInTheDocument();
+      });
+    });
+
+    it("progress bar correctly shows counts when switching between morning and evening", async () => {
+      const user = userEvent.setup();
+      const mixedRoutine = [
+        createMockRoutineStep({
+          id: "morning-1",
+          routineStep: "Cleanser",
+          productName: "Morning Step 1",
+          timeOfDay: "morning",
+        }),
+        createMockRoutineStep({
+          id: "morning-2",
+          routineStep: "Moisturizer",
+          productName: "Morning Step 2",
+          timeOfDay: "morning",
+        }),
+        createMockRoutineStep({
+          id: "evening-1",
+          routineStep: "Cleanser",
+          productName: "Evening Step 1",
+          timeOfDay: "evening",
+        }),
+      ];
+
+      vi.mocked(toggleRoutineStepAction).mockResolvedValue({
+        success: true,
+        data: {
+          id: "completion-1",
+          routineProductId: "morning-1",
+          userProfileId: "user-1",
+          scheduledDate: new Date().toISOString(),
+          scheduledTimeOfDay: "morning",
+          onTimeDeadline: new Date().toISOString(),
+          gracePeriodEnd: new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          status: "on-time",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      });
+
+      renderWithQueryClient(
+        <SubscriberDashboard
+          userName="Alex"
+          todayRoutine={mixedRoutine}
+          goals={[]}
+        />,
+      );
+
+      // Morning tab shows 0/2 initially
+      expect(screen.getByText("0 / 2")).toBeInTheDocument();
+
+      // Check one morning step
+      const morningCheckbox = screen.getByRole("button", {
+        name: /mark morning step 1 as complete/i,
+      });
+      await user.click(morningCheckbox);
+
+      // Progress shows 1/2 for morning
+      await waitFor(() => {
+        expect(screen.getByText("1 / 2")).toBeInTheDocument();
+      });
+
+      // Switch to evening tab
+      const buttons = screen.getAllByRole("button");
+      const eveningButton = buttons.find((btn) =>
+        btn.textContent?.includes("🌙"),
+      );
+
+      if (eveningButton) {
+        await user.click(eveningButton);
+      }
+
+      // Evening tab shows 0/1 (different count)
+      await waitFor(() => {
+        expect(screen.getByText("0 / 1")).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Routine Steps - Empty States", () => {
+    it("displays empty state message when no morning routine steps", () => {
+      const eveningOnlyRoutine = [
+        createMockRoutineStep({
+          id: "evening-1",
+          routineStep: "Cleanser",
+          productName: "Evening Cleanser",
+          timeOfDay: "evening",
+        }),
+      ];
+
+      renderWithQueryClient(
+        <SubscriberDashboard
+          userName="Alex"
+          todayRoutine={eveningOnlyRoutine}
+          goals={[]}
+        />,
+      );
+
+      // Morning tab is active by default, shows empty state
+      expect(
+        screen.getByText(/no morning routine steps yet/i),
+      ).toBeInTheDocument();
+    });
+
+    it("displays empty state message when no evening routine steps", async () => {
+      const user = userEvent.setup();
+      const morningOnlyRoutine = [
+        createMockRoutineStep({
+          id: "morning-1",
+          routineStep: "Cleanser",
+          productName: "Morning Cleanser",
+          timeOfDay: "morning",
+        }),
+      ];
+
+      renderWithQueryClient(
+        <SubscriberDashboard
+          userName="Alex"
+          todayRoutine={morningOnlyRoutine}
+          goals={[]}
+        />,
+      );
+
+      // Switch to evening tab
+      const buttons = screen.getAllByRole("button");
+      const eveningButton = buttons.find((btn) =>
+        btn.textContent?.includes("🌙"),
+      );
+
+      if (eveningButton) {
+        await user.click(eveningButton);
+      }
+
+      // Evening tab shows empty state
+      await waitFor(() => {
+        expect(
+          screen.getByText(/no evening routine steps yet/i),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("displays empty state when no routine steps at all", () => {
+      renderWithQueryClient(
+        <SubscriberDashboard userName="Alex" todayRoutine={[]} goals={[]} />,
+      );
+
+      // Morning tab shows empty state by default
+      expect(
+        screen.getByText(/no morning routine steps yet/i),
+      ).toBeInTheDocument();
+    });
+  });
+
+  describe("Routine Steps - Uncheck All Workflow", () => {
+    it("user marks all as done, then unchecks all by clicking mark all again", async () => {
+      const user = userEvent.setup();
+      const morningRoutine = [
+        createMockRoutineStep({
+          id: "step-1",
+          routineStep: "Cleanser",
+          productName: "Step 1",
+          timeOfDay: "morning",
+        }),
+        createMockRoutineStep({
+          id: "step-2",
+          routineStep: "Moisturizer",
+          productName: "Step 2",
+          timeOfDay: "morning",
+        }),
+      ];
+
+      vi.mocked(toggleMultipleStepsAction).mockResolvedValue({
+        success: true,
+        data: [],
+      });
+
+      renderWithQueryClient(
+        <SubscriberDashboard
+          userName="Alex"
+          todayRoutine={morningRoutine}
+          goals={[]}
+        />,
+      );
+
+      // Mark all as done
+      const markAllButton = screen.getByRole("button", {
+        name: /mark all as done/i,
+      });
+      await user.click(markAllButton);
+
+      // All steps should be checked
+      await waitFor(() => {
+        expect(toggleMultipleStepsAction).toHaveBeenCalledWith(
+          expect.arrayContaining(["step-1", "step-2"]),
+          true,
+        );
+      });
+
+      // Progress shows 2/2
+      await waitFor(() => {
+        expect(screen.getByText("2 / 2")).toBeInTheDocument();
+      });
+
+      // Click mark all again to uncheck all
+      await user.click(markAllButton);
+
+      // Should uncheck all
+      await waitFor(() => {
+        expect(toggleMultipleStepsAction).toHaveBeenCalledWith(
+          expect.arrayContaining(["step-1", "step-2"]),
+          false,
+        );
+      });
+    });
+  });
+
+  describe("Routine Steps - Switch UI Elements", () => {
+    it("displays custom switch with sun and moon icons for morning/evening", async () => {
+      const user = userEvent.setup();
+      const mixedRoutine = [
+        createMockRoutineStep({
+          id: "morning-1",
+          routineStep: "Cleanser",
+          productName: "Morning Product",
+          timeOfDay: "morning",
+        }),
+        createMockRoutineStep({
+          id: "evening-1",
+          routineStep: "Cleanser",
+          productName: "Evening Product",
+          timeOfDay: "evening",
+        }),
+      ];
+
+      renderWithQueryClient(
+        <SubscriberDashboard
+          userName="Alex"
+          todayRoutine={mixedRoutine}
+          goals={[]}
+        />,
+      );
+
+      // User sees helper text explaining the switch
+      expect(
+        screen.getByText(/switch to view your morning or evening routine/i),
+      ).toBeInTheDocument();
+
+      // User sees "Morning Routine" label (default active state)
+      expect(screen.getByText("Morning Routine")).toBeInTheDocument();
+
+      // Find sun button (☀️) and moon button (🌙)
+      const buttons = screen.getAllByRole("button");
+      const sunButton = buttons.find((btn) => btn.textContent?.includes("☀️"));
+      const moonButton = buttons.find((btn) => btn.textContent?.includes("🌙"));
+
+      expect(sunButton).toBeInTheDocument();
+      expect(moonButton).toBeInTheDocument();
+
+      // Click moon button to switch to evening
+      if (moonButton) {
+        await user.click(moonButton);
+      }
+
+      // Label changes to "Evening Routine"
+      await waitFor(() => {
+        expect(screen.getByText("Evening Routine")).toBeInTheDocument();
+      });
+
+      // Evening product is now visible
+      expect(screen.getByText("Evening Product")).toBeInTheDocument();
+
+      // Click sun button to switch back to morning
+      if (sunButton) {
+        await user.click(sunButton);
+      }
+
+      // Label changes back to "Morning Routine"
+      await waitFor(() => {
+        expect(screen.getByText("Morning Routine")).toBeInTheDocument();
+      });
+
+      // Morning product is now visible
+      expect(screen.getByText("Morning Product")).toBeInTheDocument();
+    });
+
+    it("switch UI does not show tabs component", () => {
+      const morningRoutine = [
+        createMockRoutineStep({
+          id: "morning-1",
+          routineStep: "Cleanser",
+          productName: "Morning Product",
+          timeOfDay: "morning",
+        }),
+      ];
+
+      renderWithQueryClient(
+        <SubscriberDashboard
+          userName="Alex"
+          todayRoutine={morningRoutine}
+          goals={[]}
+        />,
+      );
+
+      // In switch mode, there should be no "Your Routine" card title
+      // (because useSwitch hides the CardHeader)
+      expect(screen.queryByText("Your Routine")).not.toBeInTheDocument();
+
+      // Switch UI elements are present instead
+      expect(
+        screen.getByText(/switch to view your morning or evening routine/i),
+      ).toBeInTheDocument();
     });
   });
 
@@ -610,11 +1003,12 @@ describe("Subscriber Dashboard - UI Tests", () => {
       const goalText = screen.getByText(/reduce dark circles/i);
       expect(goalText).toBeInTheDocument();
 
-      // Find the checkbox button with aria-label
-      const checkboxButton = screen.getByLabelText(/mark as complete/i);
-      expect(checkboxButton).toBeInTheDocument();
+      // Find the checkbox buttons (there are 2: mobile and desktop)
+      const checkboxButtons = screen.getAllByLabelText(/mark as complete/i);
+      expect(checkboxButtons.length).toBeGreaterThan(0);
 
-      await user.click(checkboxButton);
+      // Click the first one (mobile or desktop doesn't matter for functionality)
+      await user.click(checkboxButtons[0]);
 
       // Server action called
       await waitFor(() => {
@@ -643,26 +1037,11 @@ describe("Subscriber Dashboard - UI Tests", () => {
       );
 
       // Goal should be visible
-      const goalText = screen.getByText(/reduce wrinkles/i);
-      expect(goalText).toBeInTheDocument();
+      expect(screen.getByText(/reduce wrinkles/i)).toBeInTheDocument();
 
-      // Find the goal item container
-      const goalItem = goalText.closest("div[class*='rounded-lg border']");
-      expect(goalItem).toBeInTheDocument();
-
-      // Find the actual delete button (it has a Trash2 icon or "Delete" text)
-      const buttons = goalItem?.querySelectorAll("button") || [];
-      const deleteBtn = Array.from(buttons).find(
-        (btn) =>
-          btn.textContent?.includes("Delete") ||
-          btn.querySelector("svg")?.classList.contains("lucide-trash-2"),
-      );
-
-      expect(deleteBtn).toBeInTheDocument();
-
-      if (deleteBtn) {
-        await user.click(deleteBtn as HTMLElement);
-      }
+      // Click delete button
+      const deleteButton = screen.getByRole("button", { name: /delete goal/i });
+      await user.click(deleteButton);
 
       // Server action called
       await waitFor(() => {

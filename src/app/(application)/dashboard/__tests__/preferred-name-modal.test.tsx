@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DashboardPage from "../page";
 
 // Mock server actions
-vi.mock("../actions/setup-dashboard-actions", () => ({
+vi.mock("../setup-dashboard/setup-dashboard-actions", () => ({
   fetchDashboardAction: vi.fn(),
   updateNickname: vi.fn(),
   updateSkinTest: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock("sonner", () => ({
 import {
   fetchDashboardAction,
   updateNickname,
-} from "../actions/setup-dashboard-actions";
+} from "../setup-dashboard/setup-dashboard-actions";
 import { toast } from "sonner";
 
 // Helper to render with QueryClient
