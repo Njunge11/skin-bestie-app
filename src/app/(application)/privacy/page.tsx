@@ -1,17 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  ShieldCheck,
-  Database,
-  UserCheck,
-  Share2,
-  Lock,
-  FileText,
-  Cookie,
-  Baby,
-  RefreshCw,
-  Mail,
-} from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export default function PrivacyPage() {
   return (
@@ -42,12 +31,9 @@ export default function PrivacyPage() {
         <div className="space-y-8">
           {/* Section 1 */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Database className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                1. Information We Collect
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              1. Information We Collect
+            </h2>
             <p className="text-base text-gray-700 leading-relaxed mb-3">
               When you sign up and use Skin Bestie, we may collect the following
               information:
@@ -80,12 +66,9 @@ export default function PrivacyPage() {
 
           {/* Section 2 */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <UserCheck className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                2. How We Use Your Information
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              2. How We Use Your Information
+            </h2>
             <p className="text-base text-gray-700 leading-relaxed mb-3">
               We use your information to:
             </p>
@@ -114,12 +97,9 @@ export default function PrivacyPage() {
 
           {/* Section 3 */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Share2 className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                3. Sharing of Information
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              3. Sharing of Information
+            </h2>
             <p className="text-base text-gray-700 leading-relaxed mb-3">
               We do not sell your data. We may share information only with:
             </p>
@@ -144,12 +124,9 @@ export default function PrivacyPage() {
 
           {/* Section 4 */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Lock className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                4. Data Storage & Security
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              4. Data Storage & Security
+            </h2>
             <ul className="space-y-2 ml-5 list-disc text-base text-gray-700 leading-relaxed">
               <li>
                 Your data is stored securely using industry-standard encryption.
@@ -169,12 +146,9 @@ export default function PrivacyPage() {
 
           {/* Section 5 */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <FileText className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                5. Your Rights
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              5. Your Rights
+            </h2>
             <p className="text-base text-gray-700 leading-relaxed mb-3">
               You have the right to:
             </p>
@@ -201,12 +175,9 @@ export default function PrivacyPage() {
 
           {/* Section 6 */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Cookie className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                6. Cookies & Analytics
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              6. Cookies & Analytics
+            </h2>
             <p className="text-base text-gray-700 leading-relaxed">
               We may use cookies and analytics tools to understand usage
               patterns and improve the app. These do not identify you
@@ -218,12 +189,9 @@ export default function PrivacyPage() {
 
           {/* Section 7 */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Baby className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                7. Children&apos;s Privacy
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              7. Children&apos;s Privacy
+            </h2>
             <p className="text-base text-gray-700 leading-relaxed">
               Skin Bestie is not intended for children under 16. We do not
               knowingly collect data from minors.
@@ -234,12 +202,9 @@ export default function PrivacyPage() {
 
           {/* Section 8 */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <RefreshCw className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                8. Updates to this Policy
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              8. Updates to this Policy
+            </h2>
             <p className="text-base text-gray-700 leading-relaxed">
               We may update this policy from time to time. Changes will be
               communicated in-app and take effect immediately upon posting.
@@ -250,12 +215,9 @@ export default function PrivacyPage() {
 
           {/* Section 9 - Contact */}
           <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Mail className="h-5 w-5 text-skinbestie-primary" />
-              <h2 className="text-xl font-semibold text-gray-900">
-                9. Contact Us
-              </h2>
-            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-3">
+              9. Contact Us
+            </h2>
             <p className="text-base text-gray-700 leading-relaxed mb-4">
               If you have any questions about this Privacy Policy, please
               contact us:
