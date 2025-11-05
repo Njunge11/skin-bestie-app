@@ -3,9 +3,10 @@ import { Separator } from "@/components/ui/separator";
 import {
   ShieldCheck,
   Database,
+  UserCheck,
   Share2,
   Lock,
-  UserCheck,
+  FileText,
   Cookie,
   Baby,
   RefreshCw,
@@ -14,19 +15,21 @@ import {
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6">
+    <div className="mx-auto w-full max-w-3xl space-y-6">
       {/* Header Section */}
-      <div className="flex items-center gap-3">
-        <ShieldCheck className="h-8 w-8 text-skinbestie-primary" />
-        <h1 className="text-2xl font-bold text-gray-900">Privacy Policy</h1>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <ShieldCheck className="h-6 w-6 text-skinbestie-primary" />
+          <h1 className="text-2xl font-bold text-gray-900">Privacy Policy</h1>
+        </div>
+        <p className="text-lg text-gray-600">
+          Effective Date: September 22, 2025
+        </p>
       </div>
-
-      {/* Effective Date */}
-      <p className="text-sm text-gray-500">Effective Date: Sept 22, 2025</p>
 
       {/* Introduction Card */}
       <Card className="p-6 bg-gray-50 border-gray-200">
-        <p className="text-gray-700 leading-relaxed">
+        <p className="text-base text-gray-700 leading-relaxed">
           At Skin Bestie, we respect your privacy and are committed to
           protecting the personal information you share with us. This policy
           explains what data we collect, how we use it, and the choices you
@@ -38,168 +41,150 @@ export default function PrivacyPage() {
       <Card className="p-8">
         <div className="space-y-8">
           {/* Section 1 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <Database className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <Database className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 1. Information We Collect
               </h2>
             </div>
-            <p className="text-gray-600">
+            <p className="text-base text-gray-700 leading-relaxed mb-3">
               When you sign up and use Skin Bestie, we may collect the following
               information:
             </p>
-            <ul className="space-y-3 pl-6 list-disc marker:text-gray-400">
-              <li className="text-gray-700">
-                <span className="font-semibold">Personal details</span> – Name,
-                email, phone number, age, and gender.
+            <ul className="space-y-2 ml-5 list-disc text-base text-gray-700 leading-relaxed">
+              <li>
+                <strong>Personal details</strong> – Name, email, phone number,
+                age, and gender.
               </li>
-              <li className="text-gray-700">
-                <span className="font-semibold">Skin information</span> – Skin
-                type, concerns, and goals you share with us.
+              <li>
+                <strong>Skin information</strong> – Skin type, concerns, and
+                goals you share with us.
               </li>
-              <li className="text-gray-700">
-                <span className="font-semibold">Photos & uploads</span> –
-                Progress photos or other files you choose to provide.
+              <li>
+                <strong>Photos & uploads</strong> – Progress photos or other
+                files you choose to provide.
               </li>
-              <li className="text-gray-700">
-                <span className="font-semibold">Activity data</span> – Routine
-                completion, interactions with the app, subscription usage.
+              <li>
+                <strong>Activity data</strong> – Routine completion,
+                interactions with the app, subscription usage.
               </li>
-              <li className="text-gray-700">
-                <span className="font-semibold">Billing information</span> –
-                Payment method, transaction history, and subscription status.
+              <li>
+                <strong>Billing information</strong> – Payment method,
+                transaction history, and subscription status.
               </li>
             </ul>
-          </div>
+          </section>
 
           <Separator />
 
           {/* Section 2 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <UserCheck className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <UserCheck className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 2. How We Use Your Information
               </h2>
             </div>
-            <p className="text-gray-600">We use your information to:</p>
-            <ul className="space-y-2 pl-6 list-disc marker:text-gray-400">
-              <li className="text-gray-700">
-                Provide personalized skincare coaching and routines.
-              </li>
-              <li className="text-gray-700">
+            <p className="text-base text-gray-700 leading-relaxed mb-3">
+              We use your information to:
+            </p>
+            <ul className="space-y-2 ml-5 list-disc text-base text-gray-700 leading-relaxed">
+              <li>Provide personalized skincare coaching and routines.</li>
+              <li>
                 Track your skincare progress and allow your coach to give
                 guidance.
               </li>
-              <li className="text-gray-700">
+              <li>
                 Recommend skincare products (including links to third-party
                 retailers).
               </li>
-              <li className="text-gray-700">
+              <li>
                 Communicate with you via the app, email, or WhatsApp (with your
                 consent).
               </li>
-              <li className="text-gray-700">
-                Process subscriptions, payments, and manage billing.
-              </li>
-              <li className="text-gray-700">
+              <li>Process subscriptions, payments, and manage billing.</li>
+              <li>
                 Improve our services, app functionality, and user experience.
               </li>
             </ul>
-          </div>
+          </section>
 
           <Separator />
 
           {/* Section 3 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <Share2 className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <Share2 className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 3. Sharing of Information
               </h2>
             </div>
-            <p className="text-gray-600">
+            <p className="text-base text-gray-700 leading-relaxed mb-3">
               We do not sell your data. We may share information only with:
             </p>
-            <ul className="space-y-3 pl-6 list-disc marker:text-gray-400">
-              <li className="text-gray-700">
-                <span className="font-semibold">Coaches</span> – Your assigned
-                skincare coach has access to your profile, concerns, progress,
-                and routines.
+            <ul className="space-y-2 ml-5 list-disc text-base text-gray-700 leading-relaxed">
+              <li>
+                <strong>Coaches</strong> – Your assigned skincare coach has
+                access to your profile, concerns, progress, and routines.
               </li>
-              <li className="text-gray-700">
-                <span className="font-semibold">Service providers</span> – Third
-                parties that help us process payments, store data securely, or
-                enable WhatsApp messaging.
+              <li>
+                <strong>Service providers</strong> – Third parties that help us
+                process payments, store data securely, or enable WhatsApp
+                messaging.
               </li>
-              <li className="text-gray-700">
-                <span className="font-semibold">Legal requirements</span> – If
-                required by law or regulation to protect Skin Bestie or our
-                users.
+              <li>
+                <strong>Legal requirements</strong> – If required by law or
+                regulation to protect Skin Bestie or our users.
               </li>
             </ul>
-          </div>
+          </section>
 
           <Separator />
 
           {/* Section 4 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <Lock className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <Lock className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 4. Data Storage & Security
               </h2>
             </div>
-            <ul className="space-y-2 pl-6 list-disc marker:text-gray-400">
-              <li className="text-gray-700">
+            <ul className="space-y-2 ml-5 list-disc text-base text-gray-700 leading-relaxed">
+              <li>
                 Your data is stored securely using industry-standard encryption.
               </li>
-              <li className="text-gray-700">
+              <li>
                 Photos and sensitive details are protected and accessible only
                 to you and your assigned coach.
               </li>
-              <li className="text-gray-700">
+              <li>
                 We take reasonable steps to protect against unauthorized access,
                 alteration, or disclosure.
               </li>
             </ul>
-          </div>
+          </section>
 
           <Separator />
 
           {/* Section 5 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <UserCheck className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <FileText className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 5. Your Rights
               </h2>
             </div>
-            <p className="text-gray-600">You have the right to:</p>
-            <ul className="space-y-2 pl-6 list-disc marker:text-gray-400">
-              <li className="text-gray-700">
-                Access, update, or delete your personal data.
-              </li>
-              <li className="text-gray-700">
-                Withdraw consent for communication (unsubscribe anytime).
-              </li>
-              <li className="text-gray-700">Request a copy of your data.</li>
-              <li className="text-gray-700">
-                Deactivate your account at any time.
-              </li>
+            <p className="text-base text-gray-700 leading-relaxed mb-3">
+              You have the right to:
+            </p>
+            <ul className="space-y-2 ml-5 list-disc text-base text-gray-700 leading-relaxed">
+              <li>Access, update, or delete your personal data.</li>
+              <li>Withdraw consent for communication (unsubscribe anytime).</li>
+              <li>Request a copy of your data.</li>
+              <li>Deactivate your account at any time.</li>
             </ul>
-            <Card className="p-4 bg-gray-50 border-gray-200">
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <p className="text-sm text-gray-700">
                 To exercise these rights, contact us at:{" "}
                 <a
@@ -209,93 +194,84 @@ export default function PrivacyPage() {
                   privacy@skinbestie.com
                 </a>
               </p>
-            </Card>
-          </div>
+            </div>
+          </section>
 
           <Separator />
 
           {/* Section 6 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <Cookie className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <Cookie className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 6. Cookies & Analytics
               </h2>
             </div>
-            <p className="text-gray-700">
+            <p className="text-base text-gray-700 leading-relaxed">
               We may use cookies and analytics tools to understand usage
               patterns and improve the app. These do not identify you
               personally.
             </p>
-          </div>
+          </section>
 
           <Separator />
 
           {/* Section 7 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <Baby className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <Baby className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 7. Children&apos;s Privacy
               </h2>
             </div>
-            <p className="text-gray-700">
+            <p className="text-base text-gray-700 leading-relaxed">
               Skin Bestie is not intended for children under 16. We do not
               knowingly collect data from minors.
             </p>
-          </div>
+          </section>
 
           <Separator />
 
           {/* Section 8 */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <RefreshCw className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <RefreshCw className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 8. Updates to this Policy
               </h2>
             </div>
-            <p className="text-gray-700">
+            <p className="text-base text-gray-700 leading-relaxed">
               We may update this policy from time to time. Changes will be
               communicated in-app and take effect immediately upon posting.
             </p>
-          </div>
+          </section>
 
           <Separator />
 
-          {/* Section 9 - Contact Card */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-skinbestie-primary-light">
-                <Mail className="h-5 w-5 text-skinbestie-primary" />
-              </div>
+          {/* Section 9 - Contact */}
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <Mail className="h-5 w-5 text-skinbestie-primary" />
               <h2 className="text-xl font-semibold text-gray-900">
                 9. Contact Us
               </h2>
             </div>
-            <Card className="p-6 bg-skinbestie-primary-light border-skinbestie-primary/20">
-              <p className="text-gray-700 mb-3">
-                If you have any questions about this Privacy Policy, please
-                contact us:
+            <p className="text-base text-gray-700 leading-relaxed mb-4">
+              If you have any questions about this Privacy Policy, please
+              contact us:
+            </p>
+            <div className="p-4 bg-skinbestie-primary-light rounded-lg border border-skinbestie-primary/20">
+              <p className="font-semibold text-gray-900 mb-1 text-sm">
+                Skin Bestie
               </p>
-              <div className="space-y-1">
-                <p className="font-semibold text-gray-900">Skin Bestie</p>
-                <a
-                  href="mailto:privacy@skinbestie.com"
-                  className="flex items-center gap-2 text-skinbestie-primary hover:underline font-medium"
-                >
-                  <Mail className="h-4 w-4" />
-                  privacy@skinbestie.com
-                </a>
-              </div>
-            </Card>
-          </div>
+              <a
+                href="mailto:privacy@skinbestie.com"
+                className="text-sm text-skinbestie-primary hover:underline font-medium"
+              >
+                privacy@skinbestie.com
+              </a>
+            </div>
+          </section>
         </div>
       </Card>
     </div>
