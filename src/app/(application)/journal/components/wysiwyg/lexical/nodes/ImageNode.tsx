@@ -174,6 +174,14 @@ function ImageComponent({
     width: width === "inherit" ? maxWidth : width,
   };
 
+  // Debug logging
+  console.log("ImageComponent render:", {
+    resizable,
+    isInNodeSelection,
+    isFocused,
+    shouldShowResizer: resizable && isInNodeSelection && isFocused,
+  });
+
   return (
     <Suspense fallback={null}>
       <div

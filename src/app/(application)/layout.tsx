@@ -12,6 +12,7 @@ export default function ApplicationLayout({
 }) {
   const { data: dashboard } = useDashboard();
 
+  // Check if we're on the journal route
   // Use dashboard data or fallback - nickname is standalone, firstName gets lastName
   const userName = dashboard?.user
     ? dashboard.user.nickname ||

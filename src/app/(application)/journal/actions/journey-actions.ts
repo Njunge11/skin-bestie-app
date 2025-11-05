@@ -1,30 +1,87 @@
 "use server";
 
 import { auth } from "@/auth";
-import type { Note, NoteFormData } from "./note.types";
+
+export interface Journey {
+  id: string;
+  title: string;
+  content: string;
+  createdBy: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  createdAt: string;
+  lastModified: string;
+  tags: string[];
+}
+
+export interface JourneyFormData {
+  title: string;
+  content: string;
+  tags: string[];
+}
 
 type Result<T> =
   | { success: true; data: T }
   | { success: false; error: { message: string; code?: string } };
 
-/**
- * Fetch all notes for the current user
- */
-export async function fetchNotesAction(): Promise<Result<Note[]>> {
+// In-memory storage for all journeys (persists until server restart)
+const journeysMap = new Map<string, Journey>();
+
+// Helper to check if content is valid Lexical JSON
+function isValidLexicalJSON(content: string): boolean {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const parsed = JSON.parse(content);
+    return (
+      parsed.root && parsed.root.children && Array.isArray(parsed.root.children)
+    );
+  } catch {
+    return false;
+  }
+}
 
-    // TODO: Replace with actual API call
-    // const notes = await api.get(`/api/notes?userId=${session.user.id}`);
+// Convert plain text to Lexical JSON format
+function convertPlainTextToLexicalJSON(plainText: string): string {
+  // Split by double newlines to create paragraphs
+  const paragraphs = plainText
+    .split("\n\n")
+    .filter((text) => text.trim())
+    .map((text) => ({
+      children: [
+        {
+          detail: 0,
+          format: 0,
+          mode: "normal",
+          style: "",
+          text: text.trim(),
+          type: "text",
+          version: 1,
+        },
+      ],
+      direction: "ltr",
+      format: "",
+      indent: 0,
+      type: "paragraph",
+      version: 1,
+    }));
 
-    // Mock skincare journal entries
-    const mockNotes: Note[] = [
+  return JSON.stringify({
+    root: {
+      children: paragraphs,
+      direction: "ltr",
+      format: "",
+      indent: 0,
+      type: "root",
+      version: 1,
+    },
+  });
+}
+
+// Initialize with mock data on first load
+function initializeMockData(userId: string, userName: string) {
+  if (journeysMap.size === 0) {
+    const mockJourneys: Journey[] = [
       {
         id: "1",
         title: "Starting My Skincare Journey",
@@ -34,8 +91,8 @@ My coach has set me up with a simple but effective routine. In the morning, I'll
 
 I'm excited but also trying to be patient. My coach reminded me that real results take 6-8 weeks, so I'm committing to staying consistent and tracking my progress here. She also stressed the importance of not switching products too quickly and giving each step time to work. I'm feeling hopeful about this new chapter!`,
         createdBy: {
-          id: session.user.id,
-          name: session.user.name || "User",
+          id: userId,
+          name: userName,
         },
         createdAt: new Date("2024-01-15").toISOString(),
         lastModified: new Date("2024-01-15").toISOString(),
@@ -50,8 +107,8 @@ I'm handling it by staying consistent with my routine and not adding or removing
 
 On the positive side, I've noticed some great changes already. My skin texture feels noticeably smoother, and the dry patches on my cheeks are way better. My sunscreen isn't pilling anymore either, which makes my morning routine so much easier. Trying to trust the process here and will give it another 2-3 weeks before evaluating. Fingers crossed the worst is behind me!`,
         createdBy: {
-          id: session.user.id,
-          name: session.user.name || "User",
+          id: userId,
+          name: userName,
         },
         createdAt: new Date("2024-01-29").toISOString(),
         lastModified: new Date("2024-01-29").toISOString(),
@@ -66,8 +123,8 @@ I've learned some great application tips along the way. I apply it to damp skin 
 
 My coach wants me to introduce a retinol in a few weeks once my skin is fully adjusted to the current routine. I'm a bit nervous about adding another active ingredient, but also really excited for the next level of results. She said retinol will help with the fine lines I've been noticing and improve my overall skin texture even more.`,
         createdBy: {
-          id: session.user.id,
-          name: session.user.name || "User",
+          id: userId,
+          name: userName,
         },
         createdAt: new Date("2024-02-15").toISOString(),
         lastModified: new Date("2024-02-15").toISOString(),
@@ -82,8 +139,8 @@ No irritation at all this morning! My skin feels normal, maybe slightly tighter 
 
 I need to remember not to use BHA on retinol nights and to keep my routine simple on those days. I'll stay at this frequency for a month before gradually increasing. My coach reminded me that results take 3-4 months to really show, so I need to be patient and trust the process. So far so good though! Will update in a few weeks once I've gotten into the rhythm of this new addition.`,
         createdBy: {
-          id: session.user.id,
-          name: session.user.name || "User",
+          id: userId,
+          name: userName,
         },
         createdAt: new Date("2024-03-01").toISOString(),
         lastModified: new Date("2024-03-01").toISOString(),
@@ -98,8 +155,8 @@ My current routine has evolved but stayed simple. In the morning I use a gentle 
 
 The biggest lessons I've learned are that consistency is absolutely everything, simple routines work better than complicated ones, and sunscreen is completely non-negotiable. Patience really does pay off, and having a coach to guide me has made such a huge difference. My coach suggested we start thinking about addressing some old acne marks with a targeted treatment, and she's researching options for me. We're also considering adding a hydrating toner for extra moisture as we head into warmer weather. Feeling really proud of myself for sticking with this journey!`,
         createdBy: {
-          id: session.user.id,
-          name: session.user.name || "User",
+          id: userId,
+          name: userName,
         },
         createdAt: new Date("2024-04-15").toISOString(),
         lastModified: new Date("2024-04-15").toISOString(),
@@ -114,8 +171,8 @@ My coach gave me some great additional summer tips. She suggested keeping my ski
 
 Someone at work asked if I'd gotten a facial because my skin was glowing, which totally made my day! This journey has been so worth it. I've also noticed I'm way more confident going makeup-free now - just some concealer and SPF and I'm good to go. I never thought I'd feel this comfortable in my own skin. Feeling so grateful for this skincare journey and my amazing coach who's guided me every step of the way!`,
         createdBy: {
-          id: session.user.id,
-          name: session.user.name || "User",
+          id: userId,
+          name: userName,
         },
         createdAt: new Date("2024-05-20").toISOString(),
         lastModified: new Date("2024-05-20").toISOString(),
@@ -123,23 +180,20 @@ Someone at work asked if I'd gotten a facial because my skin was glowing, which 
       },
     ];
 
-    return { success: true, data: mockNotes };
-  } catch (error) {
-    console.error("Error fetching notes:", error);
-    return {
-      success: false,
-      error: {
-        message:
-          error instanceof Error ? error.message : "Failed to fetch notes",
-      },
-    };
+    // Migrate plain text to Lexical JSON and populate the Map
+    mockJourneys.forEach((journey) => {
+      if (!isValidLexicalJSON(journey.content)) {
+        journey.content = convertPlainTextToLexicalJSON(journey.content);
+      }
+      journeysMap.set(journey.id, journey);
+    });
   }
 }
 
 /**
- * Fetch a single note by ID
+ * Fetch all journeys for the current user
  */
-export async function fetchNoteAction(noteId: string): Promise<Result<Note>> {
+export async function fetchJourneysAction(): Promise<Result<Journey[]>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -149,42 +203,34 @@ export async function fetchNoteAction(noteId: string): Promise<Result<Note>> {
       };
     }
 
-    // TODO: Replace with actual API call
-    // const note = await api.get(`/api/notes/${noteId}`);
+    // Initialize mock data if not already done
+    initializeMockData(session.user.id, session.user.name || "User");
 
-    // Mock data for now
-    const result = await fetchNotesAction();
-    if (!result.success) {
-      return result;
-    }
+    // Return all journeys from Map (sorted by creation date, newest first)
+    const journeys = Array.from(journeysMap.values()).sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
 
-    const note = result.data.find((n) => n.id === noteId);
-    if (!note) {
-      return {
-        success: false,
-        error: { message: "Note not found", code: "NOT_FOUND" },
-      };
-    }
-
-    return { success: true, data: note };
+    return { success: true, data: journeys };
   } catch (error) {
-    console.error("Error fetching note:", error);
+    console.error("Error fetching journeys:", error);
     return {
       success: false,
       error: {
         message:
-          error instanceof Error ? error.message : "Failed to fetch note",
+          error instanceof Error ? error.message : "Failed to fetch journeys",
       },
     };
   }
 }
 
 /**
- * Create a new note
+ * Fetch a single journey by ID
  */
-export async function createNoteAction(
-  data: NoteFormData,
-): Promise<Result<Note>> {
+export async function fetchJourneyAction(
+  journeyId: string,
+): Promise<Result<Journey>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -194,14 +240,46 @@ export async function createNoteAction(
       };
     }
 
-    // TODO: Replace with actual API call
-    // const note = await api.post("/api/notes", {
-    //   userId: session.user.id,
-    //   ...data,
-    // });
+    // Initialize mock data if not already done
+    initializeMockData(session.user.id, session.user.name || "User");
 
-    // Mock data for now
-    const newNote: Note = {
+    // Check if journey exists in Map
+    if (journeysMap.has(journeyId)) {
+      return { success: true, data: journeysMap.get(journeyId)! };
+    }
+
+    return {
+      success: false,
+      error: { message: "Journey not found", code: "NOT_FOUND" },
+    };
+  } catch (error) {
+    console.error("Error fetching journey:", error);
+    return {
+      success: false,
+      error: {
+        message:
+          error instanceof Error ? error.message : "Failed to fetch journey",
+      },
+    };
+  }
+}
+
+/**
+ * Create a new journey
+ */
+export async function createJourneyAction(
+  data: JourneyFormData,
+): Promise<Result<Journey>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
+      };
+    }
+
+    const newJourney: Journey = {
       id: Date.now().toString(),
       ...data,
       createdBy: {
@@ -212,26 +290,29 @@ export async function createNoteAction(
       lastModified: new Date().toISOString(),
     };
 
-    return { success: true, data: newNote };
+    // Store in Map
+    journeysMap.set(newJourney.id, newJourney);
+
+    return { success: true, data: newJourney };
   } catch (error) {
-    console.error("Error creating note:", error);
+    console.error("Error creating journey:", error);
     return {
       success: false,
       error: {
         message:
-          error instanceof Error ? error.message : "Failed to create note",
+          error instanceof Error ? error.message : "Failed to create journey",
       },
     };
   }
 }
 
 /**
- * Update an existing note
+ * Update an existing journey
  */
-export async function updateNoteAction(
-  noteId: string,
-  data: Partial<NoteFormData>,
-): Promise<Result<Note>> {
+export async function updateJourneyAction(
+  journeyId: string,
+  data: Partial<JourneyFormData>,
+): Promise<Result<Journey>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -241,38 +322,39 @@ export async function updateNoteAction(
       };
     }
 
-    // TODO: Replace with actual API call
-    // const note = await api.patch(`/api/notes/${noteId}`, data);
-
-    // Mock data for now
-    const result = await fetchNoteAction(noteId);
+    const result = await fetchJourneyAction(journeyId);
     if (!result.success) {
       return result;
     }
 
-    const updatedNote: Note = {
+    const updatedJourney: Journey = {
       ...result.data,
       ...data,
       lastModified: new Date().toISOString(),
     };
 
-    return { success: true, data: updatedNote };
+    // Update in Map (works for both mock and created journeys)
+    journeysMap.set(journeyId, updatedJourney);
+
+    return { success: true, data: updatedJourney };
   } catch (error) {
-    console.error("Error updating note:", error);
+    console.error("Error updating journey:", error);
     return {
       success: false,
       error: {
         message:
-          error instanceof Error ? error.message : "Failed to update note",
+          error instanceof Error ? error.message : "Failed to update journey",
       },
     };
   }
 }
 
 /**
- * Delete a note
+ * Delete a journey
  */
-export async function deleteNoteAction(noteId: string): Promise<Result<void>> {
+export async function deleteJourneyAction(
+  journeyId: string,
+): Promise<Result<void>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -284,17 +366,16 @@ export async function deleteNoteAction(noteId: string): Promise<Result<void>> {
 
     // TODO: Replace with actual API call
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _noteId = noteId; // Will be used when API is implemented
-    // await api.delete(`/api/notes/${noteId}`);
+    const _journeyId = journeyId; // Will be used when API is implemented
 
     return { success: true, data: undefined };
   } catch (error) {
-    console.error("Error deleting note:", error);
+    console.error("Error deleting journey:", error);
     return {
       success: false,
       error: {
         message:
-          error instanceof Error ? error.message : "Failed to delete note",
+          error instanceof Error ? error.message : "Failed to delete journey",
       },
     };
   }

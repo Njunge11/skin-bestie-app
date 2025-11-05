@@ -1,16 +1,23 @@
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import type { NoteListItem } from "./note.types";
 
-interface NoteListItemProps {
-  note: NoteListItem;
+export interface JourneyListItem {
+  id: string;
+  title: string;
+  preview: string;
+  date: string;
+  tags: string[];
+}
+
+interface JourneyListItemProps {
+  journey: JourneyListItem;
   isActive?: boolean;
 }
 
-export function NoteListItemComponent({
-  note,
+export function JourneyListItem({
+  journey,
   isActive = false,
-}: NoteListItemProps) {
+}: JourneyListItemProps) {
   return (
     <div
       className={cn(
@@ -21,17 +28,17 @@ export function NoteListItemComponent({
       <div className="space-y-2.5">
         {/* Date */}
         <p className="text-xs text-gray-500 uppercase font-medium tracking-wide">
-          {format(new Date(note.date), "d MMM").toUpperCase()}
+          {format(new Date(journey.date), "d MMM").toUpperCase()}
         </p>
 
         {/* Title */}
         <h3 className="font-semibold text-gray-900 text-lg line-clamp-1">
-          {note.title}
+          {journey.title}
         </h3>
 
         {/* Preview */}
         <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-          {note.preview}
+          {journey.preview}
         </p>
       </div>
     </div>
