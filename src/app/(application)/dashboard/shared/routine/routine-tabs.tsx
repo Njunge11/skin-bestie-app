@@ -130,7 +130,7 @@ export function RoutineTabs({
             </p>
 
             {/* Custom Switch Component */}
-            <div className="flex items-center justify-between">
+            <div className="space-y-3">
               {/* Toggle Switch */}
               <div className="relative inline-flex items-center bg-skinbestie-primary rounded-full p-0.5 gap-0.5">
                 {/* Sun Icon Button */}
@@ -160,8 +160,35 @@ export function RoutineTabs({
                 </button>
               </div>
 
-              {/* Routine Label */}
-              <span className="text-xl font-semibold text-gray-900">
+              {/* Routine Label and Mark All (Mobile only - side by side) */}
+              <div className="flex items-center justify-between md:hidden">
+                <span className="text-xl font-semibold text-gray-900">
+                  {activeTab === "morning" ? "Morning" : "Evening"} Routine
+                </span>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleSelectAll}
+                    aria-label="Mark all as done"
+                    className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer ${
+                      isAllSelected()
+                        ? "bg-skinbestie-success-dark border-skinbestie-success-dark"
+                        : "bg-white border-gray-300"
+                    }`}
+                  >
+                    {isAllSelected() && (
+                      <Check className="h-4 w-4 text-white" />
+                    )}
+                  </button>
+                  <span className="text-sm font-medium text-gray-700">
+                    Mark all as done
+                  </span>
+                </div>
+              </div>
+
+              {/* Routine Label (Desktop only) */}
+              <span className="hidden md:block text-xl font-semibold text-gray-900">
                 {activeTab === "morning" ? "Morning" : "Evening"} Routine
               </span>
             </div>
@@ -292,8 +319,9 @@ export function RoutineTabs({
         {useSwitch && (
           <>
             {/* Select All and Progress */}
-            <div className="flex items-center justify-between w-full py-4">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full py-4 gap-4">
+              {/* Mark all as done - Desktop only */}
+              <div className="hidden md:flex items-center gap-3">
                 <button
                   type="button"
                   onClick={handleSelectAll}
@@ -311,8 +339,9 @@ export function RoutineTabs({
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="flex flex-col gap-1 min-w-[120px]">
+              {/* Progress Bar */}
+              <div className="flex items-center gap-3 w-full md:w-auto">
+                <div className="flex flex-col gap-1 w-full md:min-w-[120px]">
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">Progress</span>
                     <span className="text-xs font-semibold text-gray-900">

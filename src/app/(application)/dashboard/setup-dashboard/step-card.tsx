@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Check } from "lucide-react";
+import { Check, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type StepStatus = "completed" | "pending" | "waiting";
@@ -21,6 +21,8 @@ interface StepCardProps {
   children?: React.ReactNode;
   variant?: "default" | "success" | "muted";
   className?: string;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 const variantClasses = {
@@ -65,6 +67,8 @@ export function StepCard({
   children,
   variant = "default",
   className,
+  onRefresh,
+  isRefreshing = false,
 }: StepCardProps) {
   const config = statusConfig[status];
 
@@ -82,7 +86,19 @@ export function StepCard({
             )}
           </AvatarFallback>
         </Avatar>
-        <CardAction>
+        <CardAction className="flex items-center gap-2">
+          {status === "waiting" && onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-50"
+              aria-label="Refresh status"
+            >
+              <RefreshCw
+                className={cn("w-4 h-4", isRefreshing && "animate-spin")}
+              />
+            </button>
+          )}
           <Badge
             variant={config.badge.variant}
             className={cn(config.badge.className, "w-24 justify-center")}

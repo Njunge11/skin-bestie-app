@@ -227,7 +227,7 @@ export function GoalItem({
             <div key="description" className="flex items-center gap-3">
               <p
                 className={cn(
-                  "text-lg flex-1 text-gray-700",
+                  "text-lg flex-1 text-gray-700 break-all overflow-hidden",
                   goal.complete && "line-through text-gray-400",
                 )}
               >

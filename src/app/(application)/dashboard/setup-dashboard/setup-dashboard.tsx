@@ -65,6 +65,69 @@ export function SetupDashboard({
   setOptimisticSkinTest,
 }: SetupDashboardProps) {
   const queryClient = useQueryClient();
+  const [isRefreshingGoals, setIsRefreshingGoals] = useState(false);
+  const [isRefreshingRoutine, setIsRefreshingRoutine] = useState(false);
+
+  const handleRefreshGoals = async () => {
+    setIsRefreshingGoals(true);
+
+    // Store previous state
+    const previousGoalsStatus = dashboard.setupProgress.steps.hasPublishedGoals;
+
+    // Invalidate and wait for refetch
+    await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+
+    // Small delay to allow refetch
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Check if anything changed
+    const currentData = queryClient.getQueryData(["dashboard"]) as
+      | DashboardResponse
+      | undefined;
+
+    if (currentData) {
+      const goalsChanged =
+        currentData.setupProgress.steps.hasPublishedGoals !==
+        previousGoalsStatus;
+
+      if (!goalsChanged) {
+        toast.info("No updates yet, check back soon!");
+      }
+    }
+
+    setIsRefreshingGoals(false);
+  };
+
+  const handleRefreshRoutine = async () => {
+    setIsRefreshingRoutine(true);
+
+    // Store previous state
+    const previousRoutineStatus =
+      dashboard.setupProgress.steps.hasPublishedRoutine;
+
+    // Invalidate and wait for refetch
+    await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+
+    // Small delay to allow refetch
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Check if anything changed
+    const currentData = queryClient.getQueryData(["dashboard"]) as
+      | DashboardResponse
+      | undefined;
+
+    if (currentData) {
+      const routineChanged =
+        currentData.setupProgress.steps.hasPublishedRoutine !==
+        previousRoutineStatus;
+
+      if (!routineChanged) {
+        toast.info("No updates yet, check back soon!");
+      }
+    }
+
+    setIsRefreshingRoutine(false);
+  };
   const [showSkinTestModal, setShowSkinTestModal] = useState(false);
   const [showSelectSkinTypeModal, setShowSelectSkinTypeModal] = useState(false);
   const [showReviewGoalsModal, setShowReviewGoalsModal] = useState(false);
@@ -319,6 +382,10 @@ export function SetupDashboard({
             title="Set Your Skin Goals"
             description="Create SMART goals based on your consultation to guide your skincare journey."
             variant={goalsVariant}
+            onRefresh={
+              goalsStatus === "waiting" ? handleRefreshGoals : undefined
+            }
+            isRefreshing={isRefreshingGoals}
           >
             {goalsContent}
           </StepCard>
@@ -330,6 +397,10 @@ export function SetupDashboard({
             title="Get Your Custom Routine"
             description="Receive your personalized morning and evening skincare routine with product recommendations."
             variant={routineVariant}
+            onRefresh={
+              routineStatus === "waiting" ? handleRefreshRoutine : undefined
+            }
+            isRefreshing={isRefreshingRoutine}
           >
             {routineContent}
           </StepCard>
