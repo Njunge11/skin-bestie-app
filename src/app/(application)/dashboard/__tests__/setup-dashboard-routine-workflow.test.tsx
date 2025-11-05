@@ -180,9 +180,11 @@ describe("Setup Dashboard - View Routine Workflow", () => {
     expect(screen.getByText(/morning routine/i)).toBeInTheDocument();
 
     // User sees morning products
-    expect(screen.getByText("CeraVe Hydrating Cleanser")).toBeInTheDocument();
     expect(
-      screen.getByText("CeraVe Daily Moisturizing Lotion"),
+      screen.getAllByText("CeraVe Hydrating Cleanser")[0],
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText("CeraVe Daily Moisturizing Lotion")[0],
     ).toBeInTheDocument();
 
     // User sees evening routine heading
@@ -190,7 +192,7 @@ describe("Setup Dashboard - View Routine Workflow", () => {
 
     // User sees evening product
     expect(
-      screen.getByText("CeraVe Foaming Facial Cleanser"),
+      screen.getAllByText("CeraVe Foaming Facial Cleanser")[0],
     ).toBeInTheDocument();
 
     // User clicks Close button (the main button, not the X)
@@ -256,7 +258,9 @@ describe("Setup Dashboard - View Routine Workflow", () => {
 
     // User sees morning routine
     expect(screen.getByText(/morning routine/i)).toBeInTheDocument();
-    expect(screen.getByText("Simple Morning Cleanser")).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Simple Morning Cleanser")[0],
+    ).toBeInTheDocument();
 
     // User does NOT see evening routine heading (no evening steps)
     expect(screen.queryByText(/evening routine/i)).not.toBeInTheDocument();

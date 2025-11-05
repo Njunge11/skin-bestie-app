@@ -266,13 +266,15 @@ describe("Subscriber Dashboard - UI Tests", () => {
       );
 
       // Find the product name
-      expect(screen.getByText("CeraVe Hydrating Cleanser")).toBeInTheDocument();
+      expect(
+        screen.getAllByText("CeraVe Hydrating Cleanser")[0],
+      ).toBeInTheDocument();
 
       // User clicks the checkbox button (using accessible label)
-      const checkboxButton = screen.getByRole("button", {
+      const checkboxButtons = screen.getAllByRole("button", {
         name: /mark cerave hydrating cleanser as complete/i,
       });
-      await user.click(checkboxButton);
+      await user.click(checkboxButtons[0]);
 
       // Server action should be called
       await waitFor(() => {
@@ -281,7 +283,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
 
       // Check completed badge appears
       await waitFor(() => {
-        expect(screen.getByText("COMPLETED")).toBeInTheDocument();
+        expect(screen.getAllByText("COMPLETED")[0]).toBeInTheDocument();
       });
     });
 
@@ -310,13 +312,13 @@ describe("Subscriber Dashboard - UI Tests", () => {
         />,
       );
 
-      expect(screen.getByText("Vitamin C Serum")).toBeInTheDocument();
+      expect(screen.getAllByText("Vitamin C Serum")[0]).toBeInTheDocument();
 
       // User clicks the checkbox
-      const checkboxButton = screen.getByRole("button", {
+      const checkboxButtons = screen.getAllByRole("button", {
         name: /mark vitamin c serum as complete/i,
       });
-      await user.click(checkboxButton);
+      await user.click(checkboxButtons[0]);
 
       // Wait for error toast
       await waitFor(() => {
@@ -373,10 +375,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       );
 
       // Click "Mark all as done" button
-      const markAllButton = screen.getByRole("button", {
+      const markAllButtons = screen.getAllByRole("button", {
         name: /mark all as done/i,
       });
-      await user.click(markAllButton);
+      await user.click(markAllButtons[0]);
 
       // Server action should be called with both step IDs
       await waitFor(() => {
@@ -412,10 +414,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       );
 
       // Click "Mark all as done" button
-      const markAllButton = screen.getByRole("button", {
+      const markAllButtons = screen.getAllByRole("button", {
         name: /mark all as done/i,
       });
-      await user.click(markAllButton);
+      await user.click(markAllButtons[0]);
 
       // Wait for error
       await waitFor(() => {
@@ -451,8 +453,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       );
 
       // Should see morning product by default
-      expect(screen.getByText("Morning Cleanser Product")).toBeInTheDocument();
-      expect(screen.getByText("Morning Routine")).toBeInTheDocument();
+      expect(
+        screen.getAllByText("Morning Cleanser Product")[0],
+      ).toBeInTheDocument();
+      expect(screen.getAllByText("Morning Routine")[0]).toBeInTheDocument();
 
       // Evening product should not be visible yet
       expect(
@@ -474,9 +478,9 @@ describe("Subscriber Dashboard - UI Tests", () => {
       // Now evening product should be visible
       await waitFor(() => {
         expect(
-          screen.getByText("Evening Cleanser Product"),
+          screen.getAllByText("Evening Cleanser Product")[0],
         ).toBeInTheDocument();
-        expect(screen.getByText("Evening Routine")).toBeInTheDocument();
+        expect(screen.getAllByText("Evening Routine")[0]).toBeInTheDocument();
       });
 
       // Morning product should not be visible
@@ -539,10 +543,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       expect(screen.getByText("0 / 3")).toBeInTheDocument();
 
       // Check first step
-      const step1Checkbox = screen.getByRole("button", {
+      const step1Checkboxes = screen.getAllByRole("button", {
         name: /mark step 1 as complete/i,
       });
-      await user.click(step1Checkbox);
+      await user.click(step1Checkboxes[0]);
 
       // Progress updates to 1/3
       await waitFor(() => {
@@ -550,10 +554,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       });
 
       // Check second step
-      const step2Checkbox = screen.getByRole("button", {
+      const step2Checkboxes = screen.getAllByRole("button", {
         name: /mark step 2 as complete/i,
       });
-      await user.click(step2Checkbox);
+      await user.click(step2Checkboxes[0]);
 
       // Progress updates to 2/3
       await waitFor(() => {
@@ -561,10 +565,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       });
 
       // Check third step
-      const step3Checkbox = screen.getByRole("button", {
+      const step3Checkboxes = screen.getAllByRole("button", {
         name: /mark step 3 as complete/i,
       });
-      await user.click(step3Checkbox);
+      await user.click(step3Checkboxes[0]);
 
       // Progress updates to 3/3 (complete)
       await waitFor(() => {
@@ -624,10 +628,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       expect(screen.getByText("0 / 2")).toBeInTheDocument();
 
       // Check one morning step
-      const morningCheckbox = screen.getByRole("button", {
+      const morningCheckboxes = screen.getAllByRole("button", {
         name: /mark morning step 1 as complete/i,
       });
-      await user.click(morningCheckbox);
+      await user.click(morningCheckboxes[0]);
 
       // Progress shows 1/2 for morning
       await waitFor(() => {
@@ -757,10 +761,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       );
 
       // Mark all as done
-      const markAllButton = screen.getByRole("button", {
+      const markAllButtons = screen.getAllByRole("button", {
         name: /mark all as done/i,
       });
-      await user.click(markAllButton);
+      await user.click(markAllButtons[0]);
 
       // All steps should be checked
       await waitFor(() => {
@@ -776,7 +780,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
       });
 
       // Click mark all again to uncheck all
-      await user.click(markAllButton);
+      await user.click(markAllButtons[0]);
 
       // Should uncheck all
       await waitFor(() => {
@@ -820,7 +824,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
       ).toBeInTheDocument();
 
       // User sees "Morning Routine" label (default active state)
-      expect(screen.getByText("Morning Routine")).toBeInTheDocument();
+      expect(screen.getAllByText("Morning Routine")[0]).toBeInTheDocument();
 
       // Find sun button (☀️) and moon button (🌙)
       const buttons = screen.getAllByRole("button");
@@ -837,11 +841,11 @@ describe("Subscriber Dashboard - UI Tests", () => {
 
       // Label changes to "Evening Routine"
       await waitFor(() => {
-        expect(screen.getByText("Evening Routine")).toBeInTheDocument();
+        expect(screen.getAllByText("Evening Routine")[0]).toBeInTheDocument();
       });
 
       // Evening product is now visible
-      expect(screen.getByText("Evening Product")).toBeInTheDocument();
+      expect(screen.getAllByText("Evening Product")[0]).toBeInTheDocument();
 
       // Click sun button to switch back to morning
       if (sunButton) {
@@ -850,11 +854,11 @@ describe("Subscriber Dashboard - UI Tests", () => {
 
       // Label changes back to "Morning Routine"
       await waitFor(() => {
-        expect(screen.getByText("Morning Routine")).toBeInTheDocument();
+        expect(screen.getAllByText("Morning Routine")[0]).toBeInTheDocument();
       });
 
       // Morning product is now visible
-      expect(screen.getByText("Morning Product")).toBeInTheDocument();
+      expect(screen.getAllByText("Morning Product")[0]).toBeInTheDocument();
     });
 
     it("switch UI does not show tabs component", () => {
@@ -1104,13 +1108,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       expect(screen.getByText(/hi sarah 👋/i)).toBeInTheDocument();
 
       // User completes routine step
-      const productHeading = screen.getByText("CeraVe Cleanser");
-      const card = productHeading.closest(".border");
-      const checkboxButton = card?.querySelector("button[type='button']");
-
-      if (checkboxButton) {
-        await user.click(checkboxButton as HTMLElement);
-      }
+      const checkboxButtons = screen.getAllByRole("button", {
+        name: /mark cerave cleanser as complete/i,
+      });
+      await user.click(checkboxButtons[0]);
 
       // Wait for server action
       await waitFor(() => {

@@ -32,31 +32,33 @@ export function SupportFeedback({}: SupportFeedbackProps) {
 
         {/* Coach Card */}
         <div className="rounded-lg p-6 bg-skinbestie-primary-light">
-          <div className="flex items-start gap-4">
-            {/* Avatar */}
-            <Avatar className="w-16 h-16">
-              <AvatarImage
-                src={coach.profilePicture || undefined}
-                alt={coach.name}
-              />
-              <AvatarFallback className="bg-skinbestie-primary text-white text-xl">
-                {coach.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
+          <div className="flex flex-col md:flex-row items-start gap-4">
+            <div className="flex items-start gap-4 flex-1 w-full">
+              {/* Avatar */}
+              <Avatar className="w-16 h-16 flex-shrink-0">
+                <AvatarImage
+                  src={coach.profilePicture || undefined}
+                  alt={coach.name}
+                />
+                <AvatarFallback className="bg-skinbestie-primary text-white text-xl">
+                  {coach.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
 
-            {/* Coach Info */}
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-gray-900">
-                Coach {coach.name}
-              </h3>
-              <p className="text-gray-600 mb-4">{coach.title}</p>
+              {/* Coach Info */}
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-900">
+                  Coach {coach.name}
+                </h3>
+                <p className="text-gray-600">{coach.title}</p>
+              </div>
             </div>
 
-            {/* Message Button */}
-            <Button className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white">
+            {/* Message Button - Hidden on mobile, shown on desktop */}
+            <Button className="hidden md:flex bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white flex-shrink-0">
               Message Benji
             </Button>
           </div>
@@ -69,6 +71,11 @@ export function SupportFeedback({}: SupportFeedbackProps) {
               your skincare goals.
             </p>
           </div>
+
+          {/* Message Button - Full width on mobile, hidden on desktop */}
+          <Button className="md:hidden w-full mt-4 bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white">
+            Message Benji
+          </Button>
         </div>
       </div>
 
