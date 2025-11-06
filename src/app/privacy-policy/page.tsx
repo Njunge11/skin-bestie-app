@@ -5,6 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { anton } from "../fonts";
 
+// Note: metadata export doesn't work in client components
+// Metadata should be added via layout.tsx or converted to server component
+
 export default function PrivacyPolicyPage() {
   const [activeSection, setActiveSection] = useState("important-info");
 

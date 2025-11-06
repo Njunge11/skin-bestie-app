@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { print } from "graphql/language/printer";
 import { wpFetch } from "@/utils/wp";
 import { GET_ONBOARDING_PAGE } from "@/queries/general/onboarding";
 import type { StepMeta } from "./onboarding.types";
 import OnboardingClient from "./onboarding.client";
+
+export const metadata: Metadata = {
+  title: "Get Started - SkinBestie",
+  description:
+    "Begin your personalized skincare journey. Share your skin concerns and goals to receive expert guidance tailored to your needs.",
+};
 // Map WP steps -> your StepMeta
 type WPStep = {
   __typename: string;

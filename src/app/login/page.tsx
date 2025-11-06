@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { print } from "graphql";
 import { redirect } from "next/navigation";
 import { wpFetch } from "@/utils/wp";
@@ -5,6 +6,12 @@ import { GetLoginPage } from "@/queries/general/login";
 import { extractLoginContent } from "@/utils/extractors/login.extractor";
 import { auth } from "@/auth";
 import LoginClient from "./login.client";
+
+export const metadata: Metadata = {
+  title: "Sign In - SkinBestie",
+  description:
+    "Welcome back! Sign in to access your personalized skincare routine and continue your journey to healthier skin.",
+};
 
 export const revalidate = 60;
 
