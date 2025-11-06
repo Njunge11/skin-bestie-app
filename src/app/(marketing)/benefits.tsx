@@ -33,11 +33,11 @@ export default function Benefits({
       <div className="h-full w-full flex items-center justify-center">
         {/* Content container with 1169px max-width as per Figma spec */}
         <div className="w-full max-w-[1169px]">
-          {/* <h1
-            className={`${anton.className} font-normal text-4xl sm:text-5xl leading-[1.2] tracking-tighter uppercase text-[#222118]`}
+          <h1
+            className={`${anton.className} font-normal text-4xl sm:text-5xl leading-[1.2] tracking-tighter uppercase text-skinbestie-landing-blue`}
           >
             {heading}
-          </h1> */}
+          </h1>
 
           <div className="mt-6 flex flex-col min-[1200px]:flex-row min-[1200px]:gap-[9px] w-full">
             <div className="hidden md:block relative bg-gray-50 w-full min-[1200px]:w-[440px] min-[1200px]:flex-none">
