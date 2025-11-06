@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  trailingSlash: true,
+  trailingSlash: false,
   images: {
     remotePatterns: [
       {
@@ -8,8 +8,17 @@ const nextConfig = {
         hostname: "dhur3fak4lnqy.cloudfront.net",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "dpmg08zn22q82.cloudfront.net",
+        port: "",
+      },
     ],
   },
+  serverExternalPackages: [
+    '@react-email/components',
+    '@react-email/render',
+  ],
 };
 
 module.exports = nextConfig;

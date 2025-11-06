@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { anton } from "../fonts";
 
@@ -19,21 +20,20 @@ export default function Journey({
   steps: JourneyStep[];
 }) {
   const cardBase =
-    "w-full lg:w-[322px] bg-[#FFFBE7] border-b-[0.4px] border-[#B5AF95] rounded-b-lg";
+    "w-full lg:w-[322px] bg-skinbestie-landing-gray border-b-[0.4px] border-[#B5AF95] rounded-b-lg";
 
   return (
     // Parent container - flex column on mobile for ordering, regular layout on larger screens
     <section
       id="how"
-      className="w-full h-auto flex flex-col min-[1440px]:flex-row overflow-hidden py-10 md:py-20 min-[1440px]:!py-0"
-      style={{ background: "radial-gradient(circle, #FDDF66, #F3ECC7)" }}
+      className="w-full h-auto flex flex-col min-[1440px]:flex-row overflow-hidden py-10 md:py-20 min-[1440px]:!py-0 bg-skinbestie-landing-beige border-b-[0.3px] border-[#959170]"
     >
       {/* Column 1 - Text content and button */}
       <div className="w-full flex flex-col min-[1440px]:min-w-[460px] min-[1440px]:w-auto min-[1440px]:pb-20">
         {/* Text content wrapper - order-1 on mobile */}
         <div className="px-4 md:px-6 min-[1440px]:!pl-20 order-1 lg:order-none min-[1440px]:pt-24 lg:max-[1439px]:flex lg:max-[1439px]:flex-col lg:max-[1439px]:items-center lg:max-[1439px]:text-center">
           <h2
-            className={`${anton.className} text-left sm:text-center min-[1440px]:!text-left font-normal text-4xl sm:text-5xl lg:text-[52px] leading-[1.15] tracking-tighter uppercase text-[#222118] min-[1440px]:max-w-[330px]`}
+            className={`${anton.className} text-left sm:text-center min-[1440px]:!text-left font-normal text-4xl sm:text-5xl lg:text-[52px] leading-[1.15] tracking-tighter uppercase text-skinbestie-landing-pink min-[1440px]:max-w-[330px]`}
           >
             {heading}
           </h2>
@@ -45,7 +45,7 @@ export default function Journey({
             <Link
               href="/onboarding"
               className="mt-9 hidden py-4.5 lg:grid w-[328px] grid-cols-[1fr_auto] items-center gap-[10px]
-             rounded-xl border-2 border-white bg-black px-5"
+             rounded-xl border-2 border-skinbestie-landing-blue bg-skinbestie-landing-blue px-5"
             >
               <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap">
                 Begin My Skin Journey
@@ -74,10 +74,12 @@ export default function Journey({
                       : "h-auto lg:max-[1439px]:h-[400px] min-[1440px]:h-[323px]"
                 }`}
               >
-                <img
+                <Image
                   src={s.iconSrc}
                   alt={s.iconAlt}
                   className="w-[40px] h-[40px]"
+                  width={40}
+                  height={40}
                 />
                 <h2
                   className={`mt-6 ${anton.className} font-normal text-2xl sm:text-3xl leading-[1.1] tracking-[-0.02em] uppercase text-[#12110F]`}
@@ -96,7 +98,7 @@ export default function Journey({
         <Link
           href="/onboarding"
           className="mt-6 flex w-full py-4.5 items-center justify-center gap-2.5
-               rounded-xl border-2 border-white bg-black px-5"
+               rounded-xl border-2 border-skinbestie-landing-blue bg-skinbestie-landing-blue px-5"
         >
           <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap text-center">
             Begin My Skin Journey

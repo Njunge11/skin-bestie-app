@@ -2,14 +2,14 @@ import Link from "next/link";
 import { anton } from "../fonts";
 export default function Footer() {
   return (
-    <footer className="bg-[#0C0C0F] px-4 pt-6 lg:pt-14 lg:pl-20 lg:pr-32">
+    <footer className="bg-skinbestie-landing-red px-4 pt-6 lg:pt-14 lg:pl-20 lg:pr-32">
       <div className="max-w-7xl mx-auto">
         {/* Top Section - Desktop Layout */}
         <div className="lg:flex lg:flex-row justify-between items-start gap-8">
           {/* Left Side - Contact Info */}
           <div className="flex-1">
             <h1
-              className={`${anton.className} font-normal text-[32px] leading-[120%] tracking-[-0.02em] uppercase  text-[#FFF7D4]`}
+              className={`${anton.className} font-normal text-[32px] leading-[120%] tracking-[-0.02em] uppercase text-[#FFFDF5]`}
             >
               HAVE A QUESTION? PLEASE EMAIL:
               <br />
@@ -18,23 +18,31 @@ export default function Footer() {
               </span>
             </h1>
             <div className="pt-9">
-              <ul className="flex flex-col md:flex-row gap-6 font-semibold text-sm leading-[150%] tracking-normal text-[#FAFAFA]">
+              <ul className="flex flex-col md:flex-row gap-6 font-semibold text-sm leading-[150%] tracking-normal">
                 <li>
-                  <a href="#how">HOW IT WORKS</a>
+                  <a href="#how" className="text-[#FAFAFA]">
+                    HOW IT WORKS
+                  </a>
                 </li>
                 <li>
-                  <a href="#pricing">PRICING</a>
+                  <a href="#pricing" className="text-[#FAFAFA]">
+                    PRICING
+                  </a>
                 </li>
                 <li>
-                  <Link href="/terms-and-conditions">
+                  <Link href="/terms-and-conditions" className="text-[#FAFAFA]">
                     CLIENT TERMS & CONDITIONS
                   </Link>
                 </li>
                 <li>
-                  <Link href="/privacy-policy">PRIVACY POLICY</Link>
+                  <Link href="/privacy-policy" className="text-[#FAFAFA]">
+                    PRIVACY POLICY
+                  </Link>
                 </li>
                 <li>
-                  <Link href="/terms-of-use">TERMS OF USE</Link>
+                  <Link href="/terms-of-use" className="text-[#FAFAFA]">
+                    TERMS OF USE
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -46,15 +54,15 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder="Enter your email address"
-                className="flex-1 bg-[#13110F] text-[#8F857B] placeholder:text-[#8F857B] font-inter font-medium text-base leading-[150%] tracking-[-0.01em] py-4 pl-4 border-[0.6px] border-[#FFF7D4] focus:outline-none focus:border-[#FFF7D4]"
+                className="flex-1 bg-skinbestie-landing-red text-white placeholder:text-white font-medium text-base leading-[150%] tracking-[-0.01em] py-4 pl-4 border-[0.6px] border-white focus:outline-none focus:border-white"
               />
 
-              <button className="bg-[#FFF7D4] text-[#13110F] font-inter font-semibold text-lg leading-[150%] tracking-[-0.01em] text-center px-[15px] py-[18px] whitespace-nowrap">
+              <button className="bg-[#FFFDF5] text-[#13110F] font-semibold text-lg leading-[150%] tracking-[-0.01em] text-center px-[15px] py-[18px] whitespace-nowrap">
                 Subscribe
               </button>
             </div>
             <div className="pt-6">
-              <p className="font-inter font-medium text-[15px] leading-[150%] tracking-[-0.01em] text-[#FAFAFA]">
+              <p className="font-medium text-[15px] leading-[150%] tracking-[-0.01em] text-[#FAFAFA]">
                 Stay in the SkinBestie Loop. Sign up for our monthly newsletter
                 for behind-the-scenes updates, a dose of skincare wisdom each
                 month, and community stories. Unsubscribe anytime.
@@ -66,68 +74,57 @@ export default function Footer() {
         {/* Large Logo/Brand Section */}
         <div className="pt-10 lg:pt-20 flex justify-center">
           <svg
-            width="577"
-            height="117"
             viewBox="0 0 577 117"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            className="w-full h-auto"
           >
             <path
               d="M32.7778 117C21.0178 117 12.6178 114.312 7.57784 108.936C2.58584 103.56 0.0898438 95.256 0.0898438 84.024V72.792H25.1458V83.088C25.1458 90.48 27.1618 94.176 31.1938 94.176C33.0658 94.176 34.5298 93.456 35.5858 92.016C36.6898 90.576 37.2418 88.68 37.2418 86.328C37.2418 83.256 36.8098 80.664 35.9458 78.552C35.1298 76.44 33.8578 74.448 32.1298 72.576C30.4498 70.656 27.6658 68.016 23.7778 64.656L13.0498 55.368C4.40984 47.928 0.0898438 39.528 0.0898438 30.168C0.0898438 19.992 2.68184 12.432 7.86584 7.488C13.0978 2.496 20.2738 0 29.3938 0C29.6338 0 29.8498 0 30.0418 0C30.2338 0 31.5058 0 33.8578 0C36.2098 0 39.2338 0.552 42.9298 1.656C46.6258 2.712 49.9138 4.512 52.7938 7.056C55.6738 9.552 57.8338 13.056 59.2738 17.568C60.7138 22.032 61.4338 27.504 61.4338 33.984H35.7298L35.5858 27.072C35.5378 25.776 34.9858 24.624 33.9298 23.616C32.8738 22.608 31.6978 22.104 30.4018 22.104C28.7218 22.104 27.2818 22.632 26.0818 23.688C24.9298 24.696 24.3538 26.016 24.3538 27.648C24.3538 30.912 26.7298 34.464 31.4818 38.304L46.8178 50.688C49.3138 52.704 51.4738 54.768 53.2978 56.88C55.1698 58.944 56.6338 61.008 57.6898 63.072C58.7938 65.088 59.6818 66.936 60.3538 68.616C61.0258 70.248 61.4818 72.048 61.7218 74.016C62.0098 75.936 62.1778 77.4 62.2258 78.408C62.2738 79.368 62.2978 80.64 62.2978 82.224C62.2978 86.256 62.0338 89.928 61.5058 93.24C60.9778 96.504 60.0418 99.672 58.6978 102.744C57.3538 105.768 55.5778 108.312 53.3698 110.376C51.2098 112.392 48.3778 114 44.8738 115.2C41.4178 116.4 37.3858 117 32.7778 117Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M105.357 1.008H130.845L116.661 53.496L133.797 115.704H107.517L93.6927 60.12V115.704H68.4927V1.008H93.5487V46.872L105.357 1.008Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M136.248 115.704V1.008H160.728V115.704H136.248Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M232.514 1.008V115.704H207.746L195.074 58.32V115.704H170.306V1.008H196.37L208.034 55.872V1.008H232.514Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M242.093 115.704V1.008H276.437C285.413 1.008 292.061 3 296.381 6.984C300.701 10.92 302.861 17.664 302.861 27.216C302.861 27.504 302.861 27.912 302.861 28.44C302.861 30.12 302.861 31.368 302.861 32.184C302.861 33 302.765 34.272 302.573 36C302.429 37.728 302.189 39.096 301.853 40.104C301.565 41.064 301.109 42.264 300.485 43.704C299.861 45.144 299.093 46.32 298.181 47.232C297.269 48.144 296.117 49.032 294.725 49.896C293.333 50.76 291.725 51.408 289.901 51.84C292.541 52.464 294.797 53.544 296.669 55.08C298.541 56.616 299.957 58.248 300.917 59.976C301.877 61.656 302.621 63.744 303.149 66.24C303.725 68.736 304.061 70.824 304.157 72.504C304.253 74.184 304.301 76.2 304.301 78.552C304.301 84.6 303.869 89.784 303.005 94.104C302.189 98.424 300.749 102.288 298.685 105.696C296.621 109.056 293.741 111.576 290.045 113.256C286.397 114.888 281.861 115.704 276.437 115.704H242.093ZM266.861 62.064V95.328C268.013 95.424 268.853 95.472 269.381 95.472C275.957 95.472 279.245 92.64 279.245 86.976C279.245 86.976 279.245 82.2 279.245 72.648C279.245 69 278.621 66.336 277.373 64.656C276.173 62.928 274.229 62.064 271.541 62.064H266.861ZM266.861 44.208H272.045C273.293 44.208 274.301 43.944 275.069 43.416C275.885 42.888 276.461 42.144 276.797 41.184C277.133 40.176 277.349 39.288 277.445 38.52C277.541 37.704 277.589 36.744 277.589 35.64V24.264C277.589 20.616 275.789 18.792 272.189 18.792H266.861V44.208Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M310.28 115.704V1.008H360.968V23.256H336.056V45.648H359.96V67.176H336.056V93.312H362.624V115.704H310.28Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M399.275 117C387.515 117 379.115 114.312 374.075 108.936C369.083 103.56 366.587 95.256 366.587 84.024V72.792H391.643V83.088C391.643 90.48 393.659 94.176 397.691 94.176C399.563 94.176 401.027 93.456 402.083 92.016C403.187 90.576 403.739 88.68 403.739 86.328C403.739 83.256 403.307 80.664 402.443 78.552C401.627 76.44 400.355 74.448 398.627 72.576C396.947 70.656 394.163 68.016 390.275 64.656L379.547 55.368C370.907 47.928 366.587 39.528 366.587 30.168C366.587 19.992 369.179 12.432 374.363 7.488C379.595 2.496 386.771 0 395.891 0C396.131 0 396.347 0 396.539 0C396.731 0 398.003 0 400.355 0C402.707 0 405.731 0.552 409.427 1.656C413.123 2.712 416.411 4.512 419.291 7.056C422.171 9.552 424.331 13.056 425.771 17.568C427.211 22.032 427.931 27.504 427.931 33.984H402.227L402.083 27.072C402.035 25.776 401.483 24.624 400.427 23.616C399.371 22.608 398.195 22.104 396.899 22.104C395.219 22.104 393.779 22.632 392.579 23.688C391.427 24.696 390.851 26.016 390.851 27.648C390.851 30.912 393.227 34.464 397.979 38.304L413.315 50.688C415.811 52.704 417.971 54.768 419.795 56.88C421.667 58.944 423.131 61.008 424.187 63.072C425.291 65.088 426.179 66.936 426.851 68.616C427.523 70.248 427.979 72.048 428.219 74.016C428.507 75.936 428.675 77.4 428.723 78.408C428.771 79.368 428.795 80.64 428.795 82.224C428.795 86.256 428.531 89.928 428.003 93.24C427.475 96.504 426.539 99.672 425.195 102.744C423.851 105.768 422.075 108.312 419.867 110.376C417.707 112.392 414.875 114 411.371 115.2C407.915 116.4 403.883 117 399.275 117Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M430.166 1.008H485.606V23.112H470.558V115.704H445.214V23.112H430.166V1.008Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M490.505 115.704V1.008H514.985V115.704H490.505Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
             <path
               d="M524.564 115.704V1.008H575.252V23.256H550.34V45.648H574.244V67.176H550.34V93.312H576.908V115.704H524.564Z"
-              fill="white"
-              fillOpacity="0.2"
+              fill="#FDE148"
             />
           </svg>
         </div>
 
         {/* Copyright */}
         <div className="pt-6 lg:pt-10">
-          <p className="font-medium text-base leading-[150%] tracking-[-0.01em] text-center text-[#807B76] mb-3">
+          <p className="font-medium text-base leading-[150%] tracking-[-0.01em] text-center text-[#FFFBE7] mb-3">
             Copyright © 2025 SkinBestie. All Rights Reserved.
           </p>
         </div>

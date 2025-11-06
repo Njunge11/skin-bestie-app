@@ -1,8 +1,27 @@
 // src/middleware.ts
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import NextAuth from "next-auth";
+import authConfig from "./auth.config";
 
-export async function middleware(request: NextRequest) {
+const { auth } = NextAuth(authConfig);
+
+export default auth(async function middleware(request) {
+  const pathname = request.nextUrl.pathname;
+
+  // Protected routes - require authentication
+  const protectedRoutes = ["/dashboard", "/my-profile", "/journal", "/privacy"];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+
+  // Redirect to login if accessing protected route without auth
+  if (isProtectedRoute && !request.auth) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // WordPress redirect handling below
   // Skip if creds aren't present
   if (!process.env.WP_USER || !process.env.WP_APP_PASS) {
     return NextResponse.next();
@@ -16,17 +35,17 @@ export async function middleware(request: NextRequest) {
   const base = process.env.WORDPRESS_API_URL; // your current IP/base
   if (!base) return NextResponse.next();
 
-  // Normalize path (remove trailing slash, but keep "/" for homepage)
-  const pathname = request.nextUrl.pathname.replace(/\/$/, "") || "/";
+  // Normalize path for WordPress (remove trailing slash, but keep "/" for homepage)
+  const normalizedPath = pathname.replace(/\/$/, "") || "/";
 
   // Build API URL safely
   const url =
     `${base}/wp-json/redirection/v1/redirect/` +
-    `?filterBy%5Burl-match%5D=plain&filterBy%5Burl%5D=${encodeURIComponent(pathname)}`;
+    `?filterBy%5Burl-match%5D=plain&filterBy%5Burl%5D=${encodeURIComponent(normalizedPath)}`;
 
   // Basic auth for WP application password
   const auth = `Basic ${Buffer.from(
-    `${process.env.WP_USER}:${process.env.WP_APP_PASS}`
+    `${process.env.WP_USER}:${process.env.WP_APP_PASS}`,
   ).toString("base64")}`;
 
   try {
@@ -58,13 +77,19 @@ export async function middleware(request: NextRequest) {
     if (!data?.items?.length) return NextResponse.next();
 
     // Find an exact match for the current path
-    const redirect = data.items.find((item: any) => item?.url === pathname);
+    const redirect = (
+      data.items as Array<{
+        url?: string;
+        action_data?: { url?: string };
+        action_code?: number;
+      }>
+    ).find((item) => item?.url === normalizedPath);
     if (!redirect?.action_data?.url) return NextResponse.next();
 
     // Build absolute target URL against the current request origin
     const target = new URL(
       redirect.action_data.url,
-      request.nextUrl.origin
+      request.nextUrl.origin,
     ).toString();
 
     // Map WP 301 → 308 (preserve method); else use 307
@@ -75,7 +100,7 @@ export async function middleware(request: NextRequest) {
     // Network/parse problems? Never break the page.
     return NextResponse.next();
   }
-}
+});
 
 // Run only on real page routes (skip _next, API, and static assets)
 // Docs: matcher must be statically analyzable constants.

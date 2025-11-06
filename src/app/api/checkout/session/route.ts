@@ -122,7 +122,10 @@ export async function POST(req: Request) {
     // Read price ID from environment variable
     const priceId = process.env.STRIPE_PRICE_ID;
     if (!priceId) {
-      return NextResponse.json({ error: "Server configuration error: Missing Stripe price ID" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Server configuration error: Missing Stripe price ID" },
+        { status: 500 },
+      );
     }
 
     // Ensure a Customer
@@ -201,12 +204,10 @@ export async function POST(req: Request) {
       {
         error: "No client_secret available (confirmation_secret / SetupIntent)",
       },
-      { status: 400 }
+      { status: 400 },
     );
-  } catch (e: any) {
-    return NextResponse.json(
-      { error: e?.message ?? "Server error" },
-      { status: 500 }
-    );
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : "Server error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

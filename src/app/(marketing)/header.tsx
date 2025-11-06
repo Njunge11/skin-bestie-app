@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -23,7 +24,7 @@ const Header = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 py-3 sm:py-4 lg:py-5 bg-[#13110F66] ${
+        className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-300 py-3 sm:py-4 lg:py-5 bg-skinbestie-landing-green ${
           isScrolled ? "backdrop-blur-md shadow-lg" : "backdrop-blur-sm"
         }`}
       >
@@ -32,9 +33,11 @@ const Header = () => {
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link href="/" className="block">
-                <img
-                  src="/skinbestie-logo.png"
+                <Image
+                  src="/skinbestie-logo.svg"
                   alt="Logo"
+                  width={206}
+                  height={42}
                   className="object-contain h-8 sm:h-10 lg:h-[42px] w-auto max-w-[160px] sm:max-w-[180px] lg:max-w-[206px]"
                 />
               </Link>
@@ -46,7 +49,7 @@ const Header = () => {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="text-[#FAFAFA] hover:text-gray-200 font-semibold text-sm uppercase leading-[1.5] tracking-normal transition-colors duration-200 whitespace-nowrap"
+                  className="text-skinbestie-landing-off-white hover:text-gray-200 font-semibold text-sm uppercase leading-[1.5] tracking-normal transition-colors duration-200 whitespace-nowrap"
                 >
                   {link.label}
                 </a>
@@ -55,16 +58,22 @@ const Header = () => {
 
             {/* Desktop Sign In Button - ONLY WITH DESKTOP NAV */}
             <div className="hidden xl:block">
-              <button className="text-[#FAFAFA] rounded-xl px-4 py-3 2xl:p-4 bg-[#EDEDED]/[0.05] border border-[#FDFAEB]/30 font-medium text-base 2xl:text-[1.0625rem] leading-[1.5] tracking-tighter transition-all duration-300 hover:bg-white/10 whitespace-nowrap">
+              <Link
+                href="/login"
+                className="text-skinbestie-landing-cream rounded-xl px-4 py-3 2xl:p-4 bg-[#EDEDED]/[0.05] border border-white font-normal text-[17px] leading-[150%] tracking-[-0.01em] text-center transition-all duration-300 hover:bg-white/10 whitespace-nowrap inline-block"
+              >
                 Sign into your account
-              </button>
+              </Link>
             </div>
 
             {/* Mobile Sign In Button - Replaces hamburger menu */}
             <div className="xl:hidden">
-              <button className="bg-[#1D1414B2] text-[#FDFAEB] rounded-xl p-4 border border-[#FDFAEB4D] font-semibold text-lg leading-[1.5] tracking-tight text-center transition-all duration-300 hover:opacity-90 whitespace-nowrap">
+              <Link
+                href="/login"
+                className="text-skinbestie-landing-cream rounded-xl px-4 py-3 bg-[#EDEDED]/[0.05] border border-white font-normal text-[17px] leading-[150%] tracking-[-0.01em] text-center transition-all duration-300 hover:bg-white/10 whitespace-nowrap inline-block"
+              >
                 Sign in
-              </button>
+              </Link>
             </div>
           </nav>
         </div>
