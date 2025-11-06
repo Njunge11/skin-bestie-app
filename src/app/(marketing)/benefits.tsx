@@ -34,7 +34,7 @@ export default function Benefits({
         {/* Content container with 1169px max-width as per Figma spec */}
         <div className="w-full max-w-[1169px]">
           <h1
-            className={`${anton.className} font-normal text-4xl sm:text-5xl leading-[1.2] tracking-tighter uppercase text-[#222118]`}
+            className={`${anton.className} font-normal text-4xl sm:text-5xl leading-[1.2] tracking-tighter uppercase text-skinbestie-landing-blue`}
           >
             {heading}
           </h1>
