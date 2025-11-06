@@ -27,8 +27,8 @@ export const appearance = {
   rules: {
     ".Input": {
       borderRadius: "0.25rem",
-      border: "0.03125rem solid #030303",
-      backgroundColor: "#FFFBE5",
+      border: "0.5px solid #828282",
+      backgroundColor: "#FFFFFF",
       paddingTop: "0.875rem",
       paddingBottom: "0.875rem",
       paddingLeft: "1.3125rem",
@@ -384,7 +384,7 @@ function Form({
       {peReady && (
         <>
           {/* Terms and Conditions Checkbox */}
-          <div className="flex items-start gap-3 p-4 bg-[#FFFBE5] border border-[#030303] rounded">
+          <div className="flex items-start gap-3 p-4 bg-white border-[0.5px] border-[#828282] rounded">
             <input
               type="checkbox"
               id="terms-checkbox"

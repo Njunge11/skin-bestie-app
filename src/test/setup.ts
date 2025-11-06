@@ -22,6 +22,14 @@ vi.mock("next/font/google", () => ({
   }),
 }));
 
+// Mock next/font/local for custom fonts
+vi.mock("next/font/local", () => ({
+  default: () => ({
+    className: "neue-haas-display",
+    style: { fontFamily: "Neue Haas Display" },
+  }),
+}));
+
 // Mock React's useOptimistic (React 19 feature)
 vi.mock("react", async () => {
   const actual = await vi.importActual<typeof import("react")>("react");

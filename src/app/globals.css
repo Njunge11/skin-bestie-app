@@ -50,6 +50,18 @@
   --color-skinbestie-blue: #235588;
   --color-skinbestie-red: #fa7ca1;
   --color-skinbestie-green: #53967b;
+  --color-skinbestie-landing-green: #258E67;
+  --color-skinbestie-landing-yellow: #FDE148;
+  --color-skinbestie-landing-blue: #195284;
+  --color-skinbestie-landing-pink: #F785B7;
+  --color-skinbestie-landing-gray: #F4F2EB;
+  --color-skinbestie-landing-red: #F5433D;
+  --color-skinbestie-landing-black: #323232;
+  --color-skinbestie-landing-white: #FFFDF5;
+  --color-skinbestie-landing-gray-form: #B3B2AD;
+  --color-skinbestie-landing-off-white: #FAFAFA;
+  --color-skinbestie-landing-cream: #FDFAEB;
+  --color-skinbestie-landing-beige: #FFFDF4;
 }
 
 :root {

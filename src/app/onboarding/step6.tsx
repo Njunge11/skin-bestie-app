@@ -31,36 +31,36 @@ declare global {
 function CalendarSkeleton() {
   return (
     <div
-      className="absolute inset-0 z-10 bg-[#F3ECC7] motion-safe:animate-pulse"
+      className="absolute inset-0 z-10 bg-[#F4F2EB] motion-safe:animate-pulse"
       role="status"
       aria-busy="true"
       aria-label="Loading calendar"
     >
       <div className="h-full w-full p-4 flex flex-col">
         {/* Header bits */}
-        <div className="mx-auto mt-1 mb-4 h-4 w-44 rounded bg-[#FFF1C7]" />
-        <div className="mx-auto -mt-2 mb-6 h-3 w-36 rounded bg-[#E9DFB0]" />
+        <div className="mx-auto mt-1 mb-4 h-4 w-44 rounded bg-gray-200" />
+        <div className="mx-auto -mt-2 mb-6 h-3 w-36 rounded bg-gray-300" />
 
         {/* Body rows — fill most of the height */}
         <div className="flex-1 space-y-3">
           {/* Week rows (taller) */}
-          <div className="h-7 rounded bg-[#FFF1C7]" />
-          <div className="h-7 rounded bg-[#E9DFB0]" />
-          <div className="h-7 rounded bg-[#FFF1C7]" />
-          <div className="h-7 rounded bg-[#E9DFB0]" />
-          <div className="h-7 rounded bg-[#FFF1C7]" />
-          <div className="h-7 rounded bg-[#E9DFB0]" />
+          <div className="h-7 rounded bg-gray-200" />
+          <div className="h-7 rounded bg-gray-300" />
+          <div className="h-7 rounded bg-gray-200" />
+          <div className="h-7 rounded bg-gray-300" />
+          <div className="h-7 rounded bg-gray-200" />
+          <div className="h-7 rounded bg-gray-300" />
 
           {/* Extra lines to avoid empty space on tall screens */}
-          <div className="h-5 rounded bg-[#FFF1C7]" />
-          <div className="h-5 rounded bg-[#E9DFB0]" />
-          <div className="h-5 rounded bg-[#FFF1C7]" />
+          <div className="h-5 rounded bg-gray-200" />
+          <div className="h-5 rounded bg-gray-300" />
+          <div className="h-5 rounded bg-gray-200" />
         </div>
 
         {/* Footer hint bars */}
         <div className="mt-6 space-y-3">
-          <div className="mx-auto h-3 w-56 rounded bg-[#FFF1C7]" />
-          <div className="mx-auto h-3 w-44 rounded bg-[#E9DFB0]" />
+          <div className="mx-auto h-3 w-56 rounded bg-gray-200" />
+          <div className="mx-auto h-3 w-44 rounded bg-gray-300" />
         </div>
       </div>
     </div>
@@ -99,8 +99,8 @@ export default function CalendlyInline() {
     const params = new URLSearchParams({
       hide_event_type_details: "1",
       hide_gdpr_banner: "1",
-      background_color: "f3ecc7",
-      primary_color: "1a1a1a",
+      background_color: "F4F2EB",
+      primary_color: "195284",
       utm_source: "site",
       utm_medium: "onboarding",
     });
@@ -128,11 +128,11 @@ export default function CalendlyInline() {
       style.id = "calendly-custom-styles";
       style.textContent = `
         .calendly-inline-widget iframe {
-          background-color: #f3ecc7 !important;
+          background-color: #F4F2EB !important;
         }
         /* Override any white backgrounds inside Calendly iframe content */
         .calendly-inline-widget [style*="background"] {
-          background-color: #f3ecc7 !important;
+          background-color: #F4F2EB !important;
         }
       `;
       document.head.appendChild(style);

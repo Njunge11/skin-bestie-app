@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 const M_INPUT_BASE =
   "rounded py-[0.875rem] px-[1.3125rem] text-[#272B2D] placeholder:text-[#878481] h-auto";
-const M_INPUT_SKIN = "bg-[#FFFBE5] border border-[#030303]";
+const M_INPUT_SKIN = "bg-white border-[0.5px] border-[#828282]";
 
 export const MInput = React.forwardRef<
   HTMLInputElement,

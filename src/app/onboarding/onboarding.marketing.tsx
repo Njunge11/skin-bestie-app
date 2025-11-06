@@ -53,8 +53,7 @@ export default function OnboardingMarketing() {
 
   return (
     <div
-      className="hidden md:flex flex-col bg-cover bg-center pt-[11.3125rem] p-[8.625rem]"
-      style={{ backgroundImage: `url('${current.bgImage}')` }}
+      className="hidden md:flex flex-col bg-skinbestie-landing-blue pt-[11.3125rem] p-[8.625rem]"
       aria-label={current.headline}
     >
       {current.component === "subscribe" || current.component === "book" ? (
@@ -62,7 +61,7 @@ export default function OnboardingMarketing() {
       ) : (
         <>
           <h1
-            className={`w-full max-w-[485px] ${anton.className} text-[#FFF7D4] text-[3.5rem] font-normal leading-[120%] tracking-[-0.02em] uppercase`}
+            className={`w-full max-w-[485px] ${anton.className} text-skinbestie-landing-pink text-[3.5rem] font-normal leading-[120%] tracking-[-0.02em] uppercase`}
           >
             {current.headline}
           </h1>

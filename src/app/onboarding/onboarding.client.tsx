@@ -20,7 +20,7 @@ export default function OnboardingClient({ steps }: { steps: StepMeta[] }) {
       lastName: "",
       email: "",
       mobileLocal: "",
-      mobileCountryISO: "KE",
+      mobileCountryISO: "GB",
       dateOfBirth: "",
       goal: "",
       routineNote: "",

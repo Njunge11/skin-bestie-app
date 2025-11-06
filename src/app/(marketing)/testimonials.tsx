@@ -40,35 +40,33 @@ export default function Testimonials({
     // OUTER fills the scene (100dvh from wrapper)
     <section
       id="community"
-      className="h-full w-full bg-[#13110F] overflow-hidden"
+      className="w-full bg-skinbestie-landing-white border-b-[0.3px] border-[#959170]"
     >
-      {/* Inner content centered into a 795px frame on xl */}
-      <div className="w-full h-full xl:flex xl:items-center xl:justify-center">
-        <div className="w-full max-w-7xl mx-auto xl:flex xl:flex-col xl:justify-center py-10 md:py-20 lg:py-40 px-4">
-          <h1
-            className={`${anton.className} text-[#FFF7D4] text-4xl sm:text-5xl text-center uppercase leading-[1.2] tracking-[-0.02em]`}
-          >
-            {heading}
-          </h1>
+      <div className="w-full max-w-7xl mx-auto py-10 md:py-20 px-4">
+        <h1
+          className={`${anton.className} text-skinbestie-landing-blue text-4xl sm:text-5xl text-center uppercase leading-[1.2] tracking-[-0.02em]`}
+        >
+          {heading}
+        </h1>
 
-          <Carousel
-            // Key bits: center + trimSnaps + loop
-            opts={{ align: "center", containScroll: "trimSnaps", loop: true }}
-            plugins={[autoplay.current]}
-            setApi={setCarouselApi}
-            className="w-full max-w-7xl mx-auto pt-11"
-            // Optional: you can remove these since stopOnMouseEnter is true above
-            // onMouseEnter={autoplay.current.stop}
-            // onMouseLeave={autoplay.current.reset}
-          >
-            <CarouselContent className="-ml-0 md:-ml-4">
-              {items.map((card, idx) => (
-                <CarouselItem
-                  key={`${card.customerName}-${idx}`}
-                  className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 flex"
-                >
-                  <div className="p-6 rounded-xl bg-[#EDEDED05] border-[0.3px] border-[#FDFAEB4D] w-full max-w-[413px] h-full flex flex-col">
-                    {/* <div>
+        <Carousel
+          // Key bits: center + trimSnaps + loop
+          opts={{ align: "center", containScroll: "trimSnaps", loop: true }}
+          plugins={[autoplay.current]}
+          setApi={setCarouselApi}
+          className="w-full max-w-7xl mx-auto pt-11"
+          // Optional: you can remove these since stopOnMouseEnter is true above
+          // onMouseEnter={autoplay.current.stop}
+          // onMouseLeave={autoplay.current.reset}
+        >
+          <CarouselContent className="-ml-0 md:-ml-4">
+            {items.map((card, idx) => (
+              <CarouselItem
+                key={`${card.customerName}-${idx}`}
+                className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3 flex"
+              >
+                <div className="p-6 rounded-xl bg-skinbestie-landing-gray border-[0.3px] border-[#FDFAEB4D] w-full max-w-[413px] h-full flex flex-col">
+                  {/* <div>
                       <h2
                         className={`${anton.className} font-normal text-2xl text-[#FFF7D4] uppercase leading-[1.2] tracking-[-0.02em]`}
                       >
@@ -98,64 +96,55 @@ export default function Testimonials({
                         {card.timeline}
                       </p>
                     </div> */}
-                    <div className="flex-grow">
-                      {/* <h2
+                  <div className="flex-grow">
+                    {/* <h2
                         className={`${anton.className} font-normal text-2xl text-[#FFF7D4] uppercase leading-[1.2] tracking-[-0.02em]`}
                       >
                         TESTIMONIAL
                       </h2> */}
-                      <p className="font-medium text-base text-[#DFDBD2] leading-[1.5] tracking-[-0.01em]">
-                        {card.testimonial}
-                      </p>
-                    </div>
-                    <div className="pt-6">
-                      <hr className="border-[0.5px] border-[#2F2B27]" />
-                    </div>
-                    <div className="pt-4">
-                      <p className="font-medium text-center text-lg text-[#DFDBD2] leading-[1.5] tracking-[-0.01em]">
-                        {`- ${card.customerName}`}
-                      </p>
-                    </div>
+                    <p className="font-medium text-base text-skinbestie-landing-black leading-[1.5] tracking-[-0.01em]">
+                      {card.testimonial}
+                    </p>
                   </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
+                  <div className="pt-6">
+                    <hr className="border-[0.5px] border-[#2F2B27]" />
+                  </div>
+                  <div className="pt-4">
+                    <p className="font-medium text-center text-lg text-skinbestie-landing-blue leading-[1.5] tracking-[-0.01em]">
+                      {`- ${card.customerName}`}
+                    </p>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
 
-            <CarouselPrevious
-              className="hidden xl:flex border-0 bg-transparent hover:bg-transparent w-[21px] h-[20px] p-0"
-              style={{ color: "#FFF7D4" }}
-            >
-              <ArrowLeft width={21} height={20} />
-              <span className="sr-only">Previous slide</span>
-            </CarouselPrevious>
-            <CarouselNext
-              className="hidden xl:flex border-0 bg-transparent hover:bg-transparent w-[21px] h-[20px] p-0"
-              style={{ color: "#FFF7D4" }}
-            >
-              <ArrowRight width={21} height={20} />
-              <span className="sr-only">Next slide</span>
-            </CarouselNext>
-          </Carousel>
+          <CarouselPrevious className="hidden xl:flex border-0 bg-transparent hover:bg-transparent w-[21px] h-[20px] p-0 text-skinbestie-landing-blue">
+            <ArrowLeft width={21} height={20} />
+            <span className="sr-only">Previous slide</span>
+          </CarouselPrevious>
+          <CarouselNext className="hidden xl:flex border-0 bg-transparent hover:bg-transparent w-[21px] h-[20px] p-0 text-skinbestie-landing-blue">
+            <ArrowRight width={21} height={20} />
+            <span className="sr-only">Next slide</span>
+          </CarouselNext>
+        </Carousel>
 
-          {/* Mobile/Tablet/iPad Pro arrows below carousel */}
-          <div className="flex justify-center gap-4 mt-6 xl:hidden">
-            <button
-              onClick={() => carouselApi?.scrollPrev()}
-              className="border-0 bg-transparent w-[21px] h-[20px] p-0"
-              style={{ color: "#FFF7D4" }}
-              aria-label="Previous slide"
-            >
-              <ArrowLeft width={21} height={20} />
-            </button>
-            <button
-              onClick={() => carouselApi?.scrollNext()}
-              className="border-0 bg-transparent w-[21px] h-[20px] p-0"
-              style={{ color: "#FFF7D4" }}
-              aria-label="Next slide"
-            >
-              <ArrowRight width={21} height={20} />
-            </button>
-          </div>
+        {/* Mobile/Tablet/iPad Pro arrows below carousel */}
+        <div className="flex justify-center gap-4 mt-6 xl:hidden">
+          <button
+            onClick={() => carouselApi?.scrollPrev()}
+            className="border-0 bg-transparent w-[21px] h-[20px] p-0 text-skinbestie-landing-blue"
+            aria-label="Previous slide"
+          >
+            <ArrowLeft width={21} height={20} />
+          </button>
+          <button
+            onClick={() => carouselApi?.scrollNext()}
+            className="border-0 bg-transparent w-[21px] h-[20px] p-0 text-skinbestie-landing-blue"
+            aria-label="Next slide"
+          >
+            <ArrowRight width={21} height={20} />
+          </button>
         </div>
       </div>
     </section>

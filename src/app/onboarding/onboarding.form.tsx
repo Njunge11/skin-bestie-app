@@ -93,13 +93,13 @@ export default function OnboardingForm() {
   };
 
   return (
-    <div className="flex flex-col pt-5 pb-5 px-4 md:px-[30px] bg-[#F3F0DF]">
+    <div className="flex flex-col pt-5 pb-5 px-4 md:px-[30px] bg-skinbestie-landing-white">
       {/* Top bar */}
       <div className="flex justify-between items-baseline">
         <button
           type="button"
           onClick={handleBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+          className="flex items-center gap-2 transition-colors"
         >
           <ArrowLeft size={24} className="text-[#222118]" />
           <span
@@ -116,7 +116,7 @@ export default function OnboardingForm() {
             STEP
           </span>
           <span
-            className={`${anton.className} text-xl leading-none tracking-tight uppercase text-[#F3ECC7] bg-[#222118] rounded-md px-3 py-1`}
+            className={`${anton.className} text-xl leading-none tracking-tight uppercase text-skinbestie-landing-white bg-skinbestie-landing-pink rounded-md px-3 py-1`}
           >
             {stepIndex + 1} OF {total}
           </span>
@@ -124,7 +124,7 @@ export default function OnboardingForm() {
       </div>
 
       {/* Card */}
-      <div className="mt-8 mx-auto w-full max-w-[440px] bg-[#F3ECC7] p-6">
+      <div className="mt-8 mx-auto w-full max-w-[440px] bg-skinbestie-landing-gray p-6 rounded-lg">
         {/* Conditionally hide form header when showing success screen */}
         {!hideFormHeader && (
           <>

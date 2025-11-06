@@ -34,7 +34,7 @@ export default function LoginForm({
   };
 
   return (
-    <div className="flex flex-col pt-5 pb-5 px-4 md:px-[30px] bg-[#F3F0DF]">
+    <div className="flex flex-col pt-5 pb-5 px-4 md:px-[30px] bg-skinbestie-landing-white">
       {/* Top bar */}
       <div className="flex justify-start items-baseline">
         <button
@@ -52,7 +52,7 @@ export default function LoginForm({
       </div>
 
       {/* Card */}
-      <div className="mt-8 mx-auto w-full max-w-[440px] bg-[#F3ECC7] p-6">
+      <div className="mt-8 mx-auto w-full max-w-[440px] bg-skinbestie-landing-gray p-6 rounded-lg">
         {emailSent ? (
           <SuccessScreen email={email} onResend={() => onEmailSent(email)} />
         ) : (
@@ -141,7 +141,8 @@ function EmailForm({
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder="you@example.com"
-            className="w-full px-4 py-3 border border-[#030303] rounded bg-[#FFFBE5] text-[#272B2D] placeholder:text-[#898989] focus:outline-none focus:ring-2 focus:ring-[#030303] focus:border-transparent"
+            style={{ border: "0.5px solid #828282" }}
+            className="w-full px-4 py-3 rounded bg-white text-[#272B2D] placeholder:text-[#878481] focus:outline-none focus:ring-2 focus:ring-[#030303] focus:border-transparent"
             disabled={loading}
           />
         </div>
@@ -149,7 +150,7 @@ function EmailForm({
         <button
           type="submit"
           disabled={loading || !email}
-          className="w-full bg-[#030303] text-[#FFFBE5] py-3 px-6 rounded font-semibold hover:bg-[#222118] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-skinbestie-landing-blue text-white py-3 px-6 rounded font-semibold hover:bg-skinbestie-landing-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Sending..." : "Send sign-in link"}
         </button>

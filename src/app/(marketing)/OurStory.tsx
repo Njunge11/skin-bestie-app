@@ -151,15 +151,12 @@ export default function OurStory({
   return (
     <section
       id="story"
-      className="w-full bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: "url('/background.svg')",
-      }}
+      className="w-full bg-skinbestie-landing-white border-b-[0.4px] border-black/50"
     >
       <div className="w-full px-4 pt-10 md:pt-20 pb-10 md:pb-20">
         <div className="mx-auto max-w-7xl">
           <h1
-            className={`${anton.className} text-left sm:text-center xl:text-left text-[#222118] text-4xl sm:text-5xl leading-[1.1] tracking-[-0.02em] uppercase font-normal`}
+            className={`${anton.className} text-left sm:text-center xl:text-left text-skinbestie-landing-green text-4xl sm:text-5xl leading-[1.1] tracking-[-0.02em] uppercase font-normal`}
           >
             {heading}
           </h1>
@@ -196,8 +193,8 @@ export default function OurStory({
                           src={v.iconSrc}
                           alt={v.iconAlt || v.title}
                           className="object-contain"
-                          width={48}
-                          height={48}
+                          width={28}
+                          height={28}
                         />
                       ) : null}
                     </div>

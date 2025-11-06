@@ -58,8 +58,8 @@ function ConcernTile({
           "rounded-[0.25rem] border-[0.04375rem]",
           "text-[#272B2D] font-medium text-[1.0625rem] leading-[150%] tracking-[-0.01em]",
           // states
-          "border-[#BCB8A6] bg-[#F3ECC7] hover:brightness-[0.98]",
-          "peer-checked:border-[#030303] peer-checked:bg-[#FFFBE5]",
+          "border-[#BCB8A6] bg-[#FBFAF1] hover:brightness-[0.98]",
+          "peer-checked:border-skinbestie-landing-pink peer-checked:bg-skinbestie-landing-pink",
           // focus ring for keyboard
           "outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[#222118]/30",
           className,

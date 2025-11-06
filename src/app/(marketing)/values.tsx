@@ -21,20 +21,13 @@ export default function Values({
   items: ValuesItem[];
 }) {
   return (
-    // OUTER fills the scene height (100dvh from the wrapper). Keep solid bg.
-    <section className="h-full w-full bg-[#FFFBE7] overflow-hidden">
-      {/* Center the desktop composition into a 558px inner frame */}
-      <div className="w-full h-full py-10 md:py-20 lg:py-40 px-4 xl:flex xl:items-center xl:justify-center">
-        <div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 xl:items-center">
-          {/* Left: Image */}
-          <div className="flex justify-center">
-            <Image src={imageSrc} alt={imageAlt} width={464} height={399} />
-          </div>
-
-          {/* Right: Values list */}
-          <div className="flex flex-col justify-center md:items-center lg:items-stretch">
+    <section className="w-full bg-skinbestie-landing-white border-b-[0.3px] border-[#959170]">
+      <div className="w-full py-10 md:py-20 px-4 flex items-center justify-center">
+        <div className="mx-auto max-w-3xl">
+          {/* Values list */}
+          <div className="flex flex-col items-center">
             <h1
-              className={`${anton.className} text-center sm:text-left text-[#222118] text-4xl sm:text-5xl leading-[1.1] tracking-[-0.02em] uppercase font-normal`}
+              className={`${anton.className} text-center text-skinbestie-landing-green text-4xl sm:text-5xl leading-[1.1] tracking-[-0.02em] uppercase font-normal`}
             >
               {heading}
             </h1>
@@ -48,8 +41,8 @@ export default function Values({
                         src={v.iconSrc}
                         alt={v.iconAlt || v.title}
                         className="object-contain"
-                        width={48}
-                        height={48}
+                        width={28}
+                        height={28}
                       />
                     ) : null}
                   </div>

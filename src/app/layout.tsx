@@ -1,14 +1,8 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"], // pick what you need
-});
+import { neueHaasDisplay } from "./fonts";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="bg-black scroll-smooth scroll-pt-20">
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${neueHaasDisplay.className} antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

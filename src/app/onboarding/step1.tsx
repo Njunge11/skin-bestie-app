@@ -23,6 +23,7 @@ export default function Step1() {
     control,
     setValue,
     getValues,
+    watch,
     trigger,
     setError,
     formState: { errors },
@@ -219,7 +220,7 @@ export default function Step1() {
               inputRef={field.ref}
               name={field.name}
               // Keep the ISO in your component's state via form state:
-              countryISO={getValues("mobileCountryISO")}
+              countryISO={watch("mobileCountryISO")}
               onCountryISOChange={async (newIso) => {
                 // update ISO
                 setValue("mobileCountryISO", newIso, {
@@ -255,12 +256,12 @@ export default function Step1() {
       </div>
 
       <div className="mt-3">
-        <div className="flex items-stretch overflow-hidden rounded-none bg-[#FFFBE5] border border-[#030303]">
+        <div className="flex items-stretch overflow-hidden rounded-none bg-white border-[0.5px] border-[#828282]">
           <button
             type="button"
             onClick={openNativePicker}
             aria-label="Open date picker"
-            className="h-[3.125rem] flex items-center justify-center p-4 border-r border-[#030303]"
+            className="h-[3.125rem] flex items-center justify-center p-4 border-r-[0.5px] border-[#828282]"
             tabIndex={-1}
           >
             <CalendarIcon className="h-5 w-5 text-[#030303]" />

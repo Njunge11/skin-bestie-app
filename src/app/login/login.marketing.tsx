@@ -12,16 +12,11 @@ interface LoginMarketingProps {
 
 export default function LoginMarketing({
   backgroundCopy,
-  backgroundImage,
 }: LoginMarketingProps) {
   return (
-    <div
-      className="hidden md:flex flex-col bg-cover bg-center pt-18 pl-20"
-      style={{ backgroundImage: `url('${backgroundImage.sourceUrl}')` }}
-      aria-label={backgroundImage.altText}
-    >
+    <div className="hidden md:flex flex-col bg-skinbestie-landing-blue pt-18 pl-20">
       <h1
-        className={`max-w-[532px] ${anton.className} text-[#FFF7D4] text-[3.5rem] font-normal leading-[120%] tracking-[-0.02em] uppercase`}
+        className={`max-w-[532px] ${anton.className} text-skinbestie-landing-pink text-[3.5rem] font-normal leading-[120%] tracking-[-0.02em] uppercase`}
       >
         {backgroundCopy}
       </h1>

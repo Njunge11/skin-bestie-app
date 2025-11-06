@@ -55,7 +55,7 @@ export function MobileNumberInput({
   onBlur,
   name,
   inputRef,
-  countryISO = "KE",
+  countryISO = "GB",
   onCountryISOChange,
   placeholder = "712 345 678",
   className,
@@ -80,11 +80,12 @@ export function MobileNumberInput({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="flex items-stretch overflow-hidden rounded-none bg-[#FFFBE5] border border-[#030303]/50">
-        <div className="flex items-stretch border-r border-[#030303]/50">
+      <div className="flex items-stretch overflow-hidden rounded-none bg-white border-[0.5px] border-[#828282]">
+        <div className="flex items-stretch border-r-[0.5px] border-[#828282]">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
+                type="button"
                 variant="ghost"
                 role="combobox"
                 aria-expanded={open}

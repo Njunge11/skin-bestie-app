@@ -27,9 +27,9 @@ export function MButton({
     <Button
       type={type}
       className={cn(
-        "w-full justify-center gap-2 rounded-[12px] bg-[#030303]",
+        "w-full justify-center gap-2 rounded-[12px] bg-skinbestie-landing-blue",
         "py-3 px-4 text-[16px] leading-[1.5] tracking-[-0.01em] font-medium",
-        "text-white hover:bg-[#030303]/90 focus-visible:ring-0 disabled:opacity-60",
+        "text-white hover:bg-skinbestie-landing-blue/90 focus-visible:ring-0 disabled:opacity-60",
         className,
       )}
       {...props}

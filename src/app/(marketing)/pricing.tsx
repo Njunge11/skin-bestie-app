@@ -18,29 +18,30 @@ export default function Pricing({
   benefits: string[];
 }) {
   return (
-    <div id="pricing" className="bg-[#FFFDF2]">
-      <div className="max-w-6xl mx-auto w-full pb-10 md:pb-20 lg:pb-28">
-        <div className="grid lg:grid-cols-2 lg:gap-12 items-start">
+    <section
+      id="pricing"
+      className="bg-skinbestie-landing-white border-b-[0.3px] border-[#959170]"
+    >
+      <div className="mx-auto w-full px-4 md:px-6 py-10 md:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(300px,413px)_minmax(400px,656px)] gap-8 lg:gap-32 max-w-[1280px] mx-auto">
           {/* Left Column */}
-          <div className="space-y-6 flex lg:justify-center pt-10 md:pt-20 lg:pt-44">
-            <div>
-              <h1
-                className={`${anton.className} text-left sm:text-center lg:text-left px-4 sm:px-0 text-4xl sm:text-5xl font-normal text-[#222118] uppercase leading-[1.2] tracking-[-0.02em] w-full lg:max-w-[333px]`}
-              >
-                {heading}
-              </h1>
-              <p className="text-left sm:text-center lg:text-left mt-2 px-4 sm:px-2 text-lg sm:text-xl text-gray-700 leading-relaxed w-full lg:max-w-[410px]">
-                {subheading}
-              </p>
-            </div>
+          <div className="w-full">
+            <h1
+              className={`${anton.className} text-3xl sm:text-4xl lg:text-5xl font-normal text-skinbestie-landing-pink mb-4 sm:mb-6 uppercase leading-[1.2] tracking-[-0.02em]`}
+            >
+              {heading}
+            </h1>
+            <p className="text-base sm:text-lg lg:text-xl text-gray-700 leading-relaxed">
+              {subheading}
+            </p>
           </div>
 
           {/* Right Column */}
-          <div className="space-y-2 px-4 md:px-6 pt-6 md:pt-10 lg:pt-28">
+          <div className="w-full space-y-2">
             {/* Price Card */}
-            <div className="bg-[#FAFAFA] border-[0.7px] border-[#000000] rounded-lg pt-[1.125rem] pb-[1.125rem]">
+            <div className="bg-skinbestie-landing-gray rounded-lg pt-[1.125rem] pb-[1.125rem]">
               <h2
-                className={`${anton.className} font-normal text-[3.5rem] leading-[1.1] tracking-[-0.02em] text-center uppercase text-[#342F17]`}
+                className={`${anton.className} font-normal text-[3.5rem] leading-[1.1] tracking-[-0.02em] text-center uppercase text-skinbestie-landing-blue`}
               >
                 {priceHeadline}
               </h2>
@@ -54,7 +55,7 @@ export default function Pricing({
               {benefits.map((b, i) => (
                 <div
                   key={`${b}-${i}`}
-                  className="box-border h-20 bg-[#F3ECC7] rounded-lg flex items-center border-[0.6px] border-[#C4BC8E] p-5"
+                  className="box-border h-20 bg-skinbestie-landing-gray rounded-lg flex items-center border-[0.6px] border-[#C4BC8E] p-5"
                 >
                   <span
                     className={`${anton.className} font-normal text-xl leading-[1.2] tracking-[-0.01em] uppercase text-[#2A2E30]`}
@@ -67,7 +68,7 @@ export default function Pricing({
             <Link
               href="/onboarding"
               className="flex w-full py-4.5 items-center justify-center gap-2.5
-               rounded-xl border-2 border-white bg-black px-5"
+               rounded-xl border-2 border-skinbestie-landing-blue bg-skinbestie-landing-blue px-5"
             >
               <span className="font-medium text-white text-[18px] leading-[1.5] tracking-[-0.01em] whitespace-nowrap text-center">
                 Begin My Skin Journey
@@ -77,6 +78,6 @@ export default function Pricing({
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
