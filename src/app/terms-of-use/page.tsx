@@ -39,28 +39,25 @@ export default function TermsOfUsePage() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#FFFBE7" }}>
+    <div className="min-h-screen bg-skinbestie-landing-white">
       {/* Hero Section */}
-      <div
-        className="relative overflow-hidden"
-        style={{
-          background:
-            "radial-gradient(circle at 50% 50%, #F4E5A6 0%, #F3ECC7 100%)",
-        }}
-      >
+      <div className="relative overflow-hidden bg-skinbestie-landing-blue">
         {/* Logo */}
         <div className="pt-8 px-4 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <Link
               href="/"
-              className="inline-block focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#222118] rounded transition-opacity hover:opacity-70"
+              className="inline-block focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink rounded transition-opacity hover:opacity-70"
               aria-label="Go to home page"
             >
               <Image
                 src="/logo.svg"
                 alt="SkinBestie Logo"
                 className="object-contain h-6 lg:h-[24px] w-auto"
-                style={{ filter: "brightness(0) saturate(100%)" }}
+                style={{
+                  filter:
+                    "brightness(0) saturate(100%) invert(72%) sepia(65%) saturate(1845%) hue-rotate(301deg) brightness(102%) contrast(93%)",
+                }}
                 width={100}
                 height={24}
               />
@@ -71,8 +68,7 @@ export default function TermsOfUsePage() {
         {/* Title */}
         <div className="max-w-7xl mx-auto px-4 lg:px-8 py-16 text-center">
           <h1
-            className={`${anton.className} text-5xl lg:text-6xl font-normal uppercase mb-6`}
-            style={{ color: "#222118" }}
+            className={`${anton.className} text-5xl lg:text-6xl font-normal uppercase mb-6 text-skinbestie-landing-pink`}
           >
             Terms of Use
           </h1>
@@ -88,7 +84,7 @@ export default function TermsOfUsePage() {
           >
             <path
               d="M0 0C240 20 480 30 720 30C960 30 1200 20 1440 0V30H0V0Z"
-              fill="#FFFBE7"
+              fill="#FFFDF5"
             />
           </svg>
         </div>
@@ -106,7 +102,7 @@ export default function TermsOfUsePage() {
                   onClick={() => scrollToSection(section.id)}
                   className={`block w-full text-left py-2 transition text-sm border-l-2 pl-4 ${
                     activeSection === section.id
-                      ? "border-black font-medium"
+                      ? "border-skinbestie-landing-pink font-medium"
                       : "border-transparent hover:border-gray-300"
                   }`}
                   style={{
