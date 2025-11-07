@@ -9,10 +9,10 @@ export default auth(async function middleware(request) {
   const pathname = request.nextUrl.pathname;
 
   // Protected routes - require authentication
-  const protectedRoutes = ["/dashboard", "/my-profile", "/journal", "/privacy"];
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.startsWith(route),
-  );
+  const protectedRoutes = ["/dashboard", "/my-profile", "/journal"];
+  const isProtectedRoute =
+    protectedRoutes.some((route) => pathname.startsWith(route)) ||
+    pathname === "/privacy"; // Only protect exact /privacy path
 
   // Redirect to login if accessing protected route without auth
   if (isProtectedRoute && !request.auth) {
