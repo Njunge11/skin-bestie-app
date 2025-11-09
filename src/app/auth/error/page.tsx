@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ErrorPage } from "@/components/error-page";
 
@@ -26,7 +27,7 @@ const errorMessages: Record<string, { title: string; message: string }> = {
   },
 };
 
-export default function AuthErrorPage() {
+function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
@@ -48,5 +49,20 @@ export default function AuthErrorPage() {
       }}
       showErrorCode={error || undefined}
     />
+  );
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense
+      fallback={
+        <ErrorPage
+          title="Loading..."
+          message="Please wait while we load the error details."
+        />
+      }
+    >
+      <AuthErrorContent />
+    </Suspense>
   );
 }
