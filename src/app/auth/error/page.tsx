@@ -16,9 +16,9 @@ const errorMessages: Record<string, { title: string; message: string }> = {
       "You do not have permission to sign in. Please contact support if you believe this is an error.",
   },
   Verification: {
-    title: "Verification Link Expired",
+    title: "Sign-In Link Invalid",
     message:
-      "The verification link has expired or has already been used. Please go to the login page to request a new link.",
+      "This link is no longer valid. Please request a new sign-in link to continue.",
   },
   Default: {
     title: "Authentication Error",
@@ -30,6 +30,14 @@ const errorMessages: Record<string, { title: string; message: string }> = {
 function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
+
+  // Debug logging
+  console.log("Error param:", error);
+  console.log("Error keys available:", Object.keys(errorMessages));
+  console.log(
+    "Matched error:",
+    error && errorMessages[error] ? error : "Default",
+  );
 
   const errorInfo = error
     ? errorMessages[error] || errorMessages.Default

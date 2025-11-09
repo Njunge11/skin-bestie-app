@@ -8,6 +8,7 @@ import authConfig from "./auth.config";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: DrizzleAdapter(db),
   session: { strategy: "jwt" },
+  debug: true, // Enable detailed logging
   ...authConfig,
   providers: [
     Resend({
