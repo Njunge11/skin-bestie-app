@@ -12,7 +12,14 @@ const pool = new pg.Pool({
   // ssl: { rejectUnauthorized: false } // uncomment if your host requires SSL
 });
 
-export const db = drizzle(pool);
+// Log pool errors
+pool.on("error", (err) => {
+  console.error("Unexpected database pool error:", err);
+});
+
+export const db = drizzle(pool, {
+  logger: true, // Enable query logging
+});
 
 // Optional: prevent accidental client import
 export const __server_only__ = true;
