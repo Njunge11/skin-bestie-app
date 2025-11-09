@@ -7,6 +7,9 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+// Configurable days before showing prompt again after dismissal
+const DAYS_BEFORE_RESHOWING = 0;
+
 // Helper to check if dismissed recently
 function shouldShowPrompt(): boolean {
   if (typeof window === "undefined") return false;
@@ -15,7 +18,7 @@ function shouldShowPrompt(): boolean {
   if (dismissedDate) {
     const daysSinceDismissed =
       (Date.now() - parseInt(dismissedDate)) / (1000 * 60 * 60 * 24);
-    if (daysSinceDismissed < 7) {
+    if (daysSinceDismissed < DAYS_BEFORE_RESHOWING) {
       return false;
     }
   }
@@ -103,8 +106,8 @@ export default function InstallPrompt() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-6">
-      <div className="bg-gradient-to-r from-[#235588] to-[#1a4066] rounded-lg p-4 shadow-md">
+    <div className="mx-auto w-full max-w-3xl mb-6">
+      <div className="bg-gradient-to-r from-skinbestie-blue to-skinbestie-landing-blue rounded-lg p-4 shadow-md">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             {isIOS ? (
@@ -113,18 +116,19 @@ export default function InstallPrompt() {
                   Install for Quick Access
                 </h3>
                 <p className="text-sm text-white/90">
-                  Tap{" "}
-                  <span className="inline-flex items-center justify-center w-5 h-5 bg-white/20 rounded mx-1">
+                  Tap the Share button{" "}
+                  <span className="inline-flex items-center justify-center w-6 h-6 bg-white/20 rounded mx-1">
                     <svg
-                      className="w-3 h-3 text-white"
+                      className="w-4 h-4 text-white"
                       fill="currentColor"
-                      viewBox="0 0 20 20"
+                      viewBox="0 0 24 24"
                     >
-                      <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                      <path d="M16.5 6.5V3H7.5v3.5H4v17h16v-17h-3.5zM9 4.5h6v2H9v-2zm9.5 15h-13v-14h13v14z" />
+                      <path d="M12 7.5l-4 4h2.5V15h3v-3.5H16l-4-4z" />
                     </svg>
                   </span>{" "}
-                  then &quot;Add to Home Screen&quot; to access your routine
-                  instantly
+                  at the bottom of your screen, then tap &quot;Add to Home
+                  Screen&quot;
                 </p>
               </>
             ) : (
