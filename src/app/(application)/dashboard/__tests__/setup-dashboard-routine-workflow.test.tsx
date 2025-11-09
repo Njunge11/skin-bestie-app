@@ -172,7 +172,7 @@ describe("Setup Dashboard - View Routine Workflow", () => {
     // User sees description
     expect(
       screen.getByText(
-        /your personalized skincare routine tailored to your needs/i,
+        /your personalised skincare routine tailored to your needs/i,
       ),
     ).toBeInTheDocument();
 

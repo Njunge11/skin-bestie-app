@@ -174,9 +174,7 @@ describe("Setup Dashboard - Goals Review Workflow", () => {
 
     // User sees description text
     expect(
-      screen.getByText(
-        /track your progress and manage your personalized skincare goals/i,
-      ),
+      screen.getByText(/here are the goals discussed with coach benji/i),
     ).toBeInTheDocument();
 
     // User clicks Save button

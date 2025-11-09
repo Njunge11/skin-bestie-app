@@ -915,9 +915,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
       await user.click(addButton);
 
       // Should see textarea for goal description
-      const textarea = await screen.findByPlaceholderText(
-        /enter the clients goal/i,
-      );
+      const textarea = await screen.findByPlaceholderText(/enter goal/i);
       await user.type(textarea, "Reduce dark spots within 2 months");
 
       // Find and click the save button
@@ -960,9 +958,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
       await user.click(addButton);
 
       // Type goal description
-      const textarea = await screen.findByPlaceholderText(
-        /enter the clients goal/i,
-      );
+      const textarea = await screen.findByPlaceholderText(/enter goal/i);
       await user.type(textarea, "Clear acne");
 
       // Click save
@@ -1122,9 +1118,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
       const addGoalButton = screen.getByRole("button", { name: /add goal/i });
       await user.click(addGoalButton);
 
-      const textarea = await screen.findByPlaceholderText(
-        /enter the clients goal/i,
-      );
+      const textarea = await screen.findByPlaceholderText(/enter goal/i);
       await user.type(textarea, "Maintain clear skin for 6 months");
 
       const saveButton = screen.getByRole("button", { name: /save$/i });
