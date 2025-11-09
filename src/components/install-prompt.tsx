@@ -7,22 +7,54 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+// Helper to check if dismissed recently
+function shouldShowPrompt(): boolean {
+  if (typeof window === "undefined") return false;
+
+  const dismissedDate = localStorage.getItem("pwa-prompt-dismissed");
+  if (dismissedDate) {
+    const daysSinceDismissed =
+      (Date.now() - parseInt(dismissedDate)) / (1000 * 60 * 60 * 24);
+    if (daysSinceDismissed < 7) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [showPrompt, setShowPrompt] = useState(false);
 
-  useEffect(() => {
-    // Check if iOS
-    setIsIOS(
+  // ✅ Initialize state with lazy initializers
+  const [isIOS] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return (
       /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-        !(window as Window & { MSStream?: unknown }).MSStream,
+      !(window as Window & { MSStream?: unknown }).MSStream
     );
+  });
 
-    // Check if already installed
-    setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
+  const [isStandalone] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(display-mode: standalone)").matches;
+  });
+
+  const [showPrompt, setShowPrompt] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const shouldShow = shouldShowPrompt();
+    const iOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+      !(window as Window & { MSStream?: unknown }).MSStream;
+    const standalone = window.matchMedia("(display-mode: standalone)").matches;
+    return shouldShow && iOS && !standalone;
+  });
+
+  // ✅ useEffect only for external system synchronization (event listener)
+  useEffect(() => {
+    if (!shouldShowPrompt()) {
+      return;
+    }
 
     // Listen for beforeinstallprompt event (Chrome/Android)
     const handler = (e: Event) => {
@@ -46,12 +78,17 @@ export default function InstallPrompt() {
 
     if (outcome === "accepted") {
       setShowPrompt(false);
+    } else {
+      // User dismissed the native prompt, save timestamp
+      localStorage.setItem("pwa-prompt-dismissed", Date.now().toString());
     }
 
     setDeferredPrompt(null);
   };
 
   const handleDismiss = () => {
+    // Save dismissal timestamp to localStorage
+    localStorage.setItem("pwa-prompt-dismissed", Date.now().toString());
     setShowPrompt(false);
   };
 
@@ -60,8 +97,8 @@ export default function InstallPrompt() {
     return null;
   }
 
-  // Don't show if user dismissed
-  if (!showPrompt && !isIOS) {
+  // Don't show if user dismissed (works for both iOS and Android)
+  if (!showPrompt) {
     return null;
   }
 
