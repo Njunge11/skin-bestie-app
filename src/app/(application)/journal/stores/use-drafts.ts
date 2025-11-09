@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 interface Draft {
-  content: string; // Lexical JSON
+  content: string; // Stringified Lexical JSON
   title: string;
   timestamp: number;
 }

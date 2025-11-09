@@ -46,13 +46,13 @@ const theme = {
 };
 
 interface LexicalEditorProps {
-  initialContent?: string;
+  initialContent?: unknown;
   onChange?: (content: string) => void;
   placeholder?: string;
 }
 
 // Plugin to initialize content
-function InitialContentPlugin({ content }: { content?: string }) {
+function InitialContentPlugin({ content }: { content?: unknown }) {
   const [editor] = useLexicalComposerContext();
   const [isFirstRender, setIsFirstRender] = useState(true);
 
@@ -61,50 +61,72 @@ function InitialContentPlugin({ content }: { content?: string }) {
     if (!isFirstRender || !content) return;
     setIsFirstRender(false);
 
-    // Check if content is valid JSON first
-    let isValidJSON = false;
-    try {
-      JSON.parse(content);
-      isValidJSON = true;
-    } catch {
-      isValidJSON = false;
-    }
-
-    if (isValidJSON) {
-      // Content is JSON, try parsing as Lexical EditorState
+    // If content is already an object (LexicalJSON from backend)
+    if (typeof content === "object" && content !== null) {
       try {
-        const editorState = editor.parseEditorState(content);
+        const lexical = content as { root?: { children?: unknown[] } };
+        // Check if content is empty
+        if (
+          !lexical.root ||
+          !lexical.root.children ||
+          lexical.root.children.length === 0
+        ) {
+          // Don't set empty state, let Lexical use default
+          return;
+        }
+
+        // Convert object to JSON string and parse as EditorState
+        const jsonString = JSON.stringify(content);
+        const editorState = editor.parseEditorState(jsonString);
         editor.setEditorState(editorState);
       } catch (error) {
-        console.error("Valid JSON but not valid Lexical EditorState:", error);
-        // Still fallback to plain text
-        createPlainTextContent();
+        console.error("Failed to parse LexicalJSON object:", error);
       }
-    } else {
-      // Content is plain text
-      createPlainTextContent();
+      return;
     }
 
-    function createPlainTextContent() {
-      editor.update(
-        () => {
-          const root = $getRoot();
-          root.clear();
+    // If content is a string
+    if (typeof content === "string") {
+      // Check if content is valid JSON first
+      let isValidJSON = false;
+      try {
+        JSON.parse(content);
+        isValidJSON = true;
+      } catch {
+        isValidJSON = false;
+      }
 
-          // Split content by newlines to create paragraphs
-          const paragraphs = content?.split("\n\n") || [];
+      if (isValidJSON) {
+        // Content is JSON, try parsing as Lexical EditorState
+        try {
+          const editorState = editor.parseEditorState(content);
+          editor.setEditorState(editorState);
+        } catch (error) {
+          console.error("Valid JSON but not valid Lexical EditorState:", error);
+          // Don't insert anything - let Lexical use default empty state
+        }
+      } else if (content.trim()) {
+        // Content is plain text (only if not empty)
+        editor.update(
+          () => {
+            const root = $getRoot();
+            root.clear();
 
-          paragraphs.forEach((paragraphText) => {
-            if (paragraphText.trim()) {
-              const paragraph = $createParagraphNode();
-              const text = $createTextNode(paragraphText.trim());
-              paragraph.append(text);
-              root.append(paragraph);
-            }
-          });
-        },
-        { tag: "history-merge" },
-      );
+            // Split content by newlines to create paragraphs
+            const paragraphs = content.split("\n\n");
+
+            paragraphs.forEach((paragraphText) => {
+              if (paragraphText.trim()) {
+                const paragraph = $createParagraphNode();
+                const text = $createTextNode(paragraphText.trim());
+                paragraph.append(text);
+                root.append(paragraph);
+              }
+            });
+          },
+          { tag: "history-merge" },
+        );
+      }
     }
   }, [editor, content, isFirstRender]);
 
@@ -116,6 +138,8 @@ export default function LexicalEditor({
   onChange,
   placeholder = "Start writing...",
 }: LexicalEditorProps) {
+  const [isInitialized, setIsInitialized] = useState(false);
+
   const initialConfig = {
     namespace: "JournalEditor",
     theme,
@@ -159,6 +183,12 @@ export default function LexicalEditor({
         {onChange && (
           <OnChangePlugin
             onChange={(editorState) => {
+              // Skip onChange during initialization to prevent unnecessary API calls
+              if (!isInitialized) {
+                setIsInitialized(true);
+                return;
+              }
+
               // Serialize entire EditorState to JSON
               const jsonString = JSON.stringify(editorState.toJSON());
               onChange(jsonString);

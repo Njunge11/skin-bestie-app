@@ -6,7 +6,6 @@ export interface JourneyListItem {
   title: string;
   preview: string;
   date: string;
-  tags: string[];
 }
 
 interface JourneyListItemProps {

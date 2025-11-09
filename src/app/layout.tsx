@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import { neueHaasDisplay } from "./fonts";
+import CookieConsent from "@/components/cookie-consent";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -82,6 +83,7 @@ export default function RootLayout({
     <html lang="en" className="bg-black scroll-smooth scroll-pt-20">
       <body className={`${neueHaasDisplay.className} antialiased`}>
         <Providers>{children}</Providers>
+        <CookieConsent />
       </body>
     </html>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { anton } from "../fonts";
+
 export default function Footer() {
   return (
     <footer className="bg-skinbestie-landing-red px-4 pt-6 lg:pt-14 lg:pl-20 lg:pr-32">

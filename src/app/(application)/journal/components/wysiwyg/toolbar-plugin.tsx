@@ -214,7 +214,7 @@ export default function ToolbarPlugin() {
       className="flex items-center gap-1 p-2 border-b bg-white sticky top-0 z-10"
       ref={toolbarRef}
     >
-      {/* Undo/Redo */}
+      {/* Undo/Redo - Hidden on mobile */}
       <Button
         variant="ghost"
         size="sm"
@@ -222,7 +222,7 @@ export default function ToolbarPlugin() {
           editor.dispatchCommand(UNDO_COMMAND, undefined);
         }}
         disabled={!canUndo}
-        className="h-8 w-8 p-0"
+        className="hidden md:flex h-8 w-8 p-0"
         aria-label="Undo"
       >
         <Undo2 className="h-4 w-4" />
@@ -234,13 +234,13 @@ export default function ToolbarPlugin() {
           editor.dispatchCommand(REDO_COMMAND, undefined);
         }}
         disabled={!canRedo}
-        className="h-8 w-8 p-0"
+        className="hidden md:flex h-8 w-8 p-0"
         aria-label="Redo"
       >
         <Redo2 className="h-4 w-4" />
       </Button>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="hidden md:block mx-1 h-6" />
 
       {/* Text Formatting */}
       <Button
@@ -343,10 +343,10 @@ export default function ToolbarPlugin() {
         <Quote className="h-4 w-4" />
       </Button>
 
-      <Separator orientation="vertical" className="mx-1 h-6" />
+      <Separator orientation="vertical" className="hidden md:block mx-1 h-6" />
 
-      {/* Link */}
-      <div className="relative">
+      {/* Link - Hidden on mobile */}
+      <div className="relative hidden md:block">
         <Button
           variant="ghost"
           size="sm"
