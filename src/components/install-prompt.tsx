@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Share } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -118,17 +119,9 @@ export default function InstallPrompt() {
                 <p className="text-sm text-white/90">
                   Tap the Share button{" "}
                   <span className="inline-flex items-center justify-center w-6 h-6 bg-white/20 rounded mx-1">
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M16.5 6.5V3H7.5v3.5H4v17h16v-17h-3.5zM9 4.5h6v2H9v-2zm9.5 15h-13v-14h13v14z" />
-                      <path d="M12 7.5l-4 4h2.5V15h3v-3.5H16l-4-4z" />
-                    </svg>
+                    <Share className="w-4 h-4 text-white" />
                   </span>{" "}
-                  at the bottom of your screen, then tap &quot;Add to Home
-                  Screen&quot;
+                  and scroll down to select &quot;Add to Home Screen&quot;
                 </p>
               </>
             ) : (
