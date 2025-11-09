@@ -5,7 +5,6 @@ import LoginMarketing from "./login.marketing";
 import LoginForm from "./login.form";
 import { LoginContent } from "@/utils/extractors/login.extractor";
 import Footer from "../(marketing)/footer";
-import InstallPrompt from "@/components/install-prompt";
 
 interface LoginClientProps {
   loginContent: LoginContent;
@@ -42,7 +41,6 @@ export default function LoginClient({ loginContent }: LoginClientProps) {
         />
       </div>
       <Footer />
-      <InstallPrompt />
     </>
   );
 }

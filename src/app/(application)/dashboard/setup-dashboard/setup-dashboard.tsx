@@ -320,7 +320,7 @@ export function SetupDashboard({
     goalsContent = (
       <p className="text-sm text-gray-600 flex items-center gap-2 mt-6">
         <span>⏳</span>
-        <span>Your coach is setting up your personalized goals</span>
+        <span>Your coach is setting up your personalised goals</span>
       </p>
     );
   }
@@ -395,7 +395,7 @@ export function SetupDashboard({
             stepNumber={4}
             status={routineStatus}
             title="Get Your Custom Routine"
-            description="Receive your personalized morning and evening skincare routine with product recommendations."
+            description="Receive your personalised morning and evening skincare routine with product recommendations."
             variant={routineVariant}
             onRefresh={
               routineStatus === "waiting" ? handleRefreshRoutine : undefined

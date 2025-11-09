@@ -67,7 +67,7 @@ export function SupportFeedback({}: SupportFeedbackProps) {
           <div className="mt-6">
             <p className="text-gray-700 leading-relaxed">
               Your dedicated skincare coach who will guide you through your
-              personalized routine, answer your questions, and help you achieve
+              personalised routine, answer your questions, and help you achieve
               your skincare goals.
             </p>
           </div>

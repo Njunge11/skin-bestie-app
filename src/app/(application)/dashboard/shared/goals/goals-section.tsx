@@ -178,7 +178,7 @@ export function GoalsSection({
                       </label>
                       <Textarea
                         id="new-goal"
-                        placeholder="Enter the clients goal"
+                        placeholder="Enter goal"
                         value={newGoalData.description}
                         onChange={(e) =>
                           setNewGoalData({

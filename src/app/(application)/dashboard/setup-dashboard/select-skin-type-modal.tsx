@@ -25,6 +25,7 @@ const skinTypes = [
   { value: "oily", label: "Oily" },
   { value: "combination", label: "Combination" },
   { value: "sensitive", label: "Sensitive" },
+  { value: "normal", label: "Normal" },
 ];
 
 export function SelectSkinTypeModal({

@@ -18,7 +18,7 @@ interface SkinTestModalProps {
 const steps = [
   {
     number: 1,
-    text: "Wash your face with lukewarm water (or if you have any makeup, use a very gentle cleanser to get any makeup off",
+    text: "Wash your face with lukewarm water (or if you have any makeup, use a very gentle cleanser to get any makeup off)",
   },
   {
     number: 2,

@@ -249,8 +249,8 @@ export function ReviewGoalsModal({
             Your Skin Goals
           </DialogTitle>
           <DialogDescription className="text-base text-gray-600 text-center">
-            Track your progress and manage your personalized skincare goals.
-            Drag to reorder by priority.
+            Here are the goals discussed with Coach Benji, confirm if they are
+            correct or make any changes to make sure they are accurate.
           </DialogDescription>
         </DialogHeader>
 

@@ -71,7 +71,7 @@ export function ShareFeedback() {
       <div>
         <h3 className="font-bold text-gray-900 mb-2">Share Other Feedback</h3>
         <Textarea
-          placeholder="Placeholder"
+          placeholder="Share your thoughts or any concerns you have..."
           value={otherFeedback}
           onChange={(e) => setOtherFeedback(e.target.value)}
           className="min-h-[120px] bg-gray-50"

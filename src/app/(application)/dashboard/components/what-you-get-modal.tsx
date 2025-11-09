@@ -2,12 +2,12 @@
 
 import {
   Package,
-  ClipboardList,
+  Clock,
+  Phone,
+  MessageCircle,
   TrendingUp,
-  Camera,
-  MessageSquare,
   BookOpen,
-  Award,
+  Users,
   X,
 } from "lucide-react";
 import {
@@ -26,40 +26,28 @@ interface WhatYouGetModalProps {
 
 const features = [
   {
-    icon: ClipboardList,
-    title: "Personalized Routines",
-    description:
-      "Custom morning and evening skincare routines tailored to your unique skin type, concerns and goals.",
+    icon: Clock,
+    title: "Personalised routine within 24 hours",
+  },
+  {
+    icon: Phone,
+    title: "Monthly coaching call",
+  },
+  {
+    icon: MessageCircle,
+    title: "Weekly WhatsApp check-ins",
   },
   {
     icon: TrendingUp,
-    title: "Daily Progress Tracking",
-    description:
-      "Custom morning and evening skincare routines tailored to your unique skin type, concerns and goals.",
-  },
-  {
-    icon: Camera,
-    title: "Before/After Photos",
-    description:
-      "Custom morning and evening skincare routines tailored to your unique skin type, concerns and goals.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Expert Coach Support",
-    description:
-      "Custom morning and evening skincare routines tailored to your unique skin type, concerns and goals.",
+    title: "Interactive progress tracker",
   },
   {
     icon: BookOpen,
-    title: "Skin Journey Journal",
-    description:
-      "Custom morning and evening skincare routines tailored to your unique skin type, concerns and goals.",
+    title: "Reflection journal",
   },
   {
-    icon: Award,
-    title: "Achievement Tracking",
-    description:
-      "Custom morning and evening skincare routines tailored to your unique skin type, concerns and goals.",
+    icon: Users,
+    title: "Supportive community",
   },
 ];
 
@@ -106,10 +94,9 @@ export function WhatYouGetModal({ open, onOpenChange }: WhatYouGetModalProps) {
                   <Icon className="h-5 w-5 text-white" />
                 </div>
                 <div className="flex-1 self-center">
-                  <h3 className="font-bold text-sm text-gray-700 mb-1">
+                  <h3 className="font-semibold text-base text-gray-900">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-gray-700">{feature.description}</p>
                 </div>
               </div>
             );

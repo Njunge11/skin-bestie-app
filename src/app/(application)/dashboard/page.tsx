@@ -7,6 +7,7 @@ import { SubscriberDashboard } from "./subscriber-dashboard";
 import { ErrorFeedback } from "../components";
 import { useDashboard } from "./hooks/use-dashboard";
 import { type DashboardResponse, type User } from "./schemas";
+import InstallPrompt from "@/components/install-prompt";
 
 function getGreeting(nickname: string): string {
   if (nickname) {
@@ -113,27 +114,33 @@ export default function DashboardPage() {
   }
 
   return (
-    <div
-      className={`mx-auto w-full max-w-3xl ${error ? "flex items-center justify-center min-h-[calc(100vh-8rem)]" : "space-y-6"}`}
-    >
-      {error ? (
-        content
-      ) : (
-        <>
-          {/* Header - only show for setup dashboard */}
-          {!isSetupComplete && dashboard && (
-            <header className="pt-4">
-              <h1 className="text-2xl font-bold text-gray-900">{greeting}</h1>
-              <p className="text-lg text-gray-600 mt-2">
-                Let&apos;s set up your personalized skin transformation journey
-              </p>
-            </header>
-          )}
+    <>
+      {/* PWA Install Prompt - only show when not in error state */}
+      {!error && dashboard && <InstallPrompt />}
 
-          {/* Content */}
-          {content}
-        </>
-      )}
-    </div>
+      <div
+        className={`mx-auto w-full max-w-3xl ${error ? "flex items-center justify-center min-h-[calc(100vh-8rem)]" : "space-y-6"}`}
+      >
+        {error ? (
+          content
+        ) : (
+          <>
+            {/* Header - only show for setup dashboard */}
+            {!isSetupComplete && dashboard && (
+              <header className="pt-4">
+                <h1 className="text-2xl font-bold text-gray-900">{greeting}</h1>
+                <p className="text-lg text-gray-600 mt-2">
+                  Let&apos;s set up your personalised skin transformation
+                  journey
+                </p>
+              </header>
+            )}
+
+            {/* Content */}
+            {content}
+          </>
+        )}
+      </div>
+    </>
   );
 }

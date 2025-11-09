@@ -77,7 +77,7 @@ export function ViewRoutineModal({
             Your Custom Routine
           </DialogTitle>
           <DialogDescription className="text-base text-gray-600 text-center">
-            Your personalized skincare routine tailored to your needs
+            Your personalised skincare routine tailored to your needs
           </DialogDescription>
         </DialogHeader>
 

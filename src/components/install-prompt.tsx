@@ -103,57 +103,69 @@ export default function InstallPrompt() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-50">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <h3 className="font-semibold text-lg mb-1">Install SkinBestie</h3>
-          {isIOS ? (
-            <p className="text-sm text-gray-600">
-              Tap the share button{" "}
-              <span className="inline-block">
-                <svg
-                  className="w-4 h-4 inline"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-6">
+      <div className="bg-gradient-to-r from-[#235588] to-[#1a4066] rounded-lg p-4 shadow-md">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            {isIOS ? (
+              <>
+                <h3 className="font-semibold text-base text-white mb-1">
+                  Install for Quick Access
+                </h3>
+                <p className="text-sm text-white/90">
+                  Tap{" "}
+                  <span className="inline-flex items-center justify-center w-5 h-5 bg-white/20 rounded mx-1">
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                    </svg>
+                  </span>{" "}
+                  then &quot;Add to Home Screen&quot; to access your routine
+                  instantly
+                </p>
+              </>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base text-white mb-1">
+                    Get the App
+                  </h3>
+                  <p className="text-sm text-white/90">
+                    Install for quick access to your skincare routine
+                  </p>
+                </div>
+                <button
+                  onClick={handleInstallClick}
+                  className="bg-white text-[#235588] px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-50 transition-colors whitespace-nowrap"
                 >
-                  <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-                </svg>
-              </span>{" "}
-              and select &quot;Add to Home Screen&quot;
-            </p>
-          ) : (
-            <>
-              <p className="text-sm text-gray-600 mb-3">
-                Get quick access to your skincare routine anytime
-              </p>
-              <button
-                onClick={handleInstallClick}
-                className="bg-[#235588] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#1a4066] transition-colors"
-              >
-                Install App
-              </button>
-            </>
-          )}
-        </div>
-        <button
-          onClick={handleDismiss}
-          className="text-gray-400 hover:text-gray-600"
-          aria-label="Dismiss"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+                  Install
+                </button>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={handleDismiss}
+            className="text-white/70 hover:text-white transition-colors flex-shrink-0"
+            aria-label="Dismiss"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );
