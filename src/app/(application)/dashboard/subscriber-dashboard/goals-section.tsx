@@ -41,6 +41,11 @@ export function GoalsSection({
     >
       <CardHeader className={cn(noPadding && "p-0")}>
         <CardTitle className="text-xl font-bold">My Goals</CardTitle>
+        <p className="text-sm text-gray-600 mt-2">
+          Track your skincare goals. Click any goal to edit or delete it, drag
+          to reorder, and set one as your primary focus to prioritise your
+          efforts.
+        </p>
       </CardHeader>
       <CardContent className={cn(noPadding && "p-0")}>
         <FeatureGoalsSection

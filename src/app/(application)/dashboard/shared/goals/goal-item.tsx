@@ -101,7 +101,7 @@ export function GoalItem({
                 htmlFor={`edit-goal-primary-${goal.id}`}
                 className="text-sm font-medium"
               >
-                Make this the main focus
+                Make primary focus
               </Label>
               <p className="text-xs text-gray-500">
                 Mark this as the top priority goal to work on
@@ -142,7 +142,10 @@ export function GoalItem({
       {...listeners}
       onClick={handleStartEdit}
       className={cn(
-        "flex flex-col gap-3 rounded-lg border border-gray-200 p-6 transition-all hover:border-gray-300 cursor-pointer bg-skinbestie-primary-light",
+        "flex flex-col gap-3 rounded-lg border p-6 transition-all hover:border-gray-300 cursor-pointer",
+        goal.isPrimaryGoal
+          ? "bg-skinbestie-landing-yellow/20 border-skinbestie-landing-yellow"
+          : "bg-skinbestie-primary-light border-gray-200",
         isDragging && "opacity-50 cursor-grabbing",
         backgroundColor && backgroundColor,
       )}
@@ -235,18 +238,30 @@ export function GoalItem({
               </p>
             </div>
 
-            {/* Main focus badge below description */}
-            {goal.isPrimaryGoal && (
-              <div
-                key="primary-badge"
-                className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-skinbestie-primary mt-2 w-fit"
+            {/* Main focus switch below description */}
+            <div
+              key="main-focus-switch"
+              className="flex items-center gap-2 mt-3"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Switch
+                id={`goal-primary-${goal.id}`}
+                checked={goal.isPrimaryGoal ?? false}
+                onCheckedChange={(checked) => {
+                  onEdit(goal.id, {
+                    description: goal.description,
+                    isPrimaryGoal: checked,
+                  });
+                }}
+                className="data-[state=checked]:bg-skinbestie-primary"
+              />
+              <Label
+                htmlFor={`goal-primary-${goal.id}`}
+                className="text-sm font-medium cursor-pointer"
               >
-                <Star className="w-4 h-4 text-white fill-white" />
-                <span className="text-xs font-medium text-white">
-                  Main Focus
-                </span>
-              </div>
-            )}
+                Make primary focus
+              </Label>
+            </div>
 
             {goal.completedAt && (
               <p key="completed-date" className="text-xs text-gray-400 mt-1">
