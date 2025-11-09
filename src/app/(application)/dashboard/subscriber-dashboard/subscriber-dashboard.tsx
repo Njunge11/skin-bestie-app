@@ -308,30 +308,30 @@ export function SubscriberDashboard({
             value={`${stats.currentStreak.days} days`}
             subtitle="Consecutive days active"
             icon={Flame}
-            iconColor="red"
-            iconBgColor="bg-red-50"
+            iconColor="pink"
+            iconBgColor="bg-pink-50"
           />
           <MetricCard
             label="Today's Progress"
             value={`${stats.todayProgress.percentage}%`}
             subtitle={`${stats.todayProgress.completed} of ${stats.todayProgress.total} steps completed`}
             icon={Target}
-            iconColor="purple"
-            iconBgColor="bg-purple-50"
+            iconColor="blue"
+            iconBgColor="bg-blue-50"
             showProgressBar={true}
             progressPercentage={stats.todayProgress.percentage}
-            progressBarColor="bg-purple-500"
+            progressBarColor="bg-skinbestie-landing-blue"
           />
           <MetricCard
             label="This Week"
             value={`${stats.weeklyCompliance.percentage.toFixed(1)}%`}
             subtitle={`${stats.weeklyCompliance.completed} of ${stats.weeklyCompliance.total} steps completed`}
             icon={CalendarCheck}
-            iconColor="cyan"
-            iconBgColor="bg-cyan-50"
+            iconColor="yellow"
+            iconBgColor="bg-yellow-50"
             showProgressBar={true}
             progressPercentage={stats.weeklyCompliance.percentage}
-            progressBarColor="bg-cyan-500"
+            progressBarColor="bg-skinbestie-landing-yellow"
           />
         </div>
       ) : (

@@ -87,6 +87,7 @@ export function JournalContentHeader({
                   size="icon"
                   onClick={onDelete}
                   className="text-gray-400 hover:text-red-600"
+                  aria-label="Delete journal entry"
                 >
                   <Trash2 className="h-5 w-5" />
                 </Button>

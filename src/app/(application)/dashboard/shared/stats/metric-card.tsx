@@ -15,7 +15,7 @@ interface MetricCardProps {
   subtitle?: string;
   encouragement?: string;
   icon: LucideIcon;
-  iconColor: "red" | "purple" | "cyan";
+  iconColor: "red" | "purple" | "cyan" | "pink" | "yellow" | "blue" | "green";
   iconBgColor: string;
   showProgressBar?: boolean;
   progressPercentage?: number;
@@ -38,6 +38,10 @@ export function MetricCard({
     red: "text-red-500",
     purple: "text-purple-500",
     cyan: "text-cyan-500",
+    pink: "text-skinbestie-landing-pink",
+    yellow: "text-skinbestie-landing-yellow",
+    blue: "text-skinbestie-landing-blue",
+    green: "text-skinbestie-landing-green",
   }[iconColor];
 
   return (
