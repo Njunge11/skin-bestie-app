@@ -146,12 +146,14 @@ function EmailForm({
       // Step 3: Profile is complete - send verification email
       await sendVerificationEmail(email);
 
-      // Also trigger NextAuth magic link (for both options)
-      await signIn("resend", {
-        email,
-        redirect: false,
-        callbackUrl: "/",
-      });
+      // Optionally send magic link if enabled
+      if (process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK === "true") {
+        await signIn("resend", {
+          email,
+          redirect: false,
+          callbackUrl: "/",
+        });
+      }
 
       // Move to code input screen
       onEmailSubmitted(email);
@@ -230,6 +232,9 @@ function CodeInputScreen({ email }: { email: string }) {
   const [resending, setResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
 
+  const magicLinkEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK === "true";
+
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code || code.length !== 6 || loading) return;
@@ -273,12 +278,14 @@ function CodeInputScreen({ email }: { email: string }) {
     try {
       await sendVerificationEmail(email);
 
-      // Also resend magic link
-      await signIn("resend", {
-        email,
-        redirect: false,
-        callbackUrl: "/",
-      });
+      // Optionally resend magic link if enabled
+      if (process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK === "true") {
+        await signIn("resend", {
+          email,
+          redirect: false,
+          callbackUrl: "/",
+        });
+      }
 
       setResendSuccess(true);
       setTimeout(() => setResendSuccess(false), 3000);
@@ -312,11 +319,15 @@ function CodeInputScreen({ email }: { email: string }) {
           Check your email
         </h2>
         <p className="text-base text-[#3F4548] max-w-md">
-          We've sent a sign-in link and 6-digit code to{" "}
+          {magicLinkEnabled
+            ? `We've sent a sign-in link and 6-digit code to `
+            : `We've sent a 6-digit code to `}
           <strong>{email}</strong>
         </p>
         <p className="text-sm text-[#3F4548]">
-          Click the link or enter your code below to continue
+          {magicLinkEnabled
+            ? "Click the link or enter your code below to continue"
+            : "Enter your code below to continue"}
         </p>
       </div>
 
