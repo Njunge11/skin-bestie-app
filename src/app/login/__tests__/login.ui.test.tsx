@@ -717,3 +717,169 @@ describe("Login - Loading States", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("Login - Magic Link Toggle", () => {
+  beforeEach(() => {
+    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
+      exists: true,
+      isCompleted: true,
+      completedSteps: [
+        "PERSONAL",
+        "SKIN_TYPE",
+        "SKIN_CONCERNS",
+        "ALLERGIES",
+        "SUBSCRIPTION",
+        "BOOKING",
+      ],
+    });
+
+    vi.mocked(mockAuthApi.sendVerificationEmail).mockResolvedValue();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+    resetMockState();
+    clearAllMocks();
+    vi.clearAllMocks();
+    delete process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK;
+  });
+
+  it('shows only verification code message when magic link is disabled', async () => {
+    const user = userEvent.setup();
+
+    // Explicitly set to false (disabled)
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "false";
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Should show ONLY verification code message (no magic link mentioned)
+    expect(screen.getByText(/we've sent a 6-digit code to/i)).toBeInTheDocument();
+    expect(screen.getByText(/enter your code below to continue/i)).toBeInTheDocument();
+
+    // Should NOT mention magic link
+    expect(screen.queryByText(/sign-in link and/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/click the link/i)).not.toBeInTheDocument();
+
+    // Verify magic link was NOT sent (signIn for resend should not be called)
+    expect(mockSignIn).not.toHaveBeenCalledWith("resend", expect.anything());
+  });
+
+  it('shows both magic link and verification code message when enabled', async () => {
+    const user = userEvent.setup();
+
+    // Enable magic link
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "true";
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Should show BOTH magic link and verification code
+    expect(
+      screen.getByText(/we've sent a sign-in link and 6-digit code to/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/click the link or enter your code below to continue/i),
+    ).toBeInTheDocument();
+
+    // Verify magic link WAS sent
+    expect(mockSignIn).toHaveBeenCalledWith("resend", {
+      email: "complete@example.com",
+      redirect: false,
+      callbackUrl: "/",
+    });
+  });
+
+  it('sends magic link on resend when enabled', async () => {
+    const user = userEvent.setup();
+
+    // Enable magic link
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "true";
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Clear mock to check resend call
+    mockSignIn.mockClear();
+
+    // User clicks resend
+    await user.click(screen.getByRole("button", { name: /resend email/i }));
+
+    // Verify magic link was sent again
+    await waitFor(() => {
+      expect(mockSignIn).toHaveBeenCalledWith("resend", {
+        email: "complete@example.com",
+        redirect: false,
+        callbackUrl: "/",
+      });
+    });
+  });
+
+  it('does NOT send magic link on resend when disabled', async () => {
+    const user = userEvent.setup();
+
+    // Disable magic link
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "false";
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // User clicks resend
+    await user.click(screen.getByRole("button", { name: /resend email/i }));
+
+    // Wait for resend to complete
+    expect(
+      await screen.findByText(/code sent! check your email/i),
+    ).toBeInTheDocument();
+
+    // Verify magic link was NOT sent
+    expect(mockSignIn).not.toHaveBeenCalled();
+
+    // But verification email was sent
+    expect(mockAuthApi.sendVerificationEmail).toHaveBeenCalledTimes(2);
+  });
+});
