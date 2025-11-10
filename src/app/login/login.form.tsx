@@ -375,7 +375,7 @@ function CodeInputScreen({ email }: { email: string }) {
         )}
 
         {resendSuccess && (
-          <p className="text-sm text-green-600 text-center">
+          <p className="text-sm text-[#3F4548] text-center">
             Code sent! Check your email.
           </p>
         )}
