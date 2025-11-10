@@ -1,102 +1,234 @@
-// MSW handlers for NextAuth authentication endpoints
+// MSW handlers for mock auth API endpoints
 import { http, HttpResponse } from "msw";
 
-// Track email sending state for testing
-let emailSentTo: string | null = null;
-let shouldFailNextRequest = false;
+// Mock user database (matching our mock-auth-api.ts)
+const MOCK_USERS: Record<
+  string,
+  {
+    exists: boolean;
+    isCompleted: boolean;
+    completedSteps: string[];
+  }
+> = {
+  "complete@example.com": {
+    exists: true,
+    isCompleted: true,
+    completedSteps: [
+      "PERSONAL",
+      "SKIN_TYPE",
+      "SKIN_CONCERNS",
+      "ALLERGIES",
+      "SUBSCRIPTION",
+      "BOOKING",
+    ],
+  },
+  "njungedev@gmail.com": {
+    exists: true,
+    isCompleted: true,
+    completedSteps: [
+      "PERSONAL",
+      "SKIN_TYPE",
+      "SKIN_CONCERNS",
+      "ALLERGIES",
+      "SUBSCRIPTION",
+      "BOOKING",
+    ],
+  },
+  "njunge@mitalabs.dev": {
+    exists: true,
+    isCompleted: true,
+    completedSteps: [
+      "PERSONAL",
+      "SKIN_TYPE",
+      "SKIN_CONCERNS",
+      "ALLERGIES",
+      "SUBSCRIPTION",
+      "BOOKING",
+    ],
+  },
+  "incomplete@example.com": {
+    exists: true,
+    isCompleted: false,
+    completedSteps: ["PERSONAL", "SKIN_TYPE"],
+  },
+  "newuser@example.com": {
+    exists: false,
+    isCompleted: false,
+    completedSteps: [],
+  },
+};
+
+// Mock verification codes storage
+const mockCodes = new Map<
+  string,
+  { code: string; expiresAt: Date; used: boolean }
+>();
+
+// Test control flags
+let shouldFailProfileCheck = false;
+let shouldFailVerification = false;
+let shouldReturnExpiredCode = false;
 
 export const handlers = [
-  // POST /api/auth/signin/resend - Request magic link
-  http.post("/api/auth/signin/resend", async ({ request }) => {
-    const formData = await request.formData();
-    const email = formData.get("email") as string;
+  // Mock checkProfileStatus
+  http.get("/api/mock-auth/profile-status", ({ request }) => {
+    const url = new URL(request.url);
+    const email = url.searchParams.get("email");
 
-    // Simulate network error if flag is set
-    if (shouldFailNextRequest) {
-      shouldFailNextRequest = false;
+    if (shouldFailProfileCheck) {
       return HttpResponse.error();
     }
 
-    // Check if email exists in the system (simulate user check)
-    if (email === "newuser@example.com") {
-      // User doesn't exist - should not allow sign in
+    if (!email) {
       return HttpResponse.json(
-        {
-          error: "User not found",
-          url: "/login?error=UserNotFound",
-        },
-        { status: 401 },
+        { error: "Email is required" },
+        { status: 400 },
       );
     }
 
-    // Simulate successful email send with delay
+    const user = MOCK_USERS[email] || {
+      exists: false,
+      isCompleted: false,
+      completedSteps: [],
+    };
+
+    return HttpResponse.json(user);
+  }),
+
+  // Mock sendVerificationEmail
+  http.post("/api/mock-auth/send-code", async ({ request }) => {
+    const { email } = (await request.json()) as { email: string };
+
+    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // Store the email that was sent to
-    emailSentTo = email;
+    // Generate verification code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000);
 
-    // Return success response
+    mockCodes.set(email, { code, expiresAt, used: false });
+
+    return HttpResponse.json({ success: true });
+  }),
+
+  // Mock verifyCode
+  http.post("/api/mock-auth/verify-code", async ({ request }) => {
+    const { email, code } = (await request.json()) as {
+      email: string;
+      code: string;
+    };
+
+    if (shouldFailVerification) {
+      return HttpResponse.json(
+        {
+          success: false,
+          error: "Something went wrong. Please try again.",
+        },
+        { status: 500 },
+      );
+    }
+
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const stored = mockCodes.get(email);
+
+    if (!stored) {
+      return HttpResponse.json({
+        success: false,
+        error: "No verification code found. Please request a new one.",
+      });
+    }
+
+    // Check if expired (or force expired for testing)
+    if (shouldReturnExpiredCode || new Date() > stored.expiresAt) {
+      mockCodes.delete(email);
+      return HttpResponse.json({
+        success: false,
+        error: "This code has expired. Please request a new one.",
+      });
+    }
+
+    // Check if already used
+    if (stored.used) {
+      return HttpResponse.json({
+        success: false,
+        error: "This code has already been used. Please request a new one.",
+      });
+    }
+
+    // Check if code matches
+    if (stored.code !== code) {
+      return HttpResponse.json({
+        success: false,
+        error: "Invalid code. Please check and try again.",
+      });
+    }
+
+    // Mark as used
+    stored.used = true;
+    mockCodes.set(email, stored);
+
+    return HttpResponse.json({ success: true });
+  }),
+
+  // Mock NextAuth signIn for verification-code provider
+  http.post("/api/auth/signin/verification-code", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
     return HttpResponse.json({
       ok: true,
       status: 200,
-      url: `/verify-request?provider=resend&type=email`,
+      url: "/dashboard",
     });
   }),
 
-  // GET /api/auth/session - Get current session
+  // Mock NextAuth signIn for resend provider (magic link)
+  http.post("/api/auth/signin/resend", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    return HttpResponse.json({
+      ok: true,
+      status: 200,
+      url: "/verify-request",
+    });
+  }),
+
+  // Mock NextAuth session
   http.get("/api/auth/session", () => {
-    // Return null session for unauthenticated users
     return HttpResponse.json({
       user: null,
       expires: null,
     });
   }),
 
-  // GET /api/auth/providers - Get available providers
-  http.get("/api/auth/providers", () => {
-    return HttpResponse.json({
-      resend: {
-        id: "resend",
-        name: "Email",
-        type: "email",
-        signinUrl: "/api/auth/signin/resend",
-        callbackUrl: "/api/auth/callback/resend",
-      },
-    });
-  }),
-
-  // GET /api/auth/csrf - Get CSRF token
+  // Mock NextAuth CSRF
   http.get("/api/auth/csrf", () => {
     return HttpResponse.json({
       csrfToken: "test-csrf-token-12345",
     });
   }),
-
-  // Simulate magic link callback (for testing redirect after auth)
-  http.get("/api/auth/callback/resend", ({ request }) => {
-    const url = new URL(request.url);
-    const token = url.searchParams.get("token");
-    const email = url.searchParams.get("email");
-
-    if (token && email) {
-      // Simulate successful authentication
-      return HttpResponse.redirect("/", 302);
-    }
-
-    return HttpResponse.json({ error: "Invalid token" }, { status: 400 });
-  }),
 ];
 
 // Helper functions for tests
-export function getLastEmailSent() {
-  return emailSentTo;
+export function resetMockState() {
+  mockCodes.clear();
+  shouldFailProfileCheck = false;
+  shouldFailVerification = false;
+  shouldReturnExpiredCode = false;
 }
 
-export function resetEmailState() {
-  emailSentTo = null;
-  shouldFailNextRequest = false;
+export function setProfileCheckToFail() {
+  shouldFailProfileCheck = true;
 }
 
-export function setNextRequestToFail() {
-  shouldFailNextRequest = true;
+export function setVerificationToFail() {
+  shouldFailVerification = true;
+}
+
+export function setCodeToExpired() {
+  shouldReturnExpiredCode = true;
+}
+
+export function getStoredCodeForEmail(email: string): string | null {
+  const stored = mockCodes.get(email);
+  return stored ? stored.code : null;
 }
