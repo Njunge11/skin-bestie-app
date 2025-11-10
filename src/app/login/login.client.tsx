@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import LoginMarketing from "./login.marketing";
 import LoginForm from "./login.form";
 import { LoginContent } from "@/utils/extractors/login.extractor";
@@ -11,19 +10,6 @@ interface LoginClientProps {
 }
 
 export default function LoginClient({ loginContent }: LoginClientProps) {
-  const [emailSent, setEmailSent] = useState(false);
-  const [email, setEmail] = useState("");
-
-  const handleEmailSent = (sentEmail: string) => {
-    setEmail(sentEmail);
-    setEmailSent(true);
-  };
-
-  const handleBackToLogin = () => {
-    setEmailSent(false);
-    setEmail("");
-  };
-
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 md:h-[784px]">
@@ -32,10 +18,10 @@ export default function LoginClient({ loginContent }: LoginClientProps) {
           backgroundImage={loginContent.backgroundImage}
         />
         <LoginForm
-          emailSent={emailSent}
-          email={email}
-          onEmailSent={handleEmailSent}
-          onBackToLogin={handleBackToLogin}
+          emailSent={false}
+          email=""
+          onEmailSent={() => {}}
+          onBackToLogin={() => {}}
           formHeading={loginContent.formHeading}
           formSubheading={loginContent.formSubheading}
         />
