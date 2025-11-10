@@ -325,7 +325,6 @@ function CodeInputScreen({ email }: { email: string }) {
       }
 
       setResendSuccess(true);
-      setTimeout(() => setResendSuccess(false), 3000);
     } catch {
       setError("Failed to resend. Please try again.");
     } finally {
@@ -409,7 +408,7 @@ function CodeInputScreen({ email }: { email: string }) {
         </div>
 
         {resendSuccess && (
-          <p className="text-sm text-[#3F4548] text-center">
+          <p className="text-sm text-green-600 text-center animate-in fade-in slide-in-from-top-2 duration-300">
             Code sent! Check your email.
           </p>
         )}

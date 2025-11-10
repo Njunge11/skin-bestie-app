@@ -102,10 +102,14 @@ describe("Login - Happy Path Workflows", () => {
     resetMockState();
     clearAllMocks();
     vi.clearAllMocks();
+    delete process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK;
   });
 
   it("user successfully logs in with verification code and is redirected to dashboard", async () => {
     const user = userEvent.setup();
+
+    // Disable magic link for this test
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "false";
 
     render(<LoginClient loginContent={mockLoginContent} />);
 
@@ -127,7 +131,13 @@ describe("Login - Happy Path Workflows", () => {
       await screen.findByRole("heading", { name: /check your email/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/we've sent a 6-digit code to/i),
+      screen.getByText((content, element) => {
+        const hasText = element?.textContent?.includes(
+          "We've sent a 6-digit code to",
+        );
+        const isCorrectElement = element?.tagName?.toLowerCase() === "p";
+        return (hasText && isCorrectElement) ?? false;
+      }),
     ).toBeInTheDocument();
     expect(screen.getByText("complete@example.com")).toBeInTheDocument();
 
@@ -928,7 +938,13 @@ describe("Login - Magic Link Toggle", () => {
 
     // Should show ONLY verification code message (no magic link mentioned)
     expect(
-      screen.getByText(/we've sent a 6-digit code to/i),
+      screen.getByText((content, element) => {
+        const hasText = element?.textContent?.includes(
+          "We've sent a 6-digit code to",
+        );
+        const isCorrectElement = element?.tagName?.toLowerCase() === "p";
+        return (hasText && isCorrectElement) ?? false;
+      }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/enter your code below to continue/i),
@@ -964,7 +980,13 @@ describe("Login - Magic Link Toggle", () => {
 
     // Should show BOTH magic link and verification code
     expect(
-      screen.getByText(/we've sent a sign-in link and 6-digit code to/i),
+      screen.getByText((content, element) => {
+        const hasText = element?.textContent?.includes(
+          "We've sent a sign-in link and 6-digit code to",
+        );
+        const isCorrectElement = element?.tagName?.toLowerCase() === "p";
+        return (hasText && isCorrectElement) ?? false;
+      }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/click the link or enter your code below to continue/i),
