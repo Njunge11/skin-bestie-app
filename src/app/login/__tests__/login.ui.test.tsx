@@ -51,14 +51,16 @@ vi.mock("@/lib/mock-auth-api", () => ({
   verifyCode: vi.fn(),
 }));
 
-describe("Login - Happy Path Workflows", () => {
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "warn" });
-  });
+// Global server setup - only start/stop once for all tests
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: "warn" });
+});
 
-  afterAll(() => {
-    server.close();
-  });
+afterAll(() => {
+  server.close();
+});
+
+describe("Login - Happy Path Workflows", () => {
 
   beforeEach(() => {
     // Setup default successful responses
@@ -152,14 +154,6 @@ describe("Login - Happy Path Workflows", () => {
 });
 
 describe("Login - Onboarding Blocked Workflows", () => {
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "warn" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   beforeEach(() => {
     vi.mocked(mockAuthApi.sendVerificationEmail).mockResolvedValue();
   });
@@ -246,14 +240,6 @@ describe("Login - Onboarding Blocked Workflows", () => {
 });
 
 describe("Login - Error Recovery Workflows", () => {
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "warn" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   beforeEach(() => {
     vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
       exists: true,
@@ -414,14 +400,6 @@ describe("Login - Error Recovery Workflows", () => {
 });
 
 describe("Login - Resend Code Workflow", () => {
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "warn" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   beforeEach(() => {
     vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
       exists: true,
@@ -486,14 +464,6 @@ describe("Login - Resend Code Workflow", () => {
 });
 
 describe("Login - Navigation and Validation", () => {
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "warn" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   beforeEach(() => {
     vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
       exists: true,
@@ -631,14 +601,6 @@ describe("Login - Navigation and Validation", () => {
 });
 
 describe("Login - Loading States", () => {
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "warn" });
-  });
-
-  afterAll(() => {
-    server.close();
-  });
-
   beforeEach(() => {
     vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
       exists: true,
