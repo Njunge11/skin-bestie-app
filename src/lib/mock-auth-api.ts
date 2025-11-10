@@ -17,6 +17,30 @@ const MOCK_USERS = {
       "BOOKING",
     ],
   },
+  "njungedev@gmail.com": {
+    exists: true,
+    isCompleted: true,
+    completedSteps: [
+      "PERSONAL",
+      "SKIN_TYPE",
+      "SKIN_CONCERNS",
+      "ALLERGIES",
+      "SUBSCRIPTION",
+      "BOOKING",
+    ],
+  },
+  "njunge@mitalabs.dev": {
+    exists: true,
+    isCompleted: true,
+    completedSteps: [
+      "PERSONAL",
+      "SKIN_TYPE",
+      "SKIN_CONCERNS",
+      "ALLERGIES",
+      "SUBSCRIPTION",
+      "BOOKING",
+    ],
+  },
   "incomplete@example.com": {
     exists: true,
     isCompleted: false,
