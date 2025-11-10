@@ -126,14 +126,8 @@ function EmailForm({
       const profileStatus = await checkProfileStatus(email);
 
       // Step 2: Handle different scenarios
-      if (!profileStatus.exists) {
-        setError("No account found with this email. Please sign up first.");
-        setLoading(false);
-        return;
-      }
-
-      if (!profileStatus.isCompleted) {
-        // User exists but onboarding incomplete
+      if (!profileStatus.exists || !profileStatus.isCompleted) {
+        // User doesn't exist or hasn't completed onboarding
         onProfileBlocked(email, profileStatus);
         return;
       }
@@ -389,10 +383,6 @@ function OnboardingBlockedScreen({
 }) {
   const router = useRouter();
 
-  // Check if user has started onboarding (has at least one completed step)
-  const hasStartedOnboarding =
-    (profileStatus.completedSteps?.length || 0) > 0;
-
   return (
     <div className="flex flex-col items-center justify-center min-h-[21rem] space-y-6">
       {/* Warning Icon */}
@@ -413,9 +403,8 @@ function OnboardingBlockedScreen({
           Your email: <strong>{email}</strong>
         </p>
         <p className="text-base text-[#3F4548] max-w-md">
-          {hasStartedOnboarding
-            ? "You need to complete your onboarding to sign in. Please use the same mobile number and email you used in your first onboarding attempt."
-            : "You need to complete your onboarding to access your account."}
+          You need to complete your onboarding to sign in. Please use the same
+          mobile number and email in your onboarding.
         </p>
       </div>
 
