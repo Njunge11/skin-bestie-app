@@ -389,23 +389,9 @@ function OnboardingBlockedScreen({
 }) {
   const router = useRouter();
 
-  const missingSteps = [
-    "PERSONAL",
-    "SKIN_TYPE",
-    "SKIN_CONCERNS",
-    "ALLERGIES",
-    "SUBSCRIPTION",
-    "BOOKING",
-  ].filter((step) => !profileStatus.completedSteps?.includes(step));
-
-  const stepNames: Record<string, string> = {
-    PERSONAL: "Personal Details",
-    SKIN_TYPE: "Skin Type",
-    SKIN_CONCERNS: "Skin Concerns",
-    ALLERGIES: "Allergies",
-    SUBSCRIPTION: "Subscription",
-    BOOKING: "Booking",
-  };
+  // Check if user has started onboarding (has at least one completed step)
+  const hasStartedOnboarding =
+    (profileStatus.completedSteps?.length || 0) > 0;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[21rem] space-y-6">
@@ -421,29 +407,17 @@ function OnboardingBlockedScreen({
       {/* Title and Description */}
       <div className="text-center space-y-3">
         <h2 className="text-2xl font-semibold text-[#272B2D]">
-          Complete Your Profile
+          Complete Your Onboarding
         </h2>
         <p className="text-base text-[#3F4548]">
           Your email: <strong>{email}</strong>
         </p>
         <p className="text-base text-[#3F4548] max-w-md">
-          Please complete your onboarding to access your account.
+          {hasStartedOnboarding
+            ? "You need to complete your onboarding to sign in. Please use the same mobile number and email you used in your first onboarding attempt."
+            : "You need to complete your onboarding to access your account."}
         </p>
       </div>
-
-      {/* Missing Steps */}
-      {missingSteps.length > 0 && (
-        <div className="w-full bg-amber-50 border border-amber-200 rounded-md p-4">
-          <p className="text-sm font-medium text-amber-900 mb-2">
-            Missing steps:
-          </p>
-          <ul className="text-sm text-amber-800 space-y-1">
-            {missingSteps.map((step) => (
-              <li key={step}>• {stepNames[step]}</li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {/* Action Button */}
       <button
