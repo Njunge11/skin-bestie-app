@@ -130,7 +130,7 @@ function EmailForm({
       // Step 2: Handle different scenarios
       if (!profileStatus.exists) {
         setError(
-          "No account found with this email. If you mistyped, please try again. Otherwise, complete onboarding first.",
+          "We couldn't find an account with this email. Please check for typos and try again.",
         );
         setShowOnboardingLink(true);
         setLoading(false);
@@ -185,7 +185,7 @@ function EmailForm({
                 onClick={() => router.push("/onboarding")}
                 className="mt-2 w-full text-sm text-[#030303] font-semibold underline hover:text-[#222118] transition-colors"
               >
-                Complete onboarding
+                New to SkinBestie? Get started here
               </button>
             )}
           </div>
@@ -312,11 +312,11 @@ function CodeInputScreen({ email }: { email: string }) {
           Check your email
         </h2>
         <p className="text-base text-[#3F4548] max-w-md">
-          We sent a sign-in link and verification code to{" "}
+          We've sent a sign-in link and 6-digit code to{" "}
           <strong>{email}</strong>
         </p>
         <p className="text-sm text-[#3F4548]">
-          Click the link in your email or enter the code below:
+          Click the link or enter your code below to continue
         </p>
       </div>
 
@@ -357,7 +357,7 @@ function CodeInputScreen({ email }: { email: string }) {
                 onClick={handleRequestNewCode}
                 className="mt-2 w-full text-sm text-[#030303] font-semibold underline hover:text-[#222118] transition-colors"
               >
-                Request new code
+                Get a new code
               </button>
             )}
           </div>
@@ -365,7 +365,7 @@ function CodeInputScreen({ email }: { email: string }) {
 
         {resendSuccess && (
           <p className="text-sm text-green-600 text-center">
-            New code sent successfully!
+            Code sent! Check your email.
           </p>
         )}
 
@@ -417,14 +417,15 @@ function OnboardingBlockedScreen({
       {/* Title and Description */}
       <div className="text-center space-y-3">
         <h2 className="text-2xl font-semibold text-[#272B2D]">
-          Complete Your Onboarding
+          Almost there!
         </h2>
-        <p className="text-base text-[#3F4548]">
-          Your email: <strong>{email}</strong>
-        </p>
         <p className="text-base text-[#3F4548] max-w-md">
-          You need to complete your onboarding to sign in. Please use the same
-          mobile number and email in your onboarding.
+          Your account <strong>{email}</strong> needs to complete onboarding
+          before you can sign in.
+        </p>
+        <p className="text-sm text-[#3F4548] max-w-md">
+          Please use the same email and phone number when completing your
+          profile.
         </p>
       </div>
 
@@ -433,7 +434,7 @@ function OnboardingBlockedScreen({
         onClick={() => router.push("/onboarding")}
         className="w-full bg-skinbestie-landing-blue text-white py-3 px-6 rounded font-semibold hover:bg-skinbestie-landing-blue/90 transition-colors"
       >
-        Complete Onboarding
+        Continue to onboarding
       </button>
     </div>
   );
