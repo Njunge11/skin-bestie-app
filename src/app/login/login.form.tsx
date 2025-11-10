@@ -110,9 +110,11 @@ function EmailForm({
   formHeading: string;
   formSubheading: string;
 }) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showOnboardingLink, setShowOnboardingLink] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,8 +128,17 @@ function EmailForm({
       const profileStatus = await checkProfileStatus(email);
 
       // Step 2: Handle different scenarios
-      if (!profileStatus.exists || !profileStatus.isCompleted) {
-        // User doesn't exist or hasn't completed onboarding
+      if (!profileStatus.exists) {
+        setError(
+          "You need to complete your onboarding before you can sign in.",
+        );
+        setShowOnboardingLink(true);
+        setLoading(false);
+        return;
+      }
+
+      if (!profileStatus.isCompleted) {
+        // User exists but onboarding incomplete
         onProfileBlocked(email, profileStatus);
         return;
       }
@@ -168,6 +179,15 @@ function EmailForm({
             role="alert"
           >
             <p className="text-sm text-red-800">{error}</p>
+            {showOnboardingLink && (
+              <button
+                type="button"
+                onClick={() => router.push("/onboarding")}
+                className="mt-2 w-full text-sm text-[#030303] font-semibold underline hover:text-[#222118] transition-colors"
+              >
+                Complete onboarding
+              </button>
+            )}
           </div>
         )}
 
