@@ -183,7 +183,7 @@ function EmailForm({
               <button
                 type="button"
                 onClick={() => router.push("/onboarding")}
-                className="mt-2 w-full text-sm text-[#030303] font-semibold underline hover:text-[#222118] transition-colors"
+                className="mt-2 w-full text-left text-sm text-[#030303] font-semibold underline hover:text-[#222118] transition-colors"
               >
                 New to SkinBestie? Get started here
               </button>
