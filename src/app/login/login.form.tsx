@@ -130,7 +130,7 @@ function EmailForm({
       // Step 2: Handle different scenarios
       if (!profileStatus.exists) {
         setError(
-          "You need to complete your onboarding before you can sign in.",
+          "No account found with this email. If you mistyped, please try again. Otherwise, complete onboarding first.",
         );
         setShowOnboardingLink(true);
         setLoading(false);
