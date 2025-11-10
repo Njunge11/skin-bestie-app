@@ -7,7 +7,12 @@ export type ApiError = Error & {
   status: number;
 };
 
-async function request(endpoint: string, method: string, body?: unknown) {
+async function request(
+  endpoint: string,
+  method: string,
+  body?: unknown,
+  options?: { allow404?: boolean },
+) {
   try {
     const url = `${BASE_URL}${endpoint}`;
 
@@ -22,7 +27,8 @@ async function request(endpoint: string, method: string, body?: unknown) {
 
     const data = await response.json();
 
-    if (!response.ok) {
+    // 404 is OK for certain endpoints (e.g., checking if user exists)
+    if (!response.ok && !(response.status === 404 && options?.allow404)) {
       console.error("API Error Response:", JSON.stringify(data, null, 2));
 
       const errorMessage =
@@ -49,10 +55,17 @@ async function request(endpoint: string, method: string, body?: unknown) {
 }
 
 export const api = {
-  get: (endpoint: string) => request(endpoint, "GET"),
-  post: (endpoint: string, body?: unknown) => request(endpoint, "POST", body),
-  patch: (endpoint: string, body?: unknown) => request(endpoint, "PATCH", body),
-  put: (endpoint: string, body?: unknown) => request(endpoint, "PUT", body),
-  delete: (endpoint: string, body?: unknown) =>
-    request(endpoint, "DELETE", body),
+  get: (endpoint: string, options?: { allow404?: boolean }) =>
+    request(endpoint, "GET", undefined, options),
+  post: (endpoint: string, body?: unknown, options?: { allow404?: boolean }) =>
+    request(endpoint, "POST", body, options),
+  patch: (endpoint: string, body?: unknown, options?: { allow404?: boolean }) =>
+    request(endpoint, "PATCH", body, options),
+  put: (endpoint: string, body?: unknown, options?: { allow404?: boolean }) =>
+    request(endpoint, "PUT", body, options),
+  delete: (
+    endpoint: string,
+    body?: unknown,
+    options?: { allow404?: boolean },
+  ) => request(endpoint, "DELETE", body, options),
 };

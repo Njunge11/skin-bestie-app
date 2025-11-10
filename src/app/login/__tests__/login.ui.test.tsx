@@ -1,4 +1,4 @@
-// UI tests for Login functionality - Core Workflows
+// UI tests for Login with Verification Code - Core Workflows
 import {
   describe,
   it,
@@ -7,14 +7,20 @@ import {
   afterAll,
   afterEach,
   vi,
+  beforeEach,
 } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render, mockPush, clearAllMocks } from "./test-utils";
 import LoginClient from "../login.client";
 import { server } from "./mocks/server";
-import { resetEmailState } from "./mocks/handlers";
+import {
+  resetMockState,
+  getStoredCodeForEmail,
+  setCodeToExpired,
+} from "./mocks/handlers";
 import { LoginContent } from "@/utils/extractors/login.extractor";
+import * as loginActions from "../actions";
 
 // Mock login content for tests
 const mockLoginContent: LoginContent = {
@@ -24,7 +30,7 @@ const mockLoginContent: LoginContent = {
     altText: "login",
   },
   formHeading: "Welcome back, bestie",
-  formSubheading: "Enter your email to receive a sign-in link",
+  formSubheading: "Sign in to your account",
 };
 
 // Mock next-auth/react signIn function
@@ -38,32 +44,68 @@ vi.mock("next-auth/react", async () => {
   };
 });
 
-describe("Login Page - Core User Workflows", () => {
-  beforeAll(() => {
-    server.listen({ onUnhandledRequest: "warn" });
-  });
+// Mock the login server actions
+vi.mock("../actions", () => ({
+  checkUserByEmailAction: vi.fn(),
+  createVerificationCodeAction: vi.fn(),
+}));
 
-  afterAll(() => {
-    server.close();
+// Global server setup - only start/stop once for all tests
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: "warn" });
+});
+
+afterAll(() => {
+  server.close();
+});
+
+describe("Login - Happy Path Workflows", () => {
+  beforeEach(() => {
+    // Setup default successful responses matching backend API structure
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
+    });
+
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
+
+    // NextAuth signIn returns undefined error when successful
+    mockSignIn.mockResolvedValue({
+      error: undefined,
+      ok: true,
+      status: 200,
+      code: undefined,
+      url: "/dashboard",
+    });
   });
 
   afterEach(() => {
     server.resetHandlers();
-    resetEmailState();
+    resetMockState();
     clearAllMocks();
-    mockSignIn.mockClear();
+    vi.clearAllMocks();
   });
 
-  it("user successfully signs in with magic link and is redirected to / (sees authenticated PWA view)", async () => {
+  it("user successfully logs in with verification code and is redirected to dashboard", async () => {
     const user = userEvent.setup();
-
-    // Setup mock signIn to return success
-    mockSignIn.mockResolvedValue({
-      error: null,
-      status: 200,
-      ok: true,
-      url: null,
-    });
 
     render(<LoginClient loginContent={mockLoginContent} />);
 
@@ -71,227 +113,553 @@ describe("Login Page - Core User Workflows", () => {
     expect(
       screen.getByRole("heading", { name: /welcome back, bestie/i }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/enter your email to receive a sign-in link/i),
-    ).toBeInTheDocument();
 
     // User enters their email
-    const emailInput = screen.getByPlaceholderText(/you@example.com/i);
-    await user.type(emailInput, "existing@example.com");
-
-    // Verify email was entered
-    expect(emailInput).toHaveValue("existing@example.com");
+    const emailInput = screen.getByLabelText(/email address/i);
+    await user.type(emailInput, "complete@example.com");
 
     // User submits the form
-    const submitButton = screen.getByRole("button", {
-      name: /send sign-in link/i,
-    });
-    expect(submitButton).not.toBeDisabled();
+    const submitButton = screen.getByRole("button", { name: /continue/i });
     await user.click(submitButton);
 
-    // Wait for success screen to appear
+    // User sees code input screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/we've sent a 6-digit code to/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText("complete@example.com")).toBeInTheDocument();
+
+    // Profile check was called
+    expect(loginActions.checkUserByEmailAction).toHaveBeenCalledWith(
+      "complete@example.com",
+    );
+
+    // Verification email was sent
+    expect(loginActions.createVerificationCodeAction).toHaveBeenCalledWith(
+      "complete@example.com",
+    );
+
+    // User enters verification code
+    const codeInput = screen.getByLabelText(/verification code/i);
+    await user.type(codeInput, "123456");
+
+    // Verify button becomes enabled
+    const verifyButton = screen.getByRole("button", { name: /verify code/i });
+    expect(verifyButton).not.toBeDisabled();
+
+    // User clicks verify
+    await user.click(verifyButton);
+
+    // NextAuth signIn was called with verification-code provider
+    // This will verify the code via VerificationCodeProvider
     await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
+      expect(mockSignIn).toHaveBeenCalledWith("verification-code", {
+        email: "complete@example.com",
+        code: "123456",
+        redirect: false,
+        callbackUrl: "/dashboard",
+      });
     });
+  });
+});
 
-    // User sees success message with their email
-    expect(screen.getByText(/we sent a sign-in link to/i)).toBeInTheDocument();
-    expect(screen.getByText("existing@example.com")).toBeInTheDocument();
-    expect(
-      screen.getByText(/click the link in the email to access your account/i),
-    ).toBeInTheDocument();
-
-    // Verify signIn was called with correct parameters
-    expect(mockSignIn).toHaveBeenCalledWith("resend", {
-      email: "existing@example.com",
-      redirect: false,
-      callbackUrl: "/",
+describe("Login - Onboarding Blocked Workflows", () => {
+  beforeEach(() => {
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     });
-
-    // User can see resend button
-    expect(
-      screen.getByRole("button", { name: /resend sign-in link/i }),
-    ).toBeInTheDocument();
   });
 
-  it("user encounters network error, sees error message, and successfully retries", async () => {
+  afterEach(() => {
+    server.resetHandlers();
+    resetMockState();
+    clearAllMocks();
+    vi.clearAllMocks();
+  });
+
+  it("user with incomplete onboarding sees blocked screen and is redirected to onboarding", async () => {
     const user = userEvent.setup();
 
-    // First attempt will fail
-    mockSignIn.mockRejectedValueOnce(new Error("Network error"));
-
-    // Second attempt will succeed
-    mockSignIn.mockResolvedValueOnce({
-      error: null,
-      status: 200,
-      ok: true,
-      url: null,
+    // Mock incomplete profile
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-incomplete",
+        email: "incomplete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Incomplete User",
+        image: null,
+      },
+      profile: {
+        id: "profile-incomplete",
+        userId: "user-incomplete",
+        email: "incomplete@example.com",
+        firstName: "Incomplete",
+        lastName: null,
+        phoneNumber: null,
+        dateOfBirth: null,
+        onboardingComplete: false,
+      },
     });
 
     render(<LoginClient loginContent={mockLoginContent} />);
 
     // User enters email
-    const emailInput = screen.getByPlaceholderText(/you@example.com/i);
-    await user.type(emailInput, "retry@example.com");
+    const emailInput = screen.getByLabelText(/email address/i);
+    await user.type(emailInput, "incomplete@example.com");
 
-    // User submits - first attempt
-    const submitButton = screen.getByRole("button", {
-      name: /send sign-in link/i,
+    // User submits
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // User sees onboarding blocked screen
+    expect(
+      await screen.findByRole("heading", { name: /almost there!/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/your account.*needs to complete onboarding/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText("incomplete@example.com")).toBeInTheDocument();
+
+    // User clicks continue to onboarding
+    const continueButton = screen.getByRole("button", {
+      name: /continue to onboarding/i,
     });
-    await user.click(submitButton);
+    await user.click(continueButton);
+
+    // User redirected to onboarding
+    expect(mockPush).toHaveBeenCalledWith("/onboarding");
+  });
+
+  it("user with no account sees error message and onboarding link", async () => {
+    const user = userEvent.setup();
+
+    // Mock no user found (404 response)
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: null,
+      profile: null,
+    });
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User enters email
+    const emailInput = screen.getByLabelText(/email address/i);
+    await user.type(emailInput, "newuser@example.com");
+
+    // User submits
+    await user.click(screen.getByRole("button", { name: /continue/i }));
 
     // User sees error message
     const errorAlert = await screen.findByRole("alert");
     expect(errorAlert).toHaveTextContent(
-      /something went wrong. please try again/i,
+      /we couldn't find an account with this email/i,
     );
 
-    // Form is still usable
-    expect(emailInput).toHaveValue("retry@example.com");
-    expect(submitButton).not.toBeDisabled();
+    // User sees onboarding link
+    const onboardingLink = screen.getByRole("button", {
+      name: /new to skinbestie\? get started here/i,
+    });
+    await user.click(onboardingLink);
 
-    // User retries by clicking submit again
-    await user.click(submitButton);
+    // User redirected to onboarding
+    expect(mockPush).toHaveBeenCalledWith("/onboarding");
+  });
+});
 
-    // This time it succeeds - user sees success screen
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
+describe("Login - Error Recovery Workflows", () => {
+  beforeEach(() => {
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    expect(screen.getByText("retry@example.com")).toBeInTheDocument();
-
-    // Verify signIn was called twice
-    expect(mockSignIn).toHaveBeenCalledTimes(2);
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
   });
 
-  it("user requests magic link resend from success screen and receives it", async () => {
+  afterEach(() => {
+    server.resetHandlers();
+    resetMockState();
+    clearAllMocks();
+    vi.clearAllMocks();
+  });
+
+  it("user enters invalid code, sees error, button returns to normal state", async () => {
     const user = userEvent.setup();
 
-    // Initial send succeeds
-    mockSignIn.mockResolvedValue({
-      error: null,
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Mock NextAuth signIn to return error (simulating VerificationCodeProvider returning null)
+    // In NextAuth v5 beta, ok can be true even with error (bug)
+    mockSignIn.mockResolvedValueOnce({
+      error: "CredentialsSignin",
+      code: "credentials",
+      status: 200,
+      ok: true, // Bug in NextAuth v5 beta
+      url: null,
+    });
+
+    const codeInput = screen.getByLabelText(/verification code/i);
+    await user.type(codeInput, "999999");
+
+    const verifyButton = screen.getByRole("button", { name: /verify code/i });
+    await user.click(verifyButton);
+
+    // User sees error message
+    const errorAlert = await screen.findByRole("alert");
+    expect(errorAlert).toHaveTextContent(/invalid verification code/i);
+
+    // Button should return to normal (not disabled/loading)
+    expect(verifyButton).not.toBeDisabled();
+    expect(verifyButton).toHaveTextContent(/verify code/i);
+
+    // User can try again with correct code
+    mockSignIn.mockResolvedValueOnce({
+      error: undefined,
+      ok: true,
+      status: 200,
+      code: undefined,
+      url: "/dashboard",
+    });
+
+    await user.clear(codeInput);
+    await user.type(codeInput, "123456");
+    await user.click(verifyButton);
+
+    // Should redirect to dashboard
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
+    });
+  });
+
+  it("user resends code after getting invalid code error", async () => {
+    const user = userEvent.setup();
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User enters email and gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // User enters invalid code
+    mockSignIn.mockResolvedValueOnce({
+      error: "CredentialsSignin",
+      code: "credentials",
       status: 200,
       ok: true,
       url: null,
     });
 
-    render(<LoginClient loginContent={mockLoginContent} />);
+    const codeInput = screen.getByLabelText(/verification code/i);
+    await user.type(codeInput, "111111");
+    await user.click(screen.getByRole("button", { name: /verify code/i }));
 
-    // User submits initial email
-    const emailInput = screen.getByPlaceholderText(/you@example.com/i);
-    await user.type(emailInput, "resend@example.com");
-    await user.click(
-      screen.getByRole("button", { name: /send sign-in link/i }),
-    );
+    // User sees error
+    const errorAlert = await screen.findByRole("alert");
+    expect(errorAlert).toHaveTextContent(/invalid verification code/i);
 
-    // Wait for success screen
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
-    });
-
-    // Don't clear mock calls - we want to verify both calls
-    // Setup for resend continues to use same mock
-
-    // User clicks resend button
-    const resendButton = screen.getByRole("button", {
-      name: /resend sign-in link/i,
-    });
-    expect(resendButton).not.toBeDisabled();
+    // User decides to request a new code instead of retrying
+    const resendButton = screen.getByRole("button", { name: /resend email/i });
     await user.click(resendButton);
 
-    // Wait for resend to complete - look for success message
+    // Input is cleared after resend
     await waitFor(() => {
-      expect(screen.getByText(/email sent successfully!/i)).toBeInTheDocument();
+      expect(codeInput).toHaveValue("");
     });
+
+    // User sees success message
+    expect(
+      await screen.findByText(/code sent! check your email/i),
+    ).toBeInTheDocument();
+
+    // User enters the new correct code
+    mockSignIn.mockResolvedValueOnce({
+      error: undefined,
+      ok: true,
+      status: 200,
+      code: undefined,
+      url: "/dashboard",
+    });
+
+    await user.type(codeInput, "123456");
+    await user.click(screen.getByRole("button", { name: /verify code/i }));
+
+    // Should redirect to dashboard
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
+    });
+  });
+
+  it("user encounters network error during profile check and successfully retries", async () => {
+    const user = userEvent.setup();
+
+    // First attempt fails
+    vi.mocked(loginActions.checkUserByEmailAction).mockRejectedValueOnce(
+      new Error("Network error"),
+    );
+
+    // Second attempt succeeds
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValueOnce({
+      user: {
+        id: "user-retry",
+        email: "retry@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Retry User",
+        image: null,
+      },
+      profile: {
+        id: "profile-retry",
+        userId: "user-retry",
+        email: "retry@example.com",
+        firstName: "Retry",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
+    });
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User enters email
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "retry@example.com",
+    );
+
+    // User submits - first attempt
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // User sees error message
+    const errorAlert = await screen.findByRole("alert");
+    expect(errorAlert).toHaveTextContent(/something went wrong/i);
+
+    // Form is still usable
+    expect(screen.getByLabelText(/email address/i)).toHaveValue(
+      "retry@example.com",
+    );
+    expect(
+      screen.getByRole("button", { name: /continue/i }),
+    ).not.toBeDisabled();
+
+    // User retries
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // This time succeeds - user sees code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Verify checkProfileStatus was called twice
+    expect(loginActions.checkUserByEmailAction).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("Login - Resend Code Workflow", () => {
+  beforeEach(() => {
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
+    });
+
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+    resetMockState();
+    clearAllMocks();
+    vi.clearAllMocks();
+  });
+
+  it("user resends verification code successfully and input is cleared", async () => {
+    const user = userEvent.setup();
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "resend@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // User starts typing a code
+    const codeInput = screen.getByLabelText(/verification code/i);
+    await user.type(codeInput, "123");
+    expect(codeInput).toHaveValue("123");
+
+    // User realizes they need to resend
+    const resendButton = screen.getByRole("button", { name: /resend email/i });
+    expect(resendButton).not.toBeDisabled();
+
+    await user.click(resendButton);
+
+    // Code input should be cleared immediately
+    await waitFor(() => {
+      expect(codeInput).toHaveValue("");
+    });
+
+    // User sees success message
+    expect(
+      await screen.findByText(/code sent! check your email/i),
+    ).toBeInTheDocument();
 
     // Email is still displayed
     expect(screen.getByText("resend@example.com")).toBeInTheDocument();
 
-    // Verify both calls - initial send and resend
-    expect(mockSignIn).toHaveBeenCalledTimes(2);
-    expect(mockSignIn).toHaveBeenNthCalledWith(1, "resend", {
-      email: "resend@example.com",
-      redirect: false,
-      callbackUrl: "/",
+    // Verify sendVerificationEmail was called twice (initial + resend)
+    expect(loginActions.createVerificationCodeAction).toHaveBeenCalledTimes(2);
+    expect(loginActions.createVerificationCodeAction).toHaveBeenCalledWith(
+      "resend@example.com",
+    );
+  });
+});
+
+describe("Login - Navigation and Validation", () => {
+  beforeEach(() => {
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
-    expect(mockSignIn).toHaveBeenNthCalledWith(2, "resend", {
-      email: "resend@example.com",
-      redirect: false,
-      callbackUrl: "/",
+
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     });
   });
 
-  it("user enters invalid email, sees browser validation, corrects it and submits successfully", async () => {
-    const user = userEvent.setup();
+  afterEach(() => {
+    server.resetHandlers();
+    resetMockState();
+    clearAllMocks();
+    vi.clearAllMocks();
+  });
 
-    mockSignIn.mockResolvedValue({
-      error: null,
-      status: 200,
-      ok: true,
-      url: null,
-    });
+  it("user navigates back from code screen to email screen", async () => {
+    const user = userEvent.setup();
 
     render(<LoginClient loginContent={mockLoginContent} />);
 
-    const emailInput = screen.getByPlaceholderText(
-      /you@example.com/i,
-    ) as HTMLInputElement;
-    const submitButton = screen.getByRole("button", {
-      name: /send sign-in link/i,
-    });
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "first@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
 
-    // User enters invalid email format
-    await user.type(emailInput, "notanemail");
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
 
-    // Try to submit - browser validation should prevent it
-    await user.click(submitButton);
+    // User clicks back button
+    const backButton = screen.getByRole("button", { name: /back/i });
+    await user.click(backButton);
 
-    // Check HTML5 validation (form should not submit)
-    expect(emailInput.validity.valid).toBe(false);
-    expect(mockSignIn).not.toHaveBeenCalled();
+    // User should be back at the email form
+    expect(
+      screen.getByRole("heading", { name: /welcome back, bestie/i }),
+    ).toBeInTheDocument();
 
-    // User corrects the email
-    await user.clear(emailInput);
-    await user.type(emailInput, "valid@example.com");
+    // Email field should be cleared
+    expect(screen.getByLabelText(/email address/i)).toHaveValue("");
 
-    // Now the input should be valid
-    expect(emailInput.validity.valid).toBe(true);
+    // User can enter a new email
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "second@example.com",
+    );
 
-    // User successfully submits
-    await user.click(submitButton);
+    await user.click(screen.getByRole("button", { name: /continue/i }));
 
-    // Wait for success screen
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
-    });
-
-    expect(screen.getByText("valid@example.com")).toBeInTheDocument();
-
-    // Verify signIn was called with valid email
-    expect(mockSignIn).toHaveBeenCalledWith("resend", {
-      email: "valid@example.com",
-      redirect: false,
-      callbackUrl: "/",
-    });
+    // User sees code screen with new email
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("second@example.com")).toBeInTheDocument();
   });
 
   it("user navigates back to homepage from login form using back button", async () => {
     const user = userEvent.setup();
 
     render(<LoginClient loginContent={mockLoginContent} />);
-
-    // User sees the login form
-    expect(
-      screen.getByRole("heading", { name: /welcome back, bestie/i }),
-    ).toBeInTheDocument();
 
     // User clicks back button
     const backButton = screen.getByRole("button", { name: /back/i });
@@ -301,405 +669,383 @@ describe("Login Page - Core User Workflows", () => {
     expect(mockPush).toHaveBeenCalledWith("/");
   });
 
-  it("user goes back to email form from success screen and can enter new email", async () => {
+  it("verify button is disabled until 6 digits are entered", async () => {
     const user = userEvent.setup();
-
-    mockSignIn.mockResolvedValue({
-      error: null,
-      status: 200,
-      ok: true,
-      url: null,
-    });
 
     render(<LoginClient loginContent={mockLoginContent} />);
 
-    // Submit first email
-    const emailInput = screen.getByPlaceholderText(/you@example.com/i);
-    await user.type(emailInput, "first@example.com");
-    await user.click(
-      screen.getByRole("button", { name: /send sign-in link/i }),
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
     );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
 
-    // Wait for success screen
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
+    // Wait for code screen
+    const codeInput = await screen.findByLabelText(/verification code/i);
+    const verifyButton = screen.getByRole("button", { name: /verify code/i });
+
+    // Button starts disabled
+    expect(verifyButton).toBeDisabled();
+
+    // Type 1-5 digits - button stays disabled
+    await user.type(codeInput, "12345");
+    expect(verifyButton).toBeDisabled();
+
+    // Type 6th digit - button becomes enabled
+    await user.type(codeInput, "6");
+    expect(verifyButton).not.toBeDisabled();
+
+    // Clear - button becomes disabled again
+    await user.clear(codeInput);
+    expect(verifyButton).toBeDisabled();
+  });
+
+  it("code input only accepts numeric characters and max 6 digits", async () => {
+    const user = userEvent.setup();
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    const codeInput = await screen.findByLabelText(/verification code/i);
+
+    // Try typing letters and special characters
+    await user.type(codeInput, "abc!@#123xyz789");
+
+    // Only numbers should be in the field, max 6
+    expect(codeInput).toHaveValue("123789");
+  });
+});
+
+describe("Login - Loading States", () => {
+  beforeEach(() => {
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    // User clicks back button from success screen
-    const backButton = screen.getByRole("button", { name: /back/i });
-    await user.click(backButton);
-
-    // User should be back at the email form
-    expect(
-      screen.getByRole("heading", { name: /welcome back, bestie/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/enter your email to receive a sign-in link/i),
-    ).toBeInTheDocument();
-
-    // Email field should be cleared/reset
-    const newEmailInput = screen.getByPlaceholderText(
-      /you@example.com/i,
-    ) as HTMLInputElement;
-    expect(newEmailInput.value).toBe("");
-
-    // User can enter a new email
-    await user.type(newEmailInput, "second@example.com");
-    expect(newEmailInput).toHaveValue("second@example.com");
-
-    // Clear previous calls
-    mockSignIn.mockClear();
-
-    // User can submit the new email
-    await user.click(
-      screen.getByRole("button", { name: /send sign-in link/i }),
+    vi.mocked(loginActions.createVerificationCodeAction).mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () =>
+              resolve({
+                code: "123456",
+                expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+              }),
+            200,
+          ),
+        ),
     );
 
-    // Wait for success screen with new email
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
+    // Mock NextAuth signIn with delay to test loading state
+    mockSignIn.mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () =>
+              resolve({
+                error: undefined,
+                ok: true,
+                status: 200,
+                code: undefined,
+                url: "/dashboard",
+              }),
+            200,
+          ),
+        ),
+    );
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+    resetMockState();
+    clearAllMocks();
+    vi.clearAllMocks();
+  });
+
+  it('shows "Checking..." button text during email submission', async () => {
+    const user = userEvent.setup();
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User enters email
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "test@example.com",
+    );
+
+    // User submits
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Check loading state
+    expect(
+      await screen.findByRole("button", { name: /checking\.\.\./i }),
+    ).toBeDisabled();
+
+    // Wait for completion
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows "Verifying..." button text during code verification', async () => {
+    const user = userEvent.setup();
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "test@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    const codeInput = await screen.findByLabelText(/verification code/i);
+
+    // User enters code
+    await user.type(codeInput, "123456");
+
+    // User submits
+    await user.click(screen.getByRole("button", { name: /verify code/i }));
+
+    // Check loading state
+    expect(
+      await screen.findByRole("button", { name: /verifying\.\.\./i }),
+    ).toBeDisabled();
+  });
+
+  it('shows "Resending..." during resend operation', async () => {
+    const user = userEvent.setup();
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "test@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // User clicks resend
+    await user.click(screen.getByRole("button", { name: /resend email/i }));
+
+    // Check loading state
+    expect(
+      await screen.findByRole("button", { name: /resending\.\.\./i }),
+    ).toBeDisabled();
+
+    // Wait for completion
+    expect(
+      await screen.findByText(/code sent! check your email/i),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("Login - Magic Link Toggle", () => {
+  beforeEach(() => {
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    expect(screen.getByText("second@example.com")).toBeInTheDocument();
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
+  });
 
-    // Verify new email was sent
+  afterEach(() => {
+    server.resetHandlers();
+    resetMockState();
+    clearAllMocks();
+    vi.clearAllMocks();
+    delete process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK;
+  });
+
+  it("shows only verification code message when magic link is disabled", async () => {
+    const user = userEvent.setup();
+
+    // Explicitly set to false (disabled)
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "false";
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Should show ONLY verification code message (no magic link mentioned)
+    expect(
+      screen.getByText(/we've sent a 6-digit code to/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/enter your code below to continue/i),
+    ).toBeInTheDocument();
+
+    // Should NOT mention magic link
+    expect(screen.queryByText(/sign-in link and/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/click the link/i)).not.toBeInTheDocument();
+
+    // Verify magic link was NOT sent (signIn for resend should not be called)
+    expect(mockSignIn).not.toHaveBeenCalledWith("resend", expect.anything());
+  });
+
+  it("shows both magic link and verification code message when enabled", async () => {
+    const user = userEvent.setup();
+
+    // Enable magic link
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "true";
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Should show BOTH magic link and verification code
+    expect(
+      screen.getByText(/we've sent a sign-in link and 6-digit code to/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/click the link or enter your code below to continue/i),
+    ).toBeInTheDocument();
+
+    // Verify magic link WAS sent
     expect(mockSignIn).toHaveBeenCalledWith("resend", {
-      email: "second@example.com",
+      email: "complete@example.com",
       redirect: false,
       callbackUrl: "/",
     });
   });
-});
 
-describe("Login Page - Loading States & Feedback", () => {
-  // Server is already started in the first describe block
-
-  afterEach(() => {
-    server.resetHandlers();
-    resetEmailState();
-    clearAllMocks();
-    mockSignIn.mockClear();
-  });
-
-  it('shows "Sending..." button text and disables inputs during email submission', async () => {
+  it("sends magic link on resend when enabled", async () => {
     const user = userEvent.setup();
 
-    // Add delay to mock to ensure we can catch loading state
-    mockSignIn.mockImplementation(
-      () =>
-        new Promise((resolve) =>
-          setTimeout(
-            () =>
-              resolve({
-                error: null,
-                status: 200,
-                ok: true,
-                url: null,
-              }),
-            100,
-          ),
-        ),
-    );
+    // Enable magic link
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "true";
 
     render(<LoginClient loginContent={mockLoginContent} />);
 
-    const emailInput = screen.getByPlaceholderText(/you@example.com/i);
-    await user.type(emailInput, "test@example.com");
-
-    const submitButton = screen.getByRole("button", {
-      name: /send sign-in link/i,
-    });
-    await user.click(submitButton);
-
-    // Check loading state
-    const loadingButton = await screen.findByRole("button", {
-      name: /sending\.\.\./i,
-    });
-    expect(loadingButton).toBeDisabled();
-
-    // Check input is disabled during submission
-    expect(emailInput).toBeDisabled();
-
-    // Wait for completion
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("shows loading state with disabled button during magic link resend", async () => {
-    const user = userEvent.setup();
-
-    // Setup initial send
-    mockSignIn.mockResolvedValueOnce({
-      error: null,
-      status: 200,
-      ok: true,
-      url: null,
-    });
-
-    render(<LoginClient loginContent={mockLoginContent} />);
-
-    // Submit initial email
+    // User gets to code screen
     await user.type(
-      screen.getByPlaceholderText(/you@example.com/i),
-      "test@example.com",
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
     );
-    await user.click(
-      screen.getByRole("button", { name: /send sign-in link/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
 
-    // Wait for success screen
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
-    });
-
-    // Setup resend with delay
-    mockSignIn.mockImplementation(
-      () =>
-        new Promise((resolve) =>
-          setTimeout(
-            () =>
-              resolve({
-                error: null,
-                status: 200,
-                ok: true,
-                url: null,
-              }),
-            100,
-          ),
-        ),
-    );
-
-    // Click resend
-    await user.click(
-      screen.getByRole("button", { name: /resend sign-in link/i }),
-    );
-
-    // Check loading state
-    const resendingButton = await screen.findByRole("button", {
-      name: /resending\.\.\./i,
-    });
-    expect(resendingButton).toBeDisabled();
-
-    // Wait for completion
-    await waitFor(() => {
-      expect(screen.getByText(/email sent successfully!/i)).toBeInTheDocument();
-    });
-  });
-
-  it("submit button is disabled when email field is empty", async () => {
-    const user = userEvent.setup();
-
-    render(<LoginClient loginContent={mockLoginContent} />);
-
-    const emailInput = screen.getByPlaceholderText(/you@example.com/i);
-    const submitButton = screen.getByRole("button", {
-      name: /send sign-in link/i,
-    });
-
-    // Initially button should be disabled (no email)
-    expect(submitButton).toBeDisabled();
-
-    // Type email - button becomes enabled
-    await user.type(emailInput, "test@example.com");
-    expect(submitButton).not.toBeDisabled();
-
-    // Clear email - button becomes disabled again
-    await user.clear(emailInput);
-    expect(submitButton).toBeDisabled();
-
-    // Type partial email - button becomes enabled
-    await user.type(emailInput, "t");
-    expect(submitButton).not.toBeDisabled();
-  });
-});
-
-describe("Login Page - Error Handling", () => {
-  // Server is already started in the first describe block
-
-  afterEach(() => {
-    server.resetHandlers();
-    resetEmailState();
-    clearAllMocks();
-    mockSignIn.mockClear();
-  });
-
-  it('user sees "Failed to send magic link" error when NextAuth signIn fails', async () => {
-    const user = userEvent.setup();
-
-    // Setup mock to return error
-    mockSignIn.mockResolvedValue({
-      error: "Authentication failed",
-      status: 401,
-      ok: false,
-      url: null,
-    });
-
-    render(<LoginClient loginContent={mockLoginContent} />);
-
-    // User enters email and submits
-    await user.type(
-      screen.getByPlaceholderText(/you@example.com/i),
-      "error@example.com",
-    );
-    await user.click(
-      screen.getByRole("button", { name: /send sign-in link/i }),
-    );
-
-    // User sees error message
-    const errorAlert = await screen.findByRole("alert");
-    expect(errorAlert).toHaveTextContent(
-      /failed to send magic link. please try again/i,
-    );
-
-    // Form remains usable
-    const emailInput = screen.getByPlaceholderText(/you@example.com/i);
-    expect(emailInput).toHaveValue("error@example.com");
-    expect(emailInput).not.toBeDisabled();
-
-    const submitButton = screen.getByRole("button", {
-      name: /send sign-in link/i,
-    });
-    expect(submitButton).not.toBeDisabled();
-  });
-
-  it('user sees "Failed to resend" error on resend failure and can retry', async () => {
-    const user = userEvent.setup();
-
-    // Initial send succeeds
-    mockSignIn.mockResolvedValueOnce({
-      error: null,
-      status: 200,
-      ok: true,
-      url: null,
-    });
-
-    render(<LoginClient loginContent={mockLoginContent} />);
-
-    // Submit initial email successfully
-    await user.type(
-      screen.getByPlaceholderText(/you@example.com/i),
-      "resend-error@example.com",
-    );
-    await user.click(
-      screen.getByRole("button", { name: /send sign-in link/i }),
-    );
-
-    // Wait for success screen
-    await waitFor(() => {
-      expect(
-        screen.getByRole("heading", { name: /check your email/i }),
-      ).toBeInTheDocument();
-    });
-
-    // Setup resend to fail
-    mockSignIn.mockResolvedValueOnce({
-      error: "Resend failed",
-      status: 500,
-      ok: false,
-      url: null,
-    });
-
-    // Click resend
-    await user.click(
-      screen.getByRole("button", { name: /resend sign-in link/i }),
-    );
-
-    // User sees error message
-    const errorAlert = await screen.findByRole("alert");
-    expect(errorAlert).toHaveTextContent(/failed to resend. please try again/i);
-
-    // Resend button is still available
-    const resendButton = screen.getByRole("button", {
-      name: /resend sign-in link/i,
-    });
-    expect(resendButton).not.toBeDisabled();
-
-    // Setup successful retry
-    mockSignIn.mockResolvedValueOnce({
-      error: null,
-      status: 200,
-      ok: true,
-      url: null,
-    });
-
-    // User can retry
-    await user.click(resendButton);
-
-    // Success message appears
-    await waitFor(() => {
-      expect(screen.getByText(/email sent successfully!/i)).toBeInTheDocument();
-    });
-  });
-
-  it("handles case where user email is not registered and suggests onboarding", async () => {
-    const user = userEvent.setup();
-
-    // Setup mock to simulate user not found
-    mockSignIn.mockResolvedValue({
-      error: "UserNotFound",
-      status: 401,
-      ok: false,
-      url: null,
-    });
-
-    render(<LoginClient loginContent={mockLoginContent} />);
-
-    // User enters unregistered email
-    await user.type(
-      screen.getByPlaceholderText(/you@example.com/i),
-      "newuser@example.com",
-    );
-    await user.click(
-      screen.getByRole("button", { name: /send sign-in link/i }),
-    );
-
-    // User sees error (generic error since we don't expose user existence)
-    const errorAlert = await screen.findByRole("alert");
-    expect(errorAlert).toHaveTextContent(
-      /failed to send magic link. please try again/i,
-    );
-
-    // Form remains usable for retry
-    expect(screen.getByPlaceholderText(/you@example.com/i)).not.toBeDisabled();
+    // Wait for code screen
     expect(
-      screen.getByRole("button", { name: /send sign-in link/i }),
-    ).not.toBeDisabled();
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Clear mock to check resend call
+    mockSignIn.mockClear();
+
+    // User clicks resend
+    await user.click(screen.getByRole("button", { name: /resend email/i }));
+
+    // Verify magic link was sent again
+    await waitFor(() => {
+      expect(mockSignIn).toHaveBeenCalledWith("resend", {
+        email: "complete@example.com",
+        redirect: false,
+        callbackUrl: "/",
+      });
+    });
   });
 
-  it('shows proper error alert with role="alert" for accessibility', async () => {
+  it("does NOT send magic link on resend when disabled", async () => {
     const user = userEvent.setup();
 
-    // Setup mock to return error
-    mockSignIn.mockRejectedValue(new Error("Network error"));
+    // Disable magic link
+    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK = "false";
 
     render(<LoginClient loginContent={mockLoginContent} />);
 
-    // Trigger error
+    // User gets to code screen
     await user.type(
-      screen.getByPlaceholderText(/you@example.com/i),
-      "test@example.com",
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
     );
-    await user.click(
-      screen.getByRole("button", { name: /send sign-in link/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
 
-    // Check error has proper ARIA role
-    const errorAlert = await screen.findByRole("alert");
-    expect(errorAlert).toBeInTheDocument();
-    expect(errorAlert).toHaveTextContent(
-      /something went wrong. please try again/i,
-    );
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
 
-    // Error should have appropriate styling (checking for class names that indicate error styling)
-    expect(errorAlert).toHaveClass("bg-red-50", "border-red-200");
+    // User clicks resend
+    await user.click(screen.getByRole("button", { name: /resend email/i }));
+
+    // Wait for resend to complete
+    expect(
+      await screen.findByText(/code sent! check your email/i),
+    ).toBeInTheDocument();
+
+    // Verify magic link was NOT sent
+    expect(mockSignIn).not.toHaveBeenCalled();
+
+    // But verification email was sent
+    expect(loginActions.createVerificationCodeAction).toHaveBeenCalledTimes(2);
   });
 });
