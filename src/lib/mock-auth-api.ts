@@ -22,11 +22,6 @@ const MOCK_USERS = {
     isCompleted: false,
     completedSteps: ["PERSONAL", "SKIN_TYPE"],
   },
-  "neverstarted@example.com": {
-    exists: true,
-    isCompleted: false,
-    completedSteps: [],
-  },
   "newuser@example.com": {
     exists: false,
     isCompleted: false,
