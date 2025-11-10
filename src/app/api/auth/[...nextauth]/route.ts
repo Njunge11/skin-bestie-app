@@ -4,8 +4,8 @@ import type { NextRequest } from "next/server";
 
 const { GET: nextauthGET, POST } = handlers;
 
-// HEAD probes should never redeem tokens
-export async function HEAD() {
+// Scanners use HEAD; never redeem on HEAD
+export async function HEAD(_req: NextRequest) {
   return new Response(null, { status: 200 });
 }
 
@@ -26,10 +26,10 @@ function isSafeLinksProbe(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   if (isSafeLinksProbe(req)) {
-    // Ignore the automated prefetch; keep the one-time token intact
+    // Ignore probe: do not reach Auth.js, do not delete the token
     return new Response(null, { status: 204 });
   }
-  return nextauthGET(req); // <-- only 1 argument
+  return nextauthGET(req);
 }
 
 export { POST };
