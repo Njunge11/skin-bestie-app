@@ -6,11 +6,29 @@ import { ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
 import { anton } from "@/app/fonts";
 import { signIn } from "next-auth/react";
 import {
-  checkProfileStatus,
-  sendVerificationEmail,
-  verifyCode,
-  type ProfileStatusResponse,
-} from "@/lib/mock-auth-api";
+  checkUserByEmailAction,
+  createVerificationCodeAction,
+} from "./actions";
+
+interface ProfileStatusResponse {
+  user: {
+    id: string;
+    email: string;
+    emailVerified: string | null;
+    name: string | null;
+    image: string | null;
+  } | null;
+  profile: {
+    id: string;
+    userId: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    phoneNumber: string | null;
+    dateOfBirth: string | null;
+    onboardingComplete: boolean;
+  } | null;
+}
 
 interface LoginFormProps {
   emailSent: boolean;
@@ -120,15 +138,23 @@ function EmailForm({
     e.preventDefault();
     if (!email || loading) return;
 
+    console.log("👤 [Login Form] Submitting email:", email);
+
     setLoading(true);
     setError(null);
 
     try {
-      // Step 1: Check profile status
-      const profileStatus = await checkProfileStatus(email);
+      // Step 1: Check if user exists and get profile status
+      console.log("👤 [Login Form] Checking if user exists...");
+      const response = await checkUserByEmailAction(email);
+      console.log("👤 [Login Form] User check response:", {
+        hasUser: !!response.user,
+        onboardingComplete: response.profile?.onboardingComplete,
+      });
 
       // Step 2: Handle different scenarios
-      if (!profileStatus.exists) {
+      if (!response.user) {
+        console.log("⚠️  [Login Form] User not found");
         setError(
           "We couldn't find an account with this email. Please check for typos and try again.",
         );
@@ -137,14 +163,19 @@ function EmailForm({
         return;
       }
 
-      if (!profileStatus.isCompleted) {
+      if (!response.profile?.onboardingComplete) {
         // User exists but onboarding incomplete
-        onProfileBlocked(email, profileStatus);
+        console.log(
+          "⚠️  [Login Form] Onboarding not complete, showing blocked screen",
+        );
+        onProfileBlocked(email, response);
         return;
       }
 
-      // Step 3: Profile is complete - send verification email
-      await sendVerificationEmail(email);
+      // Step 3: Profile is complete - send verification code
+      console.log("📧 [Login Form] Sending verification code...");
+      await createVerificationCodeAction(email);
+      console.log("✅ [Login Form] Verification code sent");
 
       // Optionally send magic link if enabled
       if (process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK === "true") {
@@ -226,45 +257,50 @@ function EmailForm({
 }
 
 function CodeInputScreen({ email }: { email: string }) {
+  const router = useRouter();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resending, setResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
 
-  const magicLinkEnabled =
-    process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK === "true";
+  const magicLinkEnabled = process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK === "true";
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!code || code.length !== 6 || loading) return;
 
+    console.log("🔐 [Code Input] Signing in with code:", code, "for:", email);
+
     setLoading(true);
     setError(null);
 
     try {
-      // Verify the code via mock API
-      const result = await verifyCode(email, code);
-
-      if (!result.success) {
-        setError(result.error || "Invalid code");
-        setLoading(false);
-        return;
-      }
-
-      // Code is valid - sign in with NextAuth credentials provider
-      const signInResult = await signIn("verification-code", {
+      // Sign in with NextAuth - this will verify the code via VerificationCodeProvider
+      console.log("🔐 [Code Input] Calling signIn...");
+      const response = await signIn("verification-code", {
         email,
         code,
-        redirect: true,
+        redirect: false,
         callbackUrl: "/dashboard",
       });
 
-      if (signInResult?.error) {
-        setError("Authentication failed. Please try again.");
-        setLoading(false);
+      console.log("📊 [Code Input] signIn response:", response);
+
+      // Check if signin was successful - in NextAuth v5 beta, we need to check for absence of error
+      // because ok can be true even when there's an error
+      if (response && !response.error) {
+        console.log("✅ [Code Input] signIn successful, redirecting...");
+        router.push("/dashboard");
+        return;
       }
-    } catch {
+
+      // Sign in failed - show error
+      console.error("❌ [Code Input] signIn failed:", response);
+      setError("Invalid verification code. Please try again.");
+      setLoading(false);
+    } catch (err) {
+      console.error("❌ [Code Input] Exception during signIn:", err);
       setError("Something went wrong. Please try again.");
       setLoading(false);
     }
@@ -274,9 +310,10 @@ function CodeInputScreen({ email }: { email: string }) {
     setResending(true);
     setError(null);
     setResendSuccess(false);
+    setCode(""); // Clear the code input
 
     try {
-      await sendVerificationEmail(email);
+      await createVerificationCodeAction(email);
 
       // Optionally resend magic link if enabled
       if (process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK === "true") {
@@ -347,32 +384,29 @@ function CodeInputScreen({ email }: { email: string }) {
             onChange={(e) => {
               const value = e.target.value.replace(/\D/g, "").slice(0, 6);
               setCode(value);
+              // Clear error when user starts typing
+              if (error) setError(null);
             }}
             maxLength={6}
             placeholder="123456"
-            style={{ border: "0.5px solid #828282" }}
+            style={{
+              border: error ? "1.5px solid #DC2626" : "0.5px solid #828282",
+            }}
             className="w-full px-4 py-3 rounded bg-white text-[#272B2D] text-center text-2xl tracking-widest placeholder:text-[#878481] focus:outline-none focus:ring-2 focus:ring-[#030303] focus:border-transparent"
             disabled={loading}
+            aria-invalid={error ? "true" : "false"}
+            aria-describedby={error ? "code-error" : undefined}
           />
+          {error && (
+            <p
+              id="code-error"
+              className="mt-2 text-sm text-red-600 text-center"
+              role="alert"
+            >
+              {error}
+            </p>
+          )}
         </div>
-
-        {error && (
-          <div
-            className="p-3 bg-red-50 border border-red-200 rounded-md"
-            role="alert"
-          >
-            <p className="text-sm text-red-800 text-center">{error}</p>
-            {error.toLowerCase().includes("expired") && (
-              <button
-                type="button"
-                onClick={handleRequestNewCode}
-                className="mt-2 w-full text-sm text-[#030303] font-semibold underline hover:text-[#222118] transition-colors"
-              >
-                Get a new code
-              </button>
-            )}
-          </div>
-        )}
 
         {resendSuccess && (
           <p className="text-sm text-[#3F4548] text-center">
@@ -427,9 +461,7 @@ function OnboardingBlockedScreen({
 
       {/* Title and Description */}
       <div className="text-center space-y-3">
-        <h2 className="text-2xl font-semibold text-[#272B2D]">
-          Almost there!
-        </h2>
+        <h2 className="text-2xl font-semibold text-[#272B2D]">Almost there!</h2>
         <p className="text-base text-[#3F4548] max-w-md">
           Your account <strong>{email}</strong> needs to complete onboarding
           before you can sign in.

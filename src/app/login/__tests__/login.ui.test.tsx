@@ -20,7 +20,7 @@ import {
   setCodeToExpired,
 } from "./mocks/handlers";
 import { LoginContent } from "@/utils/extractors/login.extractor";
-import * as mockAuthApi from "@/lib/mock-auth-api";
+import * as loginActions from "../actions";
 
 // Mock login content for tests
 const mockLoginContent: LoginContent = {
@@ -44,11 +44,10 @@ vi.mock("next-auth/react", async () => {
   };
 });
 
-// Mock the auth API module
-vi.mock("@/lib/mock-auth-api", () => ({
-  checkProfileStatus: vi.fn(),
-  sendVerificationEmail: vi.fn(),
-  verifyCode: vi.fn(),
+// Mock the login server actions
+vi.mock("../actions", () => ({
+  checkUserByEmailAction: vi.fn(),
+  createVerificationCodeAction: vi.fn(),
 }));
 
 // Global server setup - only start/stop once for all tests
@@ -61,25 +60,41 @@ afterAll(() => {
 });
 
 describe("Login - Happy Path Workflows", () => {
-
   beforeEach(() => {
-    // Setup default successful responses
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
-      exists: true,
-      isCompleted: true,
-      completedSteps: [
-        "PERSONAL",
-        "SKIN_TYPE",
-        "SKIN_CONCERNS",
-        "ALLERGIES",
-        "SUBSCRIPTION",
-        "BOOKING",
-      ],
+    // Setup default successful responses matching backend API structure
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    vi.mocked(mockAuthApi.sendVerificationEmail).mockResolvedValue();
-    vi.mocked(mockAuthApi.verifyCode).mockResolvedValue({ success: true });
-    mockSignIn.mockResolvedValue({ error: null, ok: true, status: 200 });
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
+
+    // NextAuth signIn returns undefined error when successful
+    mockSignIn.mockResolvedValue({
+      error: undefined,
+      ok: true,
+      status: 200,
+      code: undefined,
+      url: "/dashboard",
+    });
   });
 
   afterEach(() => {
@@ -111,16 +126,18 @@ describe("Login - Happy Path Workflows", () => {
     expect(
       await screen.findByRole("heading", { name: /check your email/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/we've sent a 6-digit code to/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/we've sent a 6-digit code to/i),
+    ).toBeInTheDocument();
     expect(screen.getByText("complete@example.com")).toBeInTheDocument();
 
     // Profile check was called
-    expect(mockAuthApi.checkProfileStatus).toHaveBeenCalledWith(
+    expect(loginActions.checkUserByEmailAction).toHaveBeenCalledWith(
       "complete@example.com",
     );
 
     // Verification email was sent
-    expect(mockAuthApi.sendVerificationEmail).toHaveBeenCalledWith(
+    expect(loginActions.createVerificationCodeAction).toHaveBeenCalledWith(
       "complete@example.com",
     );
 
@@ -135,27 +152,25 @@ describe("Login - Happy Path Workflows", () => {
     // User clicks verify
     await user.click(verifyButton);
 
-    // Verification was called
-    await waitFor(() => {
-      expect(mockAuthApi.verifyCode).toHaveBeenCalledWith(
-        "complete@example.com",
-        "123456",
-      );
-    });
-
     // NextAuth signIn was called with verification-code provider
-    expect(mockSignIn).toHaveBeenCalledWith("verification-code", {
-      email: "complete@example.com",
-      code: "123456",
-      redirect: true,
-      callbackUrl: "/dashboard",
+    // This will verify the code via VerificationCodeProvider
+    await waitFor(() => {
+      expect(mockSignIn).toHaveBeenCalledWith("verification-code", {
+        email: "complete@example.com",
+        code: "123456",
+        redirect: false,
+        callbackUrl: "/dashboard",
+      });
     });
   });
 });
 
 describe("Login - Onboarding Blocked Workflows", () => {
   beforeEach(() => {
-    vi.mocked(mockAuthApi.sendVerificationEmail).mockResolvedValue();
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
   });
 
   afterEach(() => {
@@ -169,10 +184,24 @@ describe("Login - Onboarding Blocked Workflows", () => {
     const user = userEvent.setup();
 
     // Mock incomplete profile
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
-      exists: true,
-      isCompleted: false,
-      completedSteps: ["PERSONAL", "SKIN_TYPE"],
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-incomplete",
+        email: "incomplete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Incomplete User",
+        image: null,
+      },
+      profile: {
+        id: "profile-incomplete",
+        userId: "user-incomplete",
+        email: "incomplete@example.com",
+        firstName: "Incomplete",
+        lastName: null,
+        phoneNumber: null,
+        dateOfBirth: null,
+        onboardingComplete: false,
+      },
     });
 
     render(<LoginClient loginContent={mockLoginContent} />);
@@ -206,11 +235,10 @@ describe("Login - Onboarding Blocked Workflows", () => {
   it("user with no account sees error message and onboarding link", async () => {
     const user = userEvent.setup();
 
-    // Mock no profile
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
-      exists: false,
-      isCompleted: false,
-      completedSteps: [],
+    // Mock no user found (404 response)
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: null,
+      profile: null,
     });
 
     render(<LoginClient loginContent={mockLoginContent} />);
@@ -241,20 +269,30 @@ describe("Login - Onboarding Blocked Workflows", () => {
 
 describe("Login - Error Recovery Workflows", () => {
   beforeEach(() => {
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
-      exists: true,
-      isCompleted: true,
-      completedSteps: [
-        "PERSONAL",
-        "SKIN_TYPE",
-        "SKIN_CONCERNS",
-        "ALLERGIES",
-        "SUBSCRIPTION",
-        "BOOKING",
-      ],
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    vi.mocked(mockAuthApi.sendVerificationEmail).mockResolvedValue();
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
   });
 
   afterEach(() => {
@@ -264,7 +302,67 @@ describe("Login - Error Recovery Workflows", () => {
     vi.clearAllMocks();
   });
 
-  it("user encounters invalid code, expired code, and recovers to login successfully", async () => {
+  it("user enters invalid code, sees error, button returns to normal state", async () => {
+    const user = userEvent.setup();
+
+    render(<LoginClient loginContent={mockLoginContent} />);
+
+    // User gets to code screen
+    await user.type(
+      screen.getByLabelText(/email address/i),
+      "complete@example.com",
+    );
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    // Wait for code screen
+    expect(
+      await screen.findByRole("heading", { name: /check your email/i }),
+    ).toBeInTheDocument();
+
+    // Mock NextAuth signIn to return error (simulating VerificationCodeProvider returning null)
+    // In NextAuth v5 beta, ok can be true even with error (bug)
+    mockSignIn.mockResolvedValueOnce({
+      error: "CredentialsSignin",
+      code: "credentials",
+      status: 200,
+      ok: true, // Bug in NextAuth v5 beta
+      url: null,
+    });
+
+    const codeInput = screen.getByLabelText(/verification code/i);
+    await user.type(codeInput, "999999");
+
+    const verifyButton = screen.getByRole("button", { name: /verify code/i });
+    await user.click(verifyButton);
+
+    // User sees error message
+    const errorAlert = await screen.findByRole("alert");
+    expect(errorAlert).toHaveTextContent(/invalid verification code/i);
+
+    // Button should return to normal (not disabled/loading)
+    expect(verifyButton).not.toBeDisabled();
+    expect(verifyButton).toHaveTextContent(/verify code/i);
+
+    // User can try again with correct code
+    mockSignIn.mockResolvedValueOnce({
+      error: undefined,
+      ok: true,
+      status: 200,
+      code: undefined,
+      url: "/dashboard",
+    });
+
+    await user.clear(codeInput);
+    await user.type(codeInput, "123456");
+    await user.click(verifyButton);
+
+    // Should redirect to dashboard
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
+    });
+  });
+
+  it("user resends code after getting invalid code error", async () => {
     const user = userEvent.setup();
 
     render(<LoginClient loginContent={mockLoginContent} />);
@@ -281,65 +379,52 @@ describe("Login - Error Recovery Workflows", () => {
       await screen.findByRole("heading", { name: /check your email/i }),
     ).toBeInTheDocument();
 
-    // User enters WRONG code
-    vi.mocked(mockAuthApi.verifyCode).mockResolvedValueOnce({
-      success: false,
-      error: "Invalid code. Please check and try again.",
+    // User enters invalid code
+    mockSignIn.mockResolvedValueOnce({
+      error: "CredentialsSignin",
+      code: "credentials",
+      status: 200,
+      ok: true,
+      url: null,
     });
 
     const codeInput = screen.getByLabelText(/verification code/i);
-    await user.type(codeInput, "999999");
-    await user.click(screen.getByRole("button", { name: /verify code/i }));
-
-    // User sees "Invalid code" error
-    let errorAlert = await screen.findByRole("alert");
-    expect(errorAlert).toHaveTextContent(/invalid code/i);
-
-    // User clears and tries expired code
-    await user.clear(codeInput);
-
-    vi.mocked(mockAuthApi.verifyCode).mockResolvedValueOnce({
-      success: false,
-      error: "This code has expired. Please request a new one.",
-    });
-
     await user.type(codeInput, "111111");
     await user.click(screen.getByRole("button", { name: /verify code/i }));
 
-    // User sees "expired" error with "Get a new code" button
-    errorAlert = await screen.findByRole("alert");
-    expect(errorAlert).toHaveTextContent(/expired/i);
+    // User sees error
+    const errorAlert = await screen.findByRole("alert");
+    expect(errorAlert).toHaveTextContent(/invalid verification code/i);
 
-    const getNewCodeButton = screen.getByRole("button", {
-      name: /get a new code/i,
+    // User decides to request a new code instead of retrying
+    const resendButton = screen.getByRole("button", { name: /resend email/i });
+    await user.click(resendButton);
+
+    // Input is cleared after resend
+    await waitFor(() => {
+      expect(codeInput).toHaveValue("");
     });
-    expect(getNewCodeButton).toBeInTheDocument();
-
-    // User clicks "Get a new code"
-    await user.click(getNewCodeButton);
 
     // User sees success message
     expect(
       await screen.findByText(/code sent! check your email/i),
     ).toBeInTheDocument();
 
-    // Input is cleared
-    expect(codeInput).toHaveValue("");
-
-    // User enters correct code
-    vi.mocked(mockAuthApi.verifyCode).mockResolvedValueOnce({ success: true });
+    // User enters the new correct code
+    mockSignIn.mockResolvedValueOnce({
+      error: undefined,
+      ok: true,
+      status: 200,
+      code: undefined,
+      url: "/dashboard",
+    });
 
     await user.type(codeInput, "123456");
     await user.click(screen.getByRole("button", { name: /verify code/i }));
 
-    // Success - NextAuth signIn called
+    // Should redirect to dashboard
     await waitFor(() => {
-      expect(mockSignIn).toHaveBeenCalledWith("verification-code", {
-        email: "complete@example.com",
-        code: "123456",
-        redirect: true,
-        callbackUrl: "/dashboard",
-      });
+      expect(mockPush).toHaveBeenCalledWith("/dashboard");
     });
   });
 
@@ -347,22 +432,29 @@ describe("Login - Error Recovery Workflows", () => {
     const user = userEvent.setup();
 
     // First attempt fails
-    vi.mocked(mockAuthApi.checkProfileStatus).mockRejectedValueOnce(
+    vi.mocked(loginActions.checkUserByEmailAction).mockRejectedValueOnce(
       new Error("Network error"),
     );
 
     // Second attempt succeeds
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValueOnce({
-      exists: true,
-      isCompleted: true,
-      completedSteps: [
-        "PERSONAL",
-        "SKIN_TYPE",
-        "SKIN_CONCERNS",
-        "ALLERGIES",
-        "SUBSCRIPTION",
-        "BOOKING",
-      ],
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValueOnce({
+      user: {
+        id: "user-retry",
+        email: "retry@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Retry User",
+        image: null,
+      },
+      profile: {
+        id: "profile-retry",
+        userId: "user-retry",
+        email: "retry@example.com",
+        firstName: "Retry",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
     render(<LoginClient loginContent={mockLoginContent} />);
@@ -384,7 +476,9 @@ describe("Login - Error Recovery Workflows", () => {
     expect(screen.getByLabelText(/email address/i)).toHaveValue(
       "retry@example.com",
     );
-    expect(screen.getByRole("button", { name: /continue/i })).not.toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: /continue/i }),
+    ).not.toBeDisabled();
 
     // User retries
     await user.click(screen.getByRole("button", { name: /continue/i }));
@@ -395,26 +489,36 @@ describe("Login - Error Recovery Workflows", () => {
     ).toBeInTheDocument();
 
     // Verify checkProfileStatus was called twice
-    expect(mockAuthApi.checkProfileStatus).toHaveBeenCalledTimes(2);
+    expect(loginActions.checkUserByEmailAction).toHaveBeenCalledTimes(2);
   });
 });
 
 describe("Login - Resend Code Workflow", () => {
   beforeEach(() => {
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
-      exists: true,
-      isCompleted: true,
-      completedSteps: [
-        "PERSONAL",
-        "SKIN_TYPE",
-        "SKIN_CONCERNS",
-        "ALLERGIES",
-        "SUBSCRIPTION",
-        "BOOKING",
-      ],
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    vi.mocked(mockAuthApi.sendVerificationEmail).mockResolvedValue();
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
   });
 
   afterEach(() => {
@@ -424,7 +528,7 @@ describe("Login - Resend Code Workflow", () => {
     vi.clearAllMocks();
   });
 
-  it("user resends verification code successfully", async () => {
+  it("user resends verification code successfully and input is cleared", async () => {
     const user = userEvent.setup();
 
     render(<LoginClient loginContent={mockLoginContent} />);
@@ -441,11 +545,21 @@ describe("Login - Resend Code Workflow", () => {
       await screen.findByRole("heading", { name: /check your email/i }),
     ).toBeInTheDocument();
 
-    // User clicks "Resend email"
+    // User starts typing a code
+    const codeInput = screen.getByLabelText(/verification code/i);
+    await user.type(codeInput, "123");
+    expect(codeInput).toHaveValue("123");
+
+    // User realizes they need to resend
     const resendButton = screen.getByRole("button", { name: /resend email/i });
     expect(resendButton).not.toBeDisabled();
 
     await user.click(resendButton);
+
+    // Code input should be cleared immediately
+    await waitFor(() => {
+      expect(codeInput).toHaveValue("");
+    });
 
     // User sees success message
     expect(
@@ -456,8 +570,8 @@ describe("Login - Resend Code Workflow", () => {
     expect(screen.getByText("resend@example.com")).toBeInTheDocument();
 
     // Verify sendVerificationEmail was called twice (initial + resend)
-    expect(mockAuthApi.sendVerificationEmail).toHaveBeenCalledTimes(2);
-    expect(mockAuthApi.sendVerificationEmail).toHaveBeenCalledWith(
+    expect(loginActions.createVerificationCodeAction).toHaveBeenCalledTimes(2);
+    expect(loginActions.createVerificationCodeAction).toHaveBeenCalledWith(
       "resend@example.com",
     );
   });
@@ -465,20 +579,30 @@ describe("Login - Resend Code Workflow", () => {
 
 describe("Login - Navigation and Validation", () => {
   beforeEach(() => {
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
-      exists: true,
-      isCompleted: true,
-      completedSteps: [
-        "PERSONAL",
-        "SKIN_TYPE",
-        "SKIN_CONCERNS",
-        "ALLERGIES",
-        "SUBSCRIPTION",
-        "BOOKING",
-      ],
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    vi.mocked(mockAuthApi.sendVerificationEmail).mockResolvedValue();
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
   });
 
   afterEach(() => {
@@ -602,27 +726,55 @@ describe("Login - Navigation and Validation", () => {
 
 describe("Login - Loading States", () => {
   beforeEach(() => {
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
-      exists: true,
-      isCompleted: true,
-      completedSteps: [
-        "PERSONAL",
-        "SKIN_TYPE",
-        "SKIN_CONCERNS",
-        "ALLERGIES",
-        "SUBSCRIPTION",
-        "BOOKING",
-      ],
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    vi.mocked(mockAuthApi.sendVerificationEmail).mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 200)),
-    );
-
-    vi.mocked(mockAuthApi.verifyCode).mockImplementation(
+    vi.mocked(loginActions.createVerificationCodeAction).mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ success: true }), 200),
+          setTimeout(
+            () =>
+              resolve({
+                code: "123456",
+                expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+              }),
+            200,
+          ),
+        ),
+    );
+
+    // Mock NextAuth signIn with delay to test loading state
+    mockSignIn.mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(
+            () =>
+              resolve({
+                error: undefined,
+                ok: true,
+                status: 200,
+                code: undefined,
+                url: "/dashboard",
+              }),
+            200,
+          ),
         ),
     );
   });
@@ -720,20 +872,30 @@ describe("Login - Loading States", () => {
 
 describe("Login - Magic Link Toggle", () => {
   beforeEach(() => {
-    vi.mocked(mockAuthApi.checkProfileStatus).mockResolvedValue({
-      exists: true,
-      isCompleted: true,
-      completedSteps: [
-        "PERSONAL",
-        "SKIN_TYPE",
-        "SKIN_CONCERNS",
-        "ALLERGIES",
-        "SUBSCRIPTION",
-        "BOOKING",
-      ],
+    vi.mocked(loginActions.checkUserByEmailAction).mockResolvedValue({
+      user: {
+        id: "user-123",
+        email: "complete@example.com",
+        emailVerified: new Date().toISOString(),
+        name: "Test User",
+        image: null,
+      },
+      profile: {
+        id: "profile-123",
+        userId: "user-123",
+        email: "complete@example.com",
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "+1234567890",
+        dateOfBirth: "1990-01-01T00:00:00Z",
+        onboardingComplete: true,
+      },
     });
 
-    vi.mocked(mockAuthApi.sendVerificationEmail).mockResolvedValue();
+    vi.mocked(loginActions.createVerificationCodeAction).mockResolvedValue({
+      code: "123456",
+      expires: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+    });
   });
 
   afterEach(() => {
@@ -744,7 +906,7 @@ describe("Login - Magic Link Toggle", () => {
     delete process.env.NEXT_PUBLIC_ENABLE_MAGIC_LINK;
   });
 
-  it('shows only verification code message when magic link is disabled', async () => {
+  it("shows only verification code message when magic link is disabled", async () => {
     const user = userEvent.setup();
 
     // Explicitly set to false (disabled)
@@ -765,8 +927,12 @@ describe("Login - Magic Link Toggle", () => {
     ).toBeInTheDocument();
 
     // Should show ONLY verification code message (no magic link mentioned)
-    expect(screen.getByText(/we've sent a 6-digit code to/i)).toBeInTheDocument();
-    expect(screen.getByText(/enter your code below to continue/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/we've sent a 6-digit code to/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/enter your code below to continue/i),
+    ).toBeInTheDocument();
 
     // Should NOT mention magic link
     expect(screen.queryByText(/sign-in link and/i)).not.toBeInTheDocument();
@@ -776,7 +942,7 @@ describe("Login - Magic Link Toggle", () => {
     expect(mockSignIn).not.toHaveBeenCalledWith("resend", expect.anything());
   });
 
-  it('shows both magic link and verification code message when enabled', async () => {
+  it("shows both magic link and verification code message when enabled", async () => {
     const user = userEvent.setup();
 
     // Enable magic link
@@ -812,7 +978,7 @@ describe("Login - Magic Link Toggle", () => {
     });
   });
 
-  it('sends magic link on resend when enabled', async () => {
+  it("sends magic link on resend when enabled", async () => {
     const user = userEvent.setup();
 
     // Enable magic link
@@ -848,7 +1014,7 @@ describe("Login - Magic Link Toggle", () => {
     });
   });
 
-  it('does NOT send magic link on resend when disabled', async () => {
+  it("does NOT send magic link on resend when disabled", async () => {
     const user = userEvent.setup();
 
     // Disable magic link
@@ -880,6 +1046,6 @@ describe("Login - Magic Link Toggle", () => {
     expect(mockSignIn).not.toHaveBeenCalled();
 
     // But verification email was sent
-    expect(mockAuthApi.sendVerificationEmail).toHaveBeenCalledTimes(2);
+    expect(loginActions.createVerificationCodeAction).toHaveBeenCalledTimes(2);
   });
 });
