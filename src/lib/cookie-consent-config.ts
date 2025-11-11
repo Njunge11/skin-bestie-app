@@ -69,13 +69,13 @@ export const cookieConsentConfig: CookieConsentConfig = {
         consentModal: {
           title: "Your cookie preferences",
           description:
-            "When you visit our website, we may collect and store browser data – like pages viewed or items clicked – using cookies. Cookies help us keep the site working, improve performance, and show you personalised content. It's your choice what we collect. You can find details and choose which types of cookies to allow by clicking on 'Cookie Settings' and update your preferences anytime. Not accepting some cookies may limit certain website features. For more details, see our <a href='/privacy-policy'>Privacy Policy</a>.",
+            "When you visit our website, we may collect and store browser data – like pages viewed or items clicked – using cookies. Cookies help us keep the site working, improve performance, and show you personalised content. It's your choice what we collect. You can find details and choose which types of cookies to allow by clicking on 'Cookie Preferences' and update your preferences anytime. Not accepting some cookies may limit certain website features. For more details, see our <a href='/privacy-policy'>Privacy Policy</a>.",
           acceptAllBtn: "Accept All",
           acceptNecessaryBtn: "Reject All",
-          showPreferencesBtn: "Cookie Settings",
+          showPreferencesBtn: "Cookie Preferences",
         },
         preferencesModal: {
-          title: "Cookie Settings",
+          title: "Cookie Preferences",
           acceptAllBtn: "Accept All",
           acceptNecessaryBtn: "Reject All",
           savePreferencesBtn: "Save Preferences",

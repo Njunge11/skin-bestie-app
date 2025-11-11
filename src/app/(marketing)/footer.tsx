@@ -19,7 +19,7 @@ export default function Footer() {
               </span>
             </h1>
             <div className="pt-9">
-              <ul className="flex flex-col md:flex-row gap-6 font-semibold text-sm leading-[150%] tracking-normal">
+              <ul className="flex flex-col md:flex-row gap-4 font-semibold text-xs leading-[150%] tracking-normal">
                 <li>
                   <a href="#how" className="text-[#FAFAFA]">
                     HOW IT WORKS
@@ -43,6 +43,11 @@ export default function Footer() {
                 <li>
                   <Link href="/terms-of-use" className="text-[#FAFAFA]">
                     TERMS OF USE
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/cookie-preferences" className="text-[#FAFAFA]">
+                    COOKIE PREFERENCES
                   </Link>
                 </li>
               </ul>

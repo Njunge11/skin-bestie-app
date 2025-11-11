@@ -22,10 +22,10 @@ export default function TermsOfUsePage() {
     { id: "internet-security", label: "Internet security and privacy" },
     { id: "copyright", label: "Copyright and Intellectual Property" },
     { id: "user-generated-content", label: "User-generated content" },
-    { id: "user-content-standards", label: "User Content Standards" },
+    { id: "user-content-standards", label: "User Content" },
     {
       id: "intellectual-property",
-      label: "Intellectual property for User Content",
+      label: "Intellectual property",
     },
     { id: "applicable-law", label: "Applicable Law and Jurisdiction" },
   ];
@@ -123,10 +123,18 @@ export default function TermsOfUsePage() {
                 className="text-base leading-relaxed mb-4"
                 style={{ color: "#1B1D1F" }}
               >
-                If you use the Skin Bestie website, you confirm that you accept
+                If you use the SkinBestie website, you confirm that you accept
                 these Terms and that you agree to comply with them. If you are
-                also using Skin Bestie&apos;s services, please see our client
-                terms and conditions.
+                also using SkinBestie&apos;s services, please see our{" "}
+                <Link
+                  href="/terms-and-conditions"
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
+                >
+                  Client Terms and Conditions
+                </Link>
+                , which govern bookings, cancellations, subscriptions, pricing
+                and payments.
               </p>
               <p
                 className="text-base leading-relaxed mb-4"
@@ -204,16 +212,21 @@ export default function TermsOfUsePage() {
                 Changes to our website
               </h2>
               <p
-                className="text-base leading-relaxed"
+                className="text-base leading-relaxed mb-4"
                 style={{ color: "#1B1D1F" }}
               >
                 We may update our website from time to time and may change the
                 content at any time. However, please note that any of the
                 content on our website may be out of date at any given time, and
-                we are under no obligation to update it. We do not guarantee
-                that our website, or any content on it, will be free from errors
-                or omissions and you accept that such changes may result in your
-                being unable to access our website.
+                we are under no obligation to update it.
+              </p>
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: "#1B1D1F" }}
+              >
+                We do not guarantee that our website, or any content on it, will
+                be free from errors or omissions and you accept that such
+                changes may result in your being unable to access our website.
               </p>
             </section>
 
@@ -258,7 +271,7 @@ export default function TermsOfUsePage() {
                 The content on this website is provided in accordance with and
                 subject to the laws of England. No representations are made that
                 materials on this website are appropriate or available for use
-                in locations outside of the United Kingdom. Users who access
+                in locations outside of the united kingdom. Users who access
                 this website from other locations do so on their own initiative
                 and are responsible for compliance with local laws.
               </p>
@@ -498,16 +511,53 @@ export default function TermsOfUsePage() {
                     className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
                     style={{ backgroundColor: "#222118" }}
                   ></span>
-                  <span
+                  <div
                     className="text-base leading-relaxed"
                     style={{ color: "#1B1D1F" }}
                   >
-                    Not to access without authority, interfere with, damage or
-                    disrupt any part of our website; any equipment or network on
-                    which our website is stored; any software used in the
-                    provision of our website; or any equipment or network or
-                    software owned or used by any third party.
-                  </span>
+                    <p className="mb-2">
+                      Not to access without authority, interfere with, damage or
+                      disrupt:
+                    </p>
+                    <ul className="space-y-2 ml-6">
+                      <li className="flex items-start">
+                        <span
+                          className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                          style={{ backgroundColor: "#222118" }}
+                        ></span>
+                        <span>Any part of our website;</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span
+                          className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                          style={{ backgroundColor: "#222118" }}
+                        ></span>
+                        <span>
+                          Any equipment or network on which our website is
+                          stored;
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span
+                          className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                          style={{ backgroundColor: "#222118" }}
+                        ></span>
+                        <span>
+                          Any software used in the provision of our website; or
+                        </span>
+                      </li>
+                      <li className="flex items-start">
+                        <span
+                          className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                          style={{ backgroundColor: "#222118" }}
+                        ></span>
+                        <span>
+                          Any equipment or network or software owned or used by
+                          any third party.
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
                 </li>
               </ul>
             </section>
@@ -674,10 +724,12 @@ export default function TermsOfUsePage() {
                 className="text-base leading-relaxed mb-4"
                 style={{ color: "#1B1D1F" }}
               >
-                We may make available, via this website, a space dedicated to
-                user content whereby users of our website can upload content
-                such as text, photos, videos, opinions, etc. (User Content) on
-                forums including but not limited to:
+                We may make available, via this website or in connection with
+                it, a space dedicated to user content (for example, forums,
+                comments, ratings and reviews, or community features) whereby
+                users of our website can upload content such as text, photos,
+                videos, opinions, etc. (User Content) on forums including but
+                not limited to:
               </p>
               <ul className="space-y-3 ml-6 mb-4">
                 <li className="flex items-start">
@@ -765,19 +817,19 @@ export default function TermsOfUsePage() {
               </p>
             </section>
 
-            {/* User Content Standards */}
+            {/* User Content */}
             <section id="user-content-standards">
               <h2
                 className={`${anton.className} text-2xl lg:text-3xl font-normal uppercase mb-6`}
                 style={{ color: "#222118" }}
               >
-                User Content Standards
+                User Content
               </h2>
               <p
                 className="text-base leading-relaxed mb-4"
                 style={{ color: "#1B1D1F" }}
               >
-                <strong>User Content must:</strong>
+                <strong>Must:</strong>
               </p>
               <ul className="space-y-3 ml-6 mb-6">
                 <li className="flex items-start">
@@ -826,7 +878,7 @@ export default function TermsOfUsePage() {
                     style={{ color: "#1B1D1F" }}
                   >
                     Comply with applicable law in the UK and in any country from
-                    which it is posted.
+                    which it is posted,
                   </span>
                 </li>
               </ul>
@@ -860,7 +912,7 @@ export default function TermsOfUsePage() {
                     style={{ color: "#1B1D1F" }}
                   >
                     Contain any material which is rude, obscene, offensive,
-                    hateful or inflammatory;
+                    hateful or inflammatory.
                   </span>
                 </li>
                 <li className="flex items-start">
@@ -1110,13 +1162,13 @@ export default function TermsOfUsePage() {
               </p>
             </section>
 
-            {/* Intellectual property for User Content */}
+            {/* Intellectual property */}
             <section id="intellectual-property">
               <h2
                 className={`${anton.className} text-2xl lg:text-3xl font-normal uppercase mb-6`}
                 style={{ color: "#222118" }}
               >
-                Intellectual property for User Content
+                Intellectual property
               </h2>
               <p
                 className="text-base leading-relaxed mb-4"

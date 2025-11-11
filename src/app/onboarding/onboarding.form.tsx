@@ -56,12 +56,12 @@ export default function OnboardingForm() {
 
   const alignLeft = current.align === "left";
 
-  // Track if Step5 is showing success screen (to hide form header)
+  // Track if Step5 or Step6 is showing success screen (to hide form header)
   const [hideFormHeader, setHideFormHeader] = useState(false);
 
   // Reset hideFormHeader when step changes
   useEffect(() => {
-    if (current.component !== "subscribe") {
+    if (current.component !== "subscribe" && current.component !== "book") {
       setHideFormHeader(false);
     }
   }, [current.component]);
@@ -146,7 +146,7 @@ export default function OnboardingForm() {
         {/* Each step validates only its own fields */}
         <StepBody
           onNext={next}
-          {...(current.component === "subscribe"
+          {...(current.component === "subscribe" || current.component === "book"
             ? { onShowingSuccess: setHideFormHeader }
             : {})}
         />

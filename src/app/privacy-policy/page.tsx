@@ -13,6 +13,7 @@ export default function PrivacyPolicyPage() {
 
   const sections = [
     { id: "important-info", label: "Important information and who we are" },
+    { id: "meaning-personal-data", label: "Meaning of personal data" },
     { id: "info-collect", label: "Information we collect" },
     { id: "how-collected", label: "How is your personal data collected?" },
     { id: "how-we-use", label: "How we use your personal data" },
@@ -159,6 +160,12 @@ export default function PrivacyPolicyPage() {
                 GDPR) in relation to any services we provide to individuals in
                 the European Economic Area (EEA).
               </p>
+              <h3
+                className={`${anton.className} text-xl lg:text-2xl font-normal uppercase mb-4 mt-8`}
+                style={{ color: "#222118" }}
+              >
+                Privacy Policy
+              </h3>
               <p
                 className="text-base leading-relaxed"
                 style={{ color: "#1B1D1F" }}
@@ -169,6 +176,41 @@ export default function PrivacyPolicyPage() {
                 with us, sign up to our marketing communications, use our
                 virtual skin coaching services, purchase a product or service,
                 or take part in a competition.
+              </p>
+            </section>
+
+            {/* Meaning of personal data */}
+            <section id="meaning-personal-data">
+              <h2
+                className={`${anton.className} text-2xl lg:text-3xl font-normal uppercase mb-6`}
+                style={{ color: "#222118" }}
+              >
+                Meaning of personal data
+              </h2>
+              <p
+                className="text-base leading-relaxed mb-4"
+                style={{ color: "#1B1D1F" }}
+              >
+                Personal data means any information relating to an identified or
+                identifiable individual (known as the data subject). Personal
+                data includes information irrespective of how it is stored.
+                Different pieces of information, which collected together can
+                lead to the identification of a particular person, also
+                constitute personal data. Common examples of personal data
+                include an individual&apos;s name, address, contact information,
+                photograph, IP address and information about the individual such
+                as their age or employment status.
+              </p>
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: "#1B1D1F" }}
+              >
+                Special category personal data means personal data revealing
+                racial or ethnic origin, political opinions, religious beliefs,
+                philosophical beliefs or trade union membership, genetic and
+                biometric data (when processed to uniquely identify an
+                individual), or data concerning health, sex life or sexual
+                orientation.
               </p>
             </section>
 
@@ -238,6 +280,20 @@ export default function PrivacyPolicyPage() {
                     className="text-base leading-relaxed"
                     style={{ color: "#1B1D1F" }}
                   >
+                    <strong>Coaching Call Data:</strong> notes from your
+                    coaching sessions and, where applicable, audio and video
+                    recordings of your Coaching Class
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span
+                    className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                    style={{ backgroundColor: "#222118" }}
+                  ></span>
+                  <span
+                    className="text-base leading-relaxed"
+                    style={{ color: "#1B1D1F" }}
+                  >
                     <strong>Technical Data:</strong> IP address, browser type,
                     time zone settings, and usage data.
                   </span>
@@ -289,9 +345,31 @@ export default function PrivacyPolicyPage() {
                 className="text-base leading-relaxed mb-4"
                 style={{ color: "#1B1D1F" }}
               >
+                The above list is not exhaustive, and SkinBestie may also
+                collect and process other personal data to the extent that this
+                is considered necessary for providing our services or compliance
+                with legal requirements.
+              </p>
+              <p
+                className="text-base leading-relaxed mb-4"
+                style={{ color: "#1B1D1F" }}
+              >
                 If you do not provide personal data we ask for where it is
                 requested (for example, at point of sale), it may delay or
                 prevent us from providing services to you.
+              </p>
+              <p
+                className="text-base leading-relaxed mb-4"
+                style={{ color: "#1B1D1F" }}
+              >
+                We also collect, use and share aggregated data such as
+                statistical or demographic data which is not personal data as it
+                does not directly (or indirectly) reveal your identity. For
+                example, we may aggregate individuals&apos; Usage Data to
+                calculate the percentage of users accessing a specific website
+                feature in order to analyse general trends in how users are
+                interacting with our website to help improve the website and our
+                service offering.
               </p>
               <h3
                 className={`${anton.className} text-xl lg:text-2xl font-normal uppercase mb-4 mt-8`}
@@ -465,6 +543,25 @@ export default function PrivacyPolicyPage() {
                     className="text-base leading-relaxed"
                     style={{ color: "#1B1D1F" }}
                   >
+                    <strong>
+                      Account management, subscriptions and billing:
+                    </strong>{" "}
+                    To create and manage your account, process payments, manage
+                    your Subscription (including renewals, upgrades, downgrades
+                    and cancellations), and send you service-related
+                    communications such as booking confirmations and renewal
+                    notices.
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span
+                    className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                    style={{ backgroundColor: "#222118" }}
+                  ></span>
+                  <span
+                    className="text-base leading-relaxed"
+                    style={{ color: "#1B1D1F" }}
+                  >
                     <strong>Marketing Communications:</strong> To send updates,
                     promotional content, and relevant skincare information (only
                     if you have provided consent).
@@ -525,6 +622,20 @@ export default function PrivacyPolicyPage() {
                 className={`${anton.className} text-xl lg:text-2xl font-normal uppercase mb-4 mt-8`}
                 style={{ color: "#222118" }}
               >
+                Third-party marketing
+              </h3>
+              <p
+                className="text-base leading-relaxed mb-6"
+                style={{ color: "#1B1D1F" }}
+              >
+                We will get your express consent before we share your personal
+                data with any third party for their own direct marketing
+                purposes.
+              </p>
+              <h3
+                className={`${anton.className} text-xl lg:text-2xl font-normal uppercase mb-4 mt-8`}
+                style={{ color: "#222118" }}
+              >
                 Opting out of marketing
               </h3>
               <p
@@ -538,8 +649,15 @@ export default function PrivacyPolicyPage() {
                 communications, you will still receive service-related
                 communications that are essential for administrative or customer
                 service purposes for example relating to order confirmations,
-                updates to our Terms and Conditions, or checking that your
-                contact details are correct.
+                updates to our{" "}
+                <Link
+                  href="/terms-and-conditions"
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
+                >
+                  Terms and Conditions
+                </Link>
+                , or checking that your contact details are correct.
               </p>
             </section>
 
@@ -569,8 +687,10 @@ export default function PrivacyPolicyPage() {
                     style={{ color: "#1B1D1F" }}
                   >
                     <strong>Service Providers:</strong> Companies providing
-                    services such as payment processing, IT services, and
-                    customer support on our behalf.
+                    services such as payment processing (for example, our
+                    payment gateways), IT and hosting, communication tools (for
+                    example, email and messaging platforms), and customer
+                    support on our behalf.
                   </span>
                 </li>
                 <li className="flex items-start">
@@ -622,15 +742,52 @@ export default function PrivacyPolicyPage() {
                 have laws that do not provide the same level of data protection
                 as the UK law. Under data protection law, we can only transfer
                 your personal data to a country or international organisation
-                outside the UK/EEA where the UK government (or, where the EU
-                GDPR applies, the European Commission) has decided the
-                particular country or international organisation ensures an
-                adequate level of protection of personal data (known as an
-                &apos;adequacy decision&apos;); there are appropriate safeguards
-                in place, together with enforceable rights and effective legal
-                remedies for data subjects; or a specific exception applies
-                under data protection law.
+                outside the UK/EEA where:
               </p>
+              <ul className="space-y-3 ml-6 mt-4">
+                <li className="flex items-start">
+                  <span
+                    className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                    style={{ backgroundColor: "#222118" }}
+                  ></span>
+                  <span
+                    className="text-base leading-relaxed"
+                    style={{ color: "#1B1D1F" }}
+                  >
+                    the UK government (or, where the EU GDPR applies, the
+                    European Commission) has decided the particular country or
+                    international organisation ensures an adequate level of
+                    protection of personal data (known as an &apos;adequacy
+                    decision&apos;);
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span
+                    className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                    style={{ backgroundColor: "#222118" }}
+                  ></span>
+                  <span
+                    className="text-base leading-relaxed"
+                    style={{ color: "#1B1D1F" }}
+                  >
+                    there are appropriate safeguards in place, together with
+                    enforceable rights and effective legal remedies for data
+                    subjects; or
+                  </span>
+                </li>
+                <li className="flex items-start">
+                  <span
+                    className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
+                    style={{ backgroundColor: "#222118" }}
+                  ></span>
+                  <span
+                    className="text-base leading-relaxed"
+                    style={{ color: "#1B1D1F" }}
+                  >
+                    a specific exception applies under data protection law.
+                  </span>
+                </li>
+              </ul>
             </section>
 
             {/* Data security */}
@@ -671,7 +828,10 @@ export default function PrivacyPolicyPage() {
                 We will only retain your personal data for as long as necessary
                 to fulfil the purposes we collected it for, including any legal,
                 accounting, or reporting requirements. When it is no longer
-                needed, we will securely delete or anonymise your data.
+                needed, we will securely delete or anonymise your data. For
+                example, we usually retain recordings of Coaching Calls for up
+                to 90 days, unless we need to keep them longer for legal,
+                regulatory or dispute-resolution purposes.
               </p>
             </section>
 
@@ -815,14 +975,22 @@ export default function PrivacyPolicyPage() {
                 preferences regarding the cookies that are set by our website,
                 please use the tool available on the website or refer to the
                 Help function within your browser to learn how to manage your
-                settings within your browser. For more information, please
-                consult the following link:{" "}
+                settings within your browser. For more information about the
+                cookies we use, please see our{" "}
+                <Link
+                  href="/cookie-preferences"
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
+                >
+                  Cookie Preferences
+                </Link>{" "}
+                page. For general information about cookies, please consult:{" "}
                 <a
                   href="https://allaboutcookies.org/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#222118] transition-opacity"
-                  style={{ color: "#222118" }}
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
                 >
                   https://allaboutcookies.org/
                 </a>
@@ -896,8 +1064,8 @@ export default function PrivacyPolicyPage() {
                   href="https://www.ico.org.uk"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#222118] transition-opacity"
-                  style={{ color: "#222118" }}
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
                 >
                   www.ico.org.uk
                 </a>

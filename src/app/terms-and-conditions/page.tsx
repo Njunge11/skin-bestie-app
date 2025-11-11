@@ -141,20 +141,28 @@ export default function TermsAndConditionsPage() {
                 website, including our{" "}
                 <Link
                   href="/privacy-policy"
-                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#222118] transition-opacity"
-                  style={{ color: "#222118" }}
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
                 >
                   Privacy Policy
                 </Link>
                 ,{" "}
                 <Link
                   href="/terms-of-use"
-                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#222118] transition-opacity"
-                  style={{ color: "#222118" }}
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
                 >
                   Terms of Use
                 </Link>
-                , and Cookie Settings.
+                , and{" "}
+                <Link
+                  href="/cookie-preferences"
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
+                >
+                  Cookie Preferences
+                </Link>
+                .
               </p>
             </section>
 
@@ -198,8 +206,23 @@ export default function TermsAndConditionsPage() {
                 When we say &quot;you&quot; or &quot;your&quot;, we mean the
                 person placing a booking or using our services. These Client
                 Terms apply to our online skincare coaching services. Your use
-                of the website is governed by our separate Terms of Use; our
-                Privacy Policy explains how we handle your personal data.
+                of the website is governed by our separate{" "}
+                <Link
+                  href="/terms-of-use"
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
+                >
+                  Terms of Use
+                </Link>
+                ; our{" "}
+                <Link
+                  href="/privacy-policy"
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
+                >
+                  Privacy Policy
+                </Link>{" "}
+                explains how we handle your personal data.
               </p>
             </section>
 
@@ -410,8 +433,15 @@ export default function TermsAndConditionsPage() {
                 className="text-base leading-relaxed"
                 style={{ color: "#1B1D1F" }}
               >
-                For how we handle personal data (including recordings), see our
-                Privacy Policy.
+                For how we handle personal data (including recordings), see our{" "}
+                <Link
+                  href="/privacy-policy"
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
+                >
+                  Privacy Policy
+                </Link>
+                .
               </p>
             </section>
 
@@ -696,8 +726,8 @@ export default function TermsAndConditionsPage() {
                 Please see our{" "}
                 <Link
                   href="/privacy-policy"
-                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#222118] transition-opacity"
-                  style={{ color: "#222118" }}
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  style={{ color: "#EB6D98" }}
                 >
                   Privacy Policy
                 </Link>{" "}

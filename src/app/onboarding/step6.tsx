@@ -4,6 +4,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
+import { CheckCircle2 } from "lucide-react";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { getUserProfile, updateUserProfile } from "./actions";
 import { mergeCompletedSteps } from "./onboarding.utils";
@@ -67,17 +69,27 @@ function CalendarSkeleton() {
   );
 }
 
-export default function CalendlyInline() {
+export default function CalendlyInline({
+  onShowingSuccess,
+}: {
+  onShowingSuccess?: (showing: boolean) => void;
+}) {
   const { getValues } = useFormContext<OnboardingSchema>();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const didInitRef = useRef(false);
   const mountedRef = useRef(false);
 
   const [ready, setReady] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const skeletonShownAtRef = useRef<number>(Date.now());
 
   const MIN_SKELETON_MS = 400; // prevent blink
   const FALLBACK_READY_MS = 3000; // if no postMessage comes
+
+  // Notify parent when showing success screen
+  useEffect(() => {
+    onShowingSuccess?.(showSuccess);
+  }, [showSuccess, onShowingSuccess]);
 
   // Get user profile ID
   const userProfileId = getValues("userProfileId");
@@ -197,6 +209,9 @@ export default function CalendlyInline() {
           });
 
           console.log("Booking completed and saved to database");
+
+          // Show success screen
+          setShowSuccess(true);
         } catch (error) {
           console.error("Failed to save booking completion:", error);
         }
@@ -204,7 +219,7 @@ export default function CalendlyInline() {
     }
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
-  }, [userProfileId, currentProfile]);
+  }, [userProfileId, currentProfile, onShowingSuccess]);
 
   // load calendly assets and init (StrictMode-safe)
   useEffect(() => {
@@ -272,6 +287,35 @@ export default function CalendlyInline() {
       <p className="text-sm text-red-600">
         Missing <code>NEXT_PUBLIC_CALENDLY_EVENT_URL</code>.
       </p>
+    );
+  }
+
+  // Show success screen after booking
+  if (showSuccess) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-6 pt-6">
+        <CheckCircle2
+          className="w-16 h-16 text-green-600"
+          strokeWidth={1.5}
+          aria-hidden="true"
+        />
+        <div className="text-center space-y-3">
+          <p className="text-lg font-semibold text-[#3F4548] max-w-md">
+            You&apos;re one step closer to better understanding what works best
+            for you.
+          </p>
+          <p className="text-sm text-[#3F4548] max-w-md">
+            A calendar invitation has been sent to{" "}
+            <span className="font-medium">{getValues("email")}</span>.
+          </p>
+        </div>
+        <Link
+          href="/login"
+          className="flex items-center justify-center w-full px-6 py-3 bg-[#195284] text-white text-base font-semibold rounded hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#195284]"
+        >
+          Login to your SkinBestie Account
+        </Link>
+      </div>
     );
   }
 

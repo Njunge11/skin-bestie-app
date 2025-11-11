@@ -397,24 +397,20 @@ function Form({
               htmlFor="terms-checkbox"
               className="text-sm text-[#3F4548] cursor-pointer"
             >
-              I agree to the{" "}
+              By clicking &quot;Subscribe&quot;, you agree to a monthly
+              auto-renewing plan with one coaching call per month plus access to
+              our resources, no roll-over of unused calls, and that you can
+              cancel any time with effect from the end of your current month
+              (see{" "}
               <a
                 href="/terms-and-conditions"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#030303] transition-opacity"
               >
-                Terms & Conditions
-              </a>{" "}
-              and{" "}
-              <a
-                href="/privacy-policy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#030303] transition-opacity"
-              >
-                Privacy Policy
+                Client Terms & Conditions
               </a>
+              ).
             </label>
           </div>
 
