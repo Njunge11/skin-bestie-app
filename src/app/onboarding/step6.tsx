@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { getUserProfile, updateUserProfile } from "./actions";
 import { mergeCompletedSteps } from "./onboarding.utils";
