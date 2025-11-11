@@ -56,13 +56,17 @@ export default function OnboardingForm() {
 
   const alignLeft = current.align === "left";
 
-  // Track if Step5 or Step6 is showing success screen (to hide form header)
-  const [hideFormHeader, setHideFormHeader] = useState(false);
+  // Track if Step5 or Step6 is showing success screen
+  const [step5Success, setStep5Success] = useState(false);
+  const [step6Success, setStep6Success] = useState(false);
 
-  // Reset hideFormHeader when step changes
+  // Reset success states when step changes
   useEffect(() => {
-    if (current.component !== "subscribe" && current.component !== "book") {
-      setHideFormHeader(false);
+    if (current.component !== "subscribe") {
+      setStep5Success(false);
+    }
+    if (current.component !== "book") {
+      setStep6Success(false);
     }
   }, [current.component]);
 
@@ -125,8 +129,17 @@ export default function OnboardingForm() {
 
       {/* Card */}
       <div className="mt-8 mx-auto w-full max-w-[440px] bg-skinbestie-landing-gray p-6 rounded-lg">
-        {/* Conditionally hide form header when showing success screen */}
-        {!hideFormHeader && (
+        {/* Show custom heading/subheading for step 6 after booking */}
+        {current.component === "book" && step6Success ? (
+          <p className="text-lg font-medium text-[#3F4548] text-center pt-2">
+            You&apos;re one step closer to better understanding what works best
+            for you.
+          </p>
+        ) : step5Success ? (
+          // Hide heading for step 5 success
+          <></>
+        ) : (
+          // Normal heading and subheading
           <>
             <h1
               className={`${anton.className} ${
@@ -146,9 +159,11 @@ export default function OnboardingForm() {
         {/* Each step validates only its own fields */}
         <StepBody
           onNext={next}
-          {...(current.component === "subscribe" || current.component === "book"
-            ? { onShowingSuccess: setHideFormHeader }
-            : {})}
+          {...(current.component === "subscribe"
+            ? { onShowingSuccess: setStep5Success }
+            : current.component === "book"
+              ? { onShowingSuccess: setStep6Success }
+              : {})}
         />
       </div>
     </div>

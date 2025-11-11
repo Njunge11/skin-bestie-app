@@ -80,16 +80,16 @@ export default function CalendlyInline({
   const mountedRef = useRef(false);
 
   const [ready, setReady] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [bookingCompleted, setBookingCompleted] = useState(false);
   const skeletonShownAtRef = useRef<number>(Date.now());
 
   const MIN_SKELETON_MS = 400; // prevent blink
   const FALLBACK_READY_MS = 3000; // if no postMessage comes
 
-  // Notify parent when showing success screen
+  // Notify parent when booking is completed (to hide heading)
   useEffect(() => {
-    onShowingSuccess?.(showSuccess);
-  }, [showSuccess, onShowingSuccess]);
+    onShowingSuccess?.(bookingCompleted);
+  }, [bookingCompleted, onShowingSuccess]);
 
   // Get user profile ID
   const userProfileId = getValues("userProfileId");
@@ -210,8 +210,8 @@ export default function CalendlyInline({
 
           console.log("Booking completed and saved to database");
 
-          // Show success screen
-          setShowSuccess(true);
+          // Mark booking as completed (will show login button)
+          setBookingCompleted(true);
         } catch (error) {
           console.error("Failed to save booking completion:", error);
         }
@@ -290,35 +290,6 @@ export default function CalendlyInline({
     );
   }
 
-  // Show success screen after booking
-  if (showSuccess) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-6 pt-6">
-        <CheckCircle2
-          className="w-16 h-16 text-green-600"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        />
-        <div className="text-center space-y-3">
-          <p className="text-lg font-semibold text-[#3F4548] max-w-md">
-            You&apos;re one step closer to better understanding what works best
-            for you.
-          </p>
-          <p className="text-sm text-[#3F4548] max-w-md">
-            A calendar invitation has been sent to{" "}
-            <span className="font-medium">{getValues("email")}</span>.
-          </p>
-        </div>
-        <Link
-          href="/login"
-          className="flex items-center justify-center w-full px-6 py-3 bg-[#195284] text-white text-base font-semibold rounded hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#195284]"
-        >
-          Login to your SkinBestie Account
-        </Link>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full">
       {/* keep your rule + spacing */}
@@ -330,7 +301,7 @@ export default function CalendlyInline({
           className="
             relative w-full
             h-[clamp(22rem,48vh,28rem)]  /* mobile */
-            md:h-[32.0625rem]            /* ≈ 513px on md+ */
+            md:h-[29rem]            /* ≈ 513px on md+ */
           "
           aria-busy={!ready}
         >
@@ -348,6 +319,16 @@ export default function CalendlyInline({
           <div ref={containerRef} className="absolute inset-0" />
         </div>
       </div>
+
+      {/* Login button after booking completion */}
+      {bookingCompleted && (
+        <Link
+          href="/login"
+          className="flex items-center justify-center w-full px-6 py-3 bg-[#195284] text-white text-base font-semibold rounded hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#195284]"
+        >
+          Login to your SkinBestie Account
+        </Link>
+      )}
     </div>
   );
 }
