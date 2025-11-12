@@ -132,7 +132,7 @@ export function RoutineTabs({
             {/* Custom Switch Component */}
             <div className="space-y-3">
               {/* Toggle Switch */}
-              <div className="relative inline-flex items-center bg-skinbestie-primary rounded-full p-0.5 gap-0.5">
+              <div className="relative flex items-center bg-skinbestie-primary rounded-full p-0.5 gap-0.5 w-fit">
                 {/* Sun Icon Button */}
                 <button
                   onClick={() => setActiveTab("morning")}
@@ -160,37 +160,29 @@ export function RoutineTabs({
                 </button>
               </div>
 
-              {/* Routine Label and Mark All (Mobile only - side by side) */}
-              <div className="flex items-center justify-between md:hidden">
-                <span className="text-xl font-semibold text-gray-900">
-                  {activeTab === "morning" ? "Morning" : "Evening"} Routine
-                </span>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleSelectAll}
-                    aria-label="Mark all as done"
-                    className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer ${
-                      isAllSelected()
-                        ? "bg-skinbestie-success-dark border-skinbestie-success-dark"
-                        : "bg-white border-gray-300"
-                    }`}
-                  >
-                    {isAllSelected() && (
-                      <Check className="h-4 w-4 text-white" />
-                    )}
-                  </button>
-                  <span className="text-sm font-medium text-gray-700">
-                    Mark all as done
-                  </span>
-                </div>
-              </div>
-
-              {/* Routine Label (Desktop only) */}
-              <span className="hidden md:block text-xl font-semibold text-gray-900">
+              {/* Routine Label */}
+              <span className="text-xl font-semibold text-gray-900">
                 {activeTab === "morning" ? "Morning" : "Evening"} Routine
               </span>
+
+              {/* Mark All (Mobile only) */}
+              <div className="flex items-center gap-3 md:hidden py-4">
+                <button
+                  type="button"
+                  onClick={handleSelectAll}
+                  aria-label="Mark all as done"
+                  className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer ${
+                    isAllSelected()
+                      ? "bg-skinbestie-success-dark border-skinbestie-success-dark"
+                      : "bg-white border-gray-300"
+                  }`}
+                >
+                  {isAllSelected() && <Check className="h-4 w-4 text-white" />}
+                </button>
+                <span className="text-sm font-medium text-gray-700">
+                  Mark all as done
+                </span>
+              </div>
             </div>
           </div>
         ) : null}

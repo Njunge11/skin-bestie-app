@@ -65,7 +65,7 @@ export function UpcomingRoutineTabs({
           {/* Custom Switch Component */}
           <div className="space-y-3">
             {/* Toggle Switch */}
-            <div className="relative inline-flex items-center bg-skinbestie-primary rounded-full p-0.5 gap-0.5">
+            <div className="relative flex items-center bg-skinbestie-primary rounded-full p-0.5 gap-0.5 w-fit">
               {/* Sun Icon Button */}
               <button
                 onClick={() => setActiveTab("morning")}
@@ -94,14 +94,9 @@ export function UpcomingRoutineTabs({
             </div>
 
             {/* Active Tab Label */}
-            <div className="flex items-center justify-between">
-              <span className="text-xl font-semibold text-gray-900">
-                {activeTab === "morning" ? "Morning" : "Evening"} Routine
-              </span>
-              <span className="block md:hidden text-xl font-semibold text-gray-900">
-                {activeTab === "morning" ? "Morning" : "Evening"} Routine
-              </span>
-            </div>
+            <span className="text-xl font-semibold text-gray-900">
+              {activeTab === "morning" ? "Morning" : "Evening"} Routine
+            </span>
           </div>
 
           {/* Routine Steps - Same cards as active routine, just no checkbox */}
