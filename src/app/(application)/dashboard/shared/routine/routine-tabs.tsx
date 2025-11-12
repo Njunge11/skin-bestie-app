@@ -130,7 +130,7 @@ export function RoutineTabs({
             </p>
 
             {/* Custom Switch Component */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Toggle Switch */}
               <div className="relative flex items-center bg-skinbestie-primary rounded-full p-0.5 gap-0.5 w-fit">
                 {/* Sun Icon Button */}
@@ -316,7 +316,7 @@ export function RoutineTabs({
           <>
             {/* Select All and Progress - Only show if todayRoutine has steps */}
             {todayRoutine && todayRoutine.length > 0 && (
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full py-4 gap-4">
+              <div className="flex flex-col md:flex-row items-center justify-between w-full py-4 gap-4">
                 {/* Mark all as done - Desktop only */}
                 <div className="hidden md:flex items-center gap-3">
                   <button
