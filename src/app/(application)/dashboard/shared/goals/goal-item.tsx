@@ -227,7 +227,7 @@ export function GoalItem({
         <div className="space-y-4">
           <p
             className={cn(
-              "text-sm",
+              "text-base",
               goal.complete && "line-through text-gray-400",
             )}
           >
@@ -388,7 +388,7 @@ export function GoalItem({
             <div className="space-y-3">
               <p
                 className={cn(
-                  "text-sm",
+                  "text-base",
                   goal.complete && "line-through text-gray-400",
                 )}
               >
