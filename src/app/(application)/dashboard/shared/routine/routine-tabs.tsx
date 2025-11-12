@@ -165,24 +165,28 @@ export function RoutineTabs({
                 {activeTab === "morning" ? "Morning" : "Evening"} Routine
               </span>
 
-              {/* Mark All (Mobile only) */}
-              <div className="flex items-center gap-3 md:hidden py-4">
-                <button
-                  type="button"
-                  onClick={handleSelectAll}
-                  aria-label="Mark all as done"
-                  className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer ${
-                    isAllSelected()
-                      ? "bg-skinbestie-success-dark border-skinbestie-success-dark"
-                      : "bg-white border-gray-300"
-                  }`}
-                >
-                  {isAllSelected() && <Check className="h-4 w-4 text-white" />}
-                </button>
-                <span className="text-sm font-medium text-gray-700">
-                  Mark all as done
-                </span>
-              </div>
+              {/* Mark All (Mobile only) - Only show if todayRoutine has steps */}
+              {todayRoutine && todayRoutine.length > 0 && (
+                <div className="flex items-center gap-3 md:hidden py-4">
+                  <button
+                    type="button"
+                    onClick={handleSelectAll}
+                    aria-label="Mark all as done"
+                    className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer ${
+                      isAllSelected()
+                        ? "bg-skinbestie-success-dark border-skinbestie-success-dark"
+                        : "bg-white border-gray-300"
+                    }`}
+                  >
+                    {isAllSelected() && (
+                      <Check className="h-4 w-4 text-white" />
+                    )}
+                  </button>
+                  <span className="text-sm font-medium text-gray-700">
+                    Mark all as done
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         ) : null}
@@ -310,47 +314,51 @@ export function RoutineTabs({
         {/* Render content for switch version */}
         {useSwitch && (
           <>
-            {/* Select All and Progress */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full py-4 gap-4">
-              {/* Mark all as done - Desktop only */}
-              <div className="hidden md:flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={handleSelectAll}
-                  aria-label="Mark all as done"
-                  className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer ${
-                    isAllSelected()
-                      ? "bg-skinbestie-success-dark border-skinbestie-success-dark"
-                      : "bg-white border-gray-300"
-                  }`}
-                >
-                  {isAllSelected() && <Check className="h-4 w-4 text-white" />}
-                </button>
-                <span className="text-sm font-medium text-gray-700">
-                  Mark all as done
-                </span>
-              </div>
+            {/* Select All and Progress - Only show if todayRoutine has steps */}
+            {todayRoutine && todayRoutine.length > 0 && (
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full py-4 gap-4">
+                {/* Mark all as done - Desktop only */}
+                <div className="hidden md:flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleSelectAll}
+                    aria-label="Mark all as done"
+                    className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer ${
+                      isAllSelected()
+                        ? "bg-skinbestie-success-dark border-skinbestie-success-dark"
+                        : "bg-white border-gray-300"
+                    }`}
+                  >
+                    {isAllSelected() && (
+                      <Check className="h-4 w-4 text-white" />
+                    )}
+                  </button>
+                  <span className="text-sm font-medium text-gray-700">
+                    Mark all as done
+                  </span>
+                </div>
 
-              {/* Progress Bar */}
-              <div className="flex items-center gap-3 w-full md:w-auto">
-                <div className="flex flex-col gap-1 w-full md:min-w-[120px]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500">Progress</span>
-                    <span className="text-xs font-semibold text-gray-900">
-                      {getCompletedCount()} / {getTotalCount()}
-                    </span>
-                  </div>
-                  <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
-                    <div
-                      className="h-full rounded-full transition-all duration-300 bg-skinbestie-success-dark"
-                      style={{
-                        width: `${getTotalCount() > 0 ? (getCompletedCount() / getTotalCount()) * 100 : 0}%`,
-                      }}
-                    />
+                {/* Progress Bar */}
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  <div className="flex flex-col gap-1 w-full md:min-w-[120px]">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500">Progress</span>
+                      <span className="text-xs font-semibold text-gray-900">
+                        {getCompletedCount()} / {getTotalCount()}
+                      </span>
+                    </div>
+                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                      <div
+                        className="h-full rounded-full transition-all duration-300 bg-skinbestie-success-dark"
+                        style={{
+                          width: `${getTotalCount() > 0 ? (getCompletedCount() / getTotalCount()) * 100 : 0}%`,
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Routine steps based on active tab */}
             <div className="space-y-4 mt-4">
