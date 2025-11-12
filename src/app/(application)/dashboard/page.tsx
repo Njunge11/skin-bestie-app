@@ -93,6 +93,7 @@ export default function DashboardPage() {
           todayRoutine={dashboard.todayRoutine}
           catchupSteps={dashboard.catchupSteps}
           goals={dashboard.goals || []}
+          routine={dashboard.routine}
         />
       );
     } else {
