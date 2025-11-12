@@ -33,7 +33,8 @@ export function WhatHappensNextCard({
       const result = await getCoachWhatsAppUrl();
 
       if (result.success) {
-        window.open(result.url, "_blank", "noopener,noreferrer");
+        // Use window.location.href for better iOS PWA compatibility
+        window.location.href = result.url;
       } else {
         toast.error(result.error);
       }
