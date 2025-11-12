@@ -58,6 +58,7 @@ const createMockDashboard = (overrides: any = {}) => {
       email: "john@example.com",
       phoneNumber: "+1234567890",
       skinType: null,
+      profileTags: null,
       ...overrides.user,
     },
     setupProgress: {

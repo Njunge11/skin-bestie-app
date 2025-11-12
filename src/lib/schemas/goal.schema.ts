@@ -11,6 +11,10 @@ export const goalSchema = z.object({
   completedAt: z.string().datetime().nullable(),
   order: z.number(),
   isPrimaryGoal: z.boolean(),
+  timeline: z
+    .string()
+    .nullable()
+    .transform((val) => val ?? "3 months"),
   templateId: z.string().optional(),
   createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),

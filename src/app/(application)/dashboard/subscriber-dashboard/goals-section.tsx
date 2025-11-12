@@ -7,6 +7,7 @@ import {
   type GoalFormData,
 } from "../shared/goals";
 import { cn } from "@/lib/utils";
+import { Target } from "lucide-react";
 
 interface GoalsSectionProps {
   goals: Goal[];
@@ -15,7 +16,6 @@ interface GoalsSectionProps {
   onToggleGoal: (id: string) => Promise<void>;
   onDeleteGoal: (id: string) => Promise<void>;
   onReorderGoals: (goals: Goal[]) => Promise<void>;
-  backgroundColor?: string;
   noBorder?: boolean;
   noPadding?: boolean;
 }
@@ -27,7 +27,6 @@ export function GoalsSection({
   onToggleGoal,
   onDeleteGoal,
   onReorderGoals,
-  backgroundColor,
   noBorder = false,
   noPadding = false,
 }: GoalsSectionProps) {
@@ -40,7 +39,10 @@ export function GoalsSection({
       )}
     >
       <CardHeader className={cn(noPadding && "p-0")}>
-        <CardTitle className="text-xl font-bold">My Goals</CardTitle>
+        <div className="flex items-center gap-2">
+          <Target className="w-5 h-5 text-skinbestie-primary" />
+          <CardTitle className="text-xl font-bold">My Goals</CardTitle>
+        </div>
         <p className="text-sm text-gray-600 mt-2">
           Track your skincare goals. Click any goal to edit or delete it, drag
           to reorder, and set one as your primary focus to prioritise your
@@ -56,8 +58,7 @@ export function GoalsSection({
           onDeleteGoal={onDeleteGoal}
           onReorderGoals={onReorderGoals}
           showCheckboxes={true}
-          showNumberBadges={false}
-          backgroundColor={backgroundColor}
+          showMainFocus={true}
         />
       </CardContent>
     </Card>

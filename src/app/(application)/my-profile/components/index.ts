@@ -1,4 +1,5 @@
 export { ProfileHeader } from "./profile-header";
+export { KeyHighlights } from "./key-highlights";
 export { ProfileDetails } from "./profile-details";
 export { ProfileGoals } from "./profile-goals";
 export { CatchupTasks } from "./catchup-tasks";

@@ -21,6 +21,7 @@ export const userSchema = z.object({
   occupation: z.string().nullable(),
   bio: z.string().nullable(),
   timezone: z.string(),
+  profileTags: z.array(z.string()).nullable(),
 });
 
 // Export inferred type

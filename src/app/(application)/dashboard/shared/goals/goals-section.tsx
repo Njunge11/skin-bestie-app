@@ -21,6 +21,13 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { GoalItem } from "./goal-item";
 import type { Goal, GoalFormData } from "./goal.types";
 
@@ -31,9 +38,8 @@ interface GoalsSectionProps {
   onToggleGoal: (id: string) => Promise<void>;
   onDeleteGoal: (id: string) => Promise<void>;
   onReorderGoals: (goals: Goal[]) => Promise<void>;
-  showNumberBadges?: boolean;
   showCheckboxes?: boolean;
-  backgroundColor?: string;
+  showMainFocus?: boolean;
 }
 
 export function GoalsSection({
@@ -43,14 +49,14 @@ export function GoalsSection({
   onToggleGoal,
   onDeleteGoal,
   onReorderGoals,
-  showNumberBadges = false,
   showCheckboxes = false,
-  backgroundColor,
+  showMainFocus = false,
 }: GoalsSectionProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [newGoalData, setNewGoalData] = useState<GoalFormData>({
     description: "",
     isPrimaryGoal: false,
+    timeline: "3 months",
   });
 
   const sensors = useSensors(
@@ -77,7 +83,11 @@ export function GoalsSection({
   };
 
   const handleStartAdding = () => {
-    setNewGoalData({ description: "", isPrimaryGoal: false });
+    setNewGoalData({
+      description: "",
+      isPrimaryGoal: false,
+      timeline: "3 months",
+    });
     setIsAdding(true);
   };
 
@@ -85,13 +95,21 @@ export function GoalsSection({
     if (newGoalData.description?.trim()) {
       onAddGoal(newGoalData);
       setIsAdding(false);
-      setNewGoalData({ description: "", isPrimaryGoal: false });
+      setNewGoalData({
+        description: "",
+        isPrimaryGoal: false,
+        timeline: "3 months",
+      });
     }
   };
 
   const handleCancelNew = () => {
     setIsAdding(false);
-    setNewGoalData({ description: "", isPrimaryGoal: false });
+    setNewGoalData({
+      description: "",
+      isPrimaryGoal: false,
+      timeline: "3 months",
+    });
   };
 
   // Sanitize goals: filter out invalid items and dedupe by id
@@ -160,9 +178,8 @@ export function GoalsSection({
                   onToggle={onToggleGoal}
                   onEdit={onUpdateGoal}
                   onDelete={onDeleteGoal}
-                  showNumberBadge={showNumberBadges}
                   showCheckbox={showCheckboxes}
-                  backgroundColor={backgroundColor}
+                  showMainFocus={showMainFocus}
                 />
               ))}
 
@@ -191,36 +208,75 @@ export function GoalsSection({
                         autoFocus
                       />
                     </div>
-                    <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3 mt-4">
-                      <div className="space-y-0.5">
-                        <Label
-                          htmlFor="new-goal-primary"
-                          className="text-sm font-medium"
-                        >
-                          Make this the main focus
-                        </Label>
-                        <p className="text-xs text-gray-500">
-                          Mark this as the top priority goal to work on
-                        </p>
-                      </div>
-                      <Switch
-                        id="new-goal-primary"
-                        checked={newGoalData.isPrimaryGoal ?? false}
-                        onCheckedChange={(checked) =>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="new-goal-timeline"
+                        className="text-sm font-medium"
+                      >
+                        Timeline
+                      </label>
+                      <Select
+                        value={newGoalData.timeline || "3 months"}
+                        onValueChange={(value) =>
                           setNewGoalData({
                             ...newGoalData,
-                            isPrimaryGoal: checked,
+                            timeline: value,
                           })
                         }
-                        className="data-[state=checked]:bg-skinbestie-primary"
-                      />
+                      >
+                        <SelectTrigger
+                          id="new-goal-timeline"
+                          className="border-gray-300"
+                        >
+                          <SelectValue placeholder="3 months" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                            (month) => {
+                              const value = `${month} ${month === 1 ? "month" : "months"}`;
+                              return (
+                                <SelectItem key={month} value={value}>
+                                  {value}
+                                  {month === 3 && " (Recommended)"}
+                                </SelectItem>
+                              );
+                            },
+                          )}
+                        </SelectContent>
+                      </Select>
                     </div>
+                    {showMainFocus && (
+                      <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3 mt-4">
+                        <div className="space-y-0.5">
+                          <Label
+                            htmlFor="new-goal-primary"
+                            className="text-sm font-medium"
+                          >
+                            Make this the main focus
+                          </Label>
+                          <p className="text-xs text-gray-500">
+                            Mark this as the top priority goal to work on
+                          </p>
+                        </div>
+                        <Switch
+                          id="new-goal-primary"
+                          checked={newGoalData.isPrimaryGoal ?? false}
+                          onCheckedChange={(checked) =>
+                            setNewGoalData({
+                              ...newGoalData,
+                              isPrimaryGoal: checked,
+                            })
+                          }
+                          className="data-[state=checked]:bg-skinbestie-primary"
+                        />
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <Button
                         size="sm"
                         onClick={handleSaveNew}
                         disabled={!newGoalData.description?.trim()}
-                        className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white disabled:opacity-50"
+                        className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white"
                       >
                         Save
                       </Button>

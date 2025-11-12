@@ -2,6 +2,7 @@
 
 import {
   ProfileHeader,
+  KeyHighlights,
   ProfileDetails,
   ProfileGoals,
   CatchupTasks,
@@ -49,6 +50,9 @@ export default function MyProfilePage() {
       </div>
 
       <ProfileHeader dashboard={dashboard} />
+
+      {/* Key Highlights - Only show if profile tags exist */}
+      <KeyHighlights profileTags={dashboard.user.profileTags} />
 
       {/* Catchup Tasks - Only show if there are catchup steps */}
       {dashboard.catchupSteps && dashboard.catchupSteps.length > 0 && (

@@ -7,6 +7,7 @@ import { Target, Flame, CalendarCheck } from "lucide-react";
 import { MetricCard, MetricCardSkeleton, WeeklySummary } from "../shared/stats";
 import {
   RoutineTabs,
+  UpcomingRoutineTabs,
   toggleRoutineStepAction,
   toggleMultipleStepsAction,
 } from "../shared/routine";
@@ -22,13 +23,14 @@ import {
   type GoalFormData,
 } from "../shared/goals";
 import { useStats } from "../hooks/use-stats";
-import type { TodayRoutineStep } from "../schemas/dashboard.schema";
+import type { TodayRoutineStep, Routine } from "../schemas/dashboard.schema";
 
 interface SubscriberDashboardProps {
   userName?: string;
   todayRoutine?: TodayRoutineStep[] | null;
   catchupSteps?: TodayRoutineStep[] | null;
   goals?: Goal[];
+  routine?: Routine | null;
 }
 
 export function SubscriberDashboard({
@@ -36,6 +38,7 @@ export function SubscriberDashboard({
   todayRoutine = null,
   catchupSteps = null,
   goals = [],
+  routine = null,
 }: SubscriberDashboardProps) {
   const queryClient = useQueryClient();
 
@@ -356,14 +359,29 @@ export function SubscriberDashboard({
         <CatchupTasks catchupSteps={catchupSteps} />
       )}
 
-      {/* Routine Tabs */}
-      <RoutineTabs
-        todayRoutine={todayRoutine}
-        checkedSteps={checkedSteps}
-        onStepToggle={handleStepToggle}
-        onAllStepsToggle={handleAllStepsToggle}
-        useSwitch={true}
-      />
+      {/* Routine Section */}
+      {todayRoutine && todayRoutine.length > 0 ? (
+        /* Active Routine - has today's steps */
+        <RoutineTabs
+          todayRoutine={todayRoutine}
+          checkedSteps={checkedSteps}
+          onStepToggle={handleStepToggle}
+          onAllStepsToggle={handleAllStepsToggle}
+          useSwitch={true}
+        />
+      ) : routine ? (
+        /* Upcoming Routine - no today's steps but routine exists */
+        <UpcomingRoutineTabs routine={routine} useSwitch={true} />
+      ) : (
+        /* No routine at all */
+        <RoutineTabs
+          todayRoutine={todayRoutine}
+          checkedSteps={checkedSteps}
+          onStepToggle={handleStepToggle}
+          onAllStepsToggle={handleAllStepsToggle}
+          useSwitch={true}
+        />
+      )}
 
       {/* Goals Section */}
       <GoalsSection

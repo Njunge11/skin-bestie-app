@@ -1,25 +1,48 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { DashboardResponse } from "../../dashboard/schemas";
 import { ShareFeedback } from "./share-feedback";
+import { getCoachWhatsAppUrl } from "../../actions/whatsapp-actions";
+import { toast } from "sonner";
 
 interface SupportFeedbackProps {
   dashboard: DashboardResponse;
 }
 
 export function SupportFeedback({}: SupportFeedbackProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
   // Mock coach data
   const coach = {
     name: "Benji",
-    title: "Certified Skincare Specialist",
+    title: "Certified Skincare Coach",
     profilePicture:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces",
     clientCount: 150,
     yearsExperience: 5,
     specialties: ["Acne Treatment", "Skin Rehabilitation"],
-    bio: "Certified level 3 skin care coach",
+    bio: "I'm your skincare-obsessed, evidence-led skin bestie. I'm here to make skincare feel simple so you can stop guessing, feel good about the products you're using, and feel genuinely confident in your skin.",
+  };
+
+  const handleMessageCoach = async () => {
+    setIsLoading(true);
+
+    try {
+      const result = await getCoachWhatsAppUrl();
+
+      if (result.success) {
+        window.open(result.url, "_blank", "noopener,noreferrer");
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error("Failed to open WhatsApp. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -51,30 +74,34 @@ export function SupportFeedback({}: SupportFeedbackProps) {
               {/* Coach Info */}
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-gray-900">
-                  Coach {coach.name}
+                  {coach.name}
                 </h3>
                 <p className="text-gray-600">{coach.title}</p>
               </div>
             </div>
 
             {/* Message Button - Hidden on mobile, shown on desktop */}
-            <Button className="hidden md:flex bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white flex-shrink-0">
-              Message Benji
+            <Button
+              onClick={handleMessageCoach}
+              disabled={isLoading}
+              className="hidden md:flex bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white flex-shrink-0"
+            >
+              {isLoading ? "Opening..." : "Message Benji"}
             </Button>
           </div>
 
           {/* About */}
           <div className="mt-6">
-            <p className="text-gray-700 leading-relaxed">
-              Your dedicated skincare coach who will guide you through your
-              personalised routine, answer your questions, and help you achieve
-              your skincare goals.
-            </p>
+            <p className="text-gray-700 leading-relaxed">{coach.bio}</p>
           </div>
 
           {/* Message Button - Full width on mobile, hidden on desktop */}
-          <Button className="md:hidden w-full mt-4 bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white">
-            Message Benji
+          <Button
+            onClick={handleMessageCoach}
+            disabled={isLoading}
+            className="md:hidden w-full mt-4 bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white"
+          >
+            {isLoading ? "Opening..." : "Message Benji"}
           </Button>
         </div>
       </div>

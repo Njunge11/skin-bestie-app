@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { WhatYouGetModal } from "../components/what-you-get-modal";
+import { getCoachWhatsAppUrl } from "../../actions/whatsapp-actions";
+import { toast } from "sonner";
 
 interface WhatHappensNextCardProps {
   description: string;
@@ -22,6 +24,25 @@ export function WhatHappensNextCard({
   coachName,
 }: WhatHappensNextCardProps) {
   const [showWhatYouGetModal, setShowWhatYouGetModal] = useState(false);
+  const [isLoadingWhatsApp, setIsLoadingWhatsApp] = useState(false);
+
+  const handleMessageCoach = async () => {
+    setIsLoadingWhatsApp(true);
+
+    try {
+      const result = await getCoachWhatsAppUrl();
+
+      if (result.success) {
+        window.open(result.url, "_blank", "noopener,noreferrer");
+      } else {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error("Failed to open WhatsApp. Please try again.");
+    } finally {
+      setIsLoadingWhatsApp(false);
+    }
+  };
 
   return (
     <>
@@ -31,9 +52,13 @@ export function WhatHappensNextCard({
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          <Button className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white w-full">
+          <Button
+            onClick={handleMessageCoach}
+            disabled={isLoadingWhatsApp}
+            className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white w-full"
+          >
             <MessageCircle className="w-4 h-4 mr-2" />
-            Message Coach {coachName}
+            {isLoadingWhatsApp ? "Opening..." : `Message Coach ${coachName}`}
           </Button>
           <Button
             onClick={() => setShowWhatYouGetModal(true)}

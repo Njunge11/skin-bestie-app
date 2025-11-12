@@ -88,6 +88,7 @@ const createMockGoal = (overrides: Partial<Goal> = {}): Goal => ({
   complete: false,
   completedAt: null,
   order: 0,
+  timeline: "3 months",
   ...overrides,
 });
 
@@ -903,6 +904,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
           completedAt: null,
           order: 0,
           isPrimaryGoal: false,
+          timeline: "3 months",
         },
       });
 
@@ -922,10 +924,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       const saveButton = screen.getByRole("button", { name: /save$/i });
       await user.click(saveButton);
 
-      // Goal should appear in the list
+      // Goal should appear in the list (note: appears twice due to responsive layouts)
       await waitFor(() => {
         expect(
-          screen.getByText(/reduce dark spots within 2 months/i),
+          screen.getAllByText(/reduce dark spots within 2 months/i)[0],
         ).toBeInTheDocument();
       });
 
@@ -934,10 +936,11 @@ describe("Subscriber Dashboard - UI Tests", () => {
         expect(toast.success).toHaveBeenCalledWith("Goal added successfully");
       });
 
-      // Server action called
+      // Server action called (including default timeline)
       expect(createGoalAction).toHaveBeenCalledWith({
         description: "Reduce dark spots within 2 months",
         isPrimaryGoal: false,
+        timeline: "3 months",
       });
     });
 
@@ -992,6 +995,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
           completedAt: new Date().toISOString(),
           order: 0,
           isPrimaryGoal: false,
+          timeline: "3 months",
         },
       });
 
@@ -999,9 +1003,9 @@ describe("Subscriber Dashboard - UI Tests", () => {
         <SubscriberDashboard userName="Alex" todayRoutine={[]} goals={goals} />,
       );
 
-      // Find goal text
-      const goalText = screen.getByText(/reduce dark circles/i);
-      expect(goalText).toBeInTheDocument();
+      // Find goal text (note: appears twice due to responsive layouts)
+      const goalTexts = screen.getAllByText(/reduce dark circles/i);
+      expect(goalTexts[0]).toBeInTheDocument();
 
       // Find the checkbox buttons (there are 2: mobile and desktop)
       const checkboxButtons = screen.getAllByLabelText(/mark as complete/i);
@@ -1036,8 +1040,8 @@ describe("Subscriber Dashboard - UI Tests", () => {
         <SubscriberDashboard userName="Alex" todayRoutine={[]} goals={goals} />,
       );
 
-      // Goal should be visible
-      expect(screen.getByText(/reduce wrinkles/i)).toBeInTheDocument();
+      // Goal should be visible (note: appears twice due to responsive layouts)
+      expect(screen.getAllByText(/reduce wrinkles/i)[0]).toBeInTheDocument();
 
       // Click delete button
       const deleteButton = screen.getByRole("button", { name: /delete goal/i });
@@ -1089,6 +1093,7 @@ describe("Subscriber Dashboard - UI Tests", () => {
           completedAt: null,
           order: 0,
           isPrimaryGoal: false,
+          timeline: "3 months",
         },
       });
 
@@ -1124,10 +1129,10 @@ describe("Subscriber Dashboard - UI Tests", () => {
       const saveButton = screen.getByRole("button", { name: /save$/i });
       await user.click(saveButton);
 
-      // Goal appears
+      // Goal appears (note: appears twice due to responsive layouts)
       await waitFor(() => {
         expect(
-          screen.getByText(/maintain clear skin for 6 months/i),
+          screen.getAllByText(/maintain clear skin for 6 months/i)[0],
         ).toBeInTheDocument();
       });
 

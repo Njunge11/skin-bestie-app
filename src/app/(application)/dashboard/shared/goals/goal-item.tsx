@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, GripVertical, Star, Pencil, Check } from "lucide-react";
+import { Trash2, GripVertical, Star, Check } from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import type { Goal, GoalFormData } from "./goal.types";
 
@@ -18,9 +25,8 @@ interface GoalItemProps {
   onToggle: (id: string) => Promise<void>;
   onEdit: (id: string, data: GoalFormData) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
-  showNumberBadge?: boolean;
   showCheckbox?: boolean;
-  backgroundColor?: string;
+  showMainFocus?: boolean;
 }
 
 export function GoalItem({
@@ -29,14 +35,14 @@ export function GoalItem({
   onToggle,
   onEdit,
   onDelete,
-  showNumberBadge = false,
   showCheckbox = false,
-  backgroundColor,
+  showMainFocus = false,
 }: GoalItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<GoalFormData>({
     description: goal.description || "",
     isPrimaryGoal: goal.isPrimaryGoal || false,
+    timeline: goal.timeline || "3 months",
   });
 
   const {
@@ -57,6 +63,7 @@ export function GoalItem({
     setEditData({
       description: goal.description || "",
       isPrimaryGoal: goal.isPrimaryGoal || false,
+      timeline: goal.timeline || "3 months",
     });
     setIsEditing(true);
   };
@@ -95,27 +102,61 @@ export function GoalItem({
               autoFocus
             />
           </div>
-          <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3 mt-4">
-            <div className="space-y-0.5">
-              <Label
-                htmlFor={`edit-goal-primary-${goal.id}`}
-                className="text-sm font-medium"
-              >
-                Make primary focus
-              </Label>
-              <p className="text-xs text-gray-500">
-                Mark this as the top priority goal to work on
-              </p>
-            </div>
-            <Switch
-              id={`edit-goal-primary-${goal.id}`}
-              checked={editData.isPrimaryGoal ?? false}
-              onCheckedChange={(checked) =>
-                setEditData({ ...editData, isPrimaryGoal: checked })
+          <div className="space-y-2">
+            <label
+              htmlFor={`edit-goal-timeline-${goal.id}`}
+              className="text-sm font-medium"
+            >
+              Timeline
+            </label>
+            <Select
+              value={editData.timeline || "3 months"}
+              onValueChange={(value) =>
+                setEditData({ ...editData, timeline: value })
               }
-              className="data-[state=checked]:bg-skinbestie-primary"
-            />
+            >
+              <SelectTrigger
+                id={`edit-goal-timeline-${goal.id}`}
+                className="border-gray-300"
+              >
+                <SelectValue placeholder="3 months" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => {
+                  const value = `${month} ${month === 1 ? "month" : "months"}`;
+                  return (
+                    <SelectItem key={month} value={value}>
+                      {value}
+                      {month === 3 && " (Recommended)"}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
+          {showMainFocus && (
+            <div className="flex items-center justify-between rounded-lg border border-gray-200 p-3 mt-4">
+              <div className="space-y-0.5">
+                <Label
+                  htmlFor={`edit-goal-primary-${goal.id}`}
+                  className="text-sm font-medium"
+                >
+                  Make this the main focus
+                </Label>
+                <p className="text-xs text-gray-500">
+                  Mark this as the top priority goal to work on
+                </p>
+              </div>
+              <Switch
+                id={`edit-goal-primary-${goal.id}`}
+                checked={editData.isPrimaryGoal ?? false}
+                onCheckedChange={(checked) =>
+                  setEditData({ ...editData, isPrimaryGoal: checked })
+                }
+                className="data-[state=checked]:bg-skinbestie-primary"
+              />
+            </div>
+          )}
           <div className="flex gap-2">
             <Button
               size="sm"
@@ -142,166 +183,319 @@ export function GoalItem({
       {...listeners}
       onClick={handleStartEdit}
       className={cn(
-        "flex flex-col gap-3 rounded-lg border p-6 transition-all hover:border-gray-300 cursor-pointer",
-        goal.isPrimaryGoal
-          ? "bg-skinbestie-landing-yellow/20 border-skinbestie-landing-yellow"
-          : "bg-skinbestie-primary-light border-gray-200",
+        "flex flex-col md:flex-row md:items-center gap-3 rounded-lg border border-gray-200 px-3 py-6 transition-all hover:border-gray-300 cursor-pointer",
         isDragging && "opacity-50 cursor-grabbing",
-        backgroundColor && backgroundColor,
       )}
     >
-      {/* Mobile: Drag Handle and Checkbox at top */}
-      <div className="flex items-center justify-between gap-3 sm:hidden">
-        <div className="flex items-center gap-3">
-          {/* Drag Handle - Visual indicator */}
-          <div className="text-gray-400">
-            <GripVertical className="w-5 h-5" />
-          </div>
-
-          {/* Priority Badge - Only show if enabled */}
-          {showNumberBadge && (
-            <Badge className="bg-skinbestie-primary text-white rounded-full w-7 h-7 p-0 flex items-center justify-center">
-              {index + 1}
-            </Badge>
-          )}
-        </div>
-
-        {/* Checkbox - Only show if enabled */}
-        {showCheckbox && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggle(goal.id);
-            }}
-            className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer flex-shrink-0 ${
-              goal.complete
-                ? "bg-skinbestie-primary border-skinbestie-primary"
-                : "bg-white border-gray-300"
-            }`}
-            aria-label={
-              goal.complete ? "Mark as incomplete" : "Mark as complete"
-            }
-          >
-            {goal.complete && <Check className="h-4 w-4 text-white" />}
-          </button>
-        )}
-      </div>
-
-      {/* Desktop and Content */}
-      <div className="flex items-center gap-3 flex-1">
-        {/* Desktop: Drag Handle - Visual indicator */}
-        <div className="text-gray-400 hidden sm:block">
+      {/* Desktop Layout - Horizontal */}
+      <div className="hidden md:flex md:items-center md:gap-3 md:flex-1">
+        {/* Drag Handle - Visual indicator */}
+        <div className="text-gray-400">
           <GripVertical className="w-5 h-5" />
         </div>
 
-        {/* Desktop: Priority Badge - Only show if enabled */}
-        {showNumberBadge && (
-          <Badge className="bg-skinbestie-primary text-white rounded-full w-7 h-7 p-0 sm:flex items-center justify-center hidden">
-            {index + 1}
-          </Badge>
-        )}
+        {/* Priority Badge */}
+        <Badge className="bg-skinbestie-primary text-white rounded-full w-7 h-7 p-0 flex items-center justify-center">
+          {index + 1}
+        </Badge>
 
-        {/* Desktop: Checkbox - Only show if enabled */}
+        {/* Checkbox */}
         {showCheckbox && (
           <button
-            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onToggle(goal.id);
             }}
-            className={`sm:flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer flex-shrink-0 hidden ${
+            className={cn(
+              "w-5 h-5 rounded border-2 transition-colors",
               goal.complete
                 ? "bg-skinbestie-primary border-skinbestie-primary"
-                : "bg-white border-gray-300"
-            }`}
+                : "border-gray-300 hover:border-gray-400",
+            )}
             aria-label={
               goal.complete ? "Mark as incomplete" : "Mark as complete"
             }
           >
-            {goal.complete && <Check className="h-4 w-4 text-white" />}
+            {goal.complete && <Check className="w-3 h-3 text-white" />}
           </button>
         )}
 
-        {/* Goal Content and Action Buttons wrapper */}
-        <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-3">
-          {/* Goal Content */}
-          <div className="flex-1">
-            <div key="description" className="flex items-center gap-3">
-              <p
+        {/* Goal Content */}
+        <div className="flex-1 space-y-3">
+          <p
+            className={cn(
+              "text-sm",
+              goal.complete && "line-through text-gray-400",
+            )}
+          >
+            {goal.description}
+          </p>
+          {showMainFocus && (
+            <div className="space-y-3">
+              <div
                 className={cn(
-                  "text-lg flex-1 text-gray-700 break-all overflow-hidden",
-                  goal.complete && "line-through text-gray-400",
+                  "flex items-center gap-2 px-2 py-1 rounded-md w-fit transition-colors",
+                  goal.isPrimaryGoal
+                    ? "bg-skinbestie-primary/10"
+                    : "bg-transparent",
                 )}
+                onClick={(e) => e.stopPropagation()}
               >
-                {goal.description}
-              </p>
+                <Switch
+                  id={`goal-primary-desktop-${goal.id}`}
+                  checked={goal.isPrimaryGoal ?? false}
+                  onCheckedChange={(checked) => {
+                    onEdit(goal.id, {
+                      description: goal.description,
+                      isPrimaryGoal: checked,
+                      timeline: goal.timeline,
+                    });
+                  }}
+                  className="data-[state=checked]:bg-skinbestie-primary"
+                />
+                {goal.isPrimaryGoal && (
+                  <Star className="w-4 h-4 text-skinbestie-primary fill-skinbestie-primary" />
+                )}
+                <Label
+                  htmlFor={`goal-primary-desktop-${goal.id}`}
+                  className={cn(
+                    "text-sm font-medium cursor-pointer",
+                    goal.isPrimaryGoal
+                      ? "text-skinbestie-primary"
+                      : "text-gray-700",
+                  )}
+                >
+                  Main focus
+                </Label>
+              </div>
+              <div
+                className="flex items-center gap-2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Label
+                  htmlFor={`goal-timeline-desktop-${goal.id}`}
+                  className="text-xs text-gray-500"
+                >
+                  Timeline:
+                </Label>
+                <Select
+                  value={goal.timeline || "3 months"}
+                  onValueChange={(value) => {
+                    onEdit(goal.id, {
+                      description: goal.description,
+                      isPrimaryGoal: goal.isPrimaryGoal,
+                      timeline: value,
+                    });
+                  }}
+                >
+                  <SelectTrigger
+                    id={`goal-timeline-desktop-${goal.id}`}
+                    className="h-8 w-[140px] text-xs border-gray-300"
+                  >
+                    <SelectValue placeholder="3 months" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                      (month) => {
+                        const value = `${month} ${month === 1 ? "month" : "months"}`;
+                        return (
+                          <SelectItem key={month} value={value}>
+                            {value}
+                            {month === 3 && " (Recommended)"}
+                          </SelectItem>
+                        );
+                      },
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          {goal.completedAt && (
+            <p className="text-xs text-gray-400 mt-1">
+              Completed {new Date(goal.completedAt).toLocaleDateString()}
+            </p>
+          )}
+        </div>
+
+        {/* Edit Button */}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleStartEdit();
+          }}
+        >
+          Edit
+        </Button>
+
+        {/* Delete Button */}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(goal.id);
+          }}
+          className="text-gray-400 hover:text-red-600"
+          aria-label="Delete goal"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Mobile Layout - Vertical */}
+      <div className="flex md:hidden flex-col gap-3 w-full">
+        {/* Top row: Drag handle, checkbox, and delete button */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-gray-400">
+              <GripVertical className="w-5 h-5" />
             </div>
 
-            {/* Main focus switch below description */}
-            <div
-              key="main-focus-switch"
-              className="flex items-center gap-2 mt-3"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Switch
-                id={`goal-primary-${goal.id}`}
-                checked={goal.isPrimaryGoal ?? false}
-                onCheckedChange={(checked) => {
-                  onEdit(goal.id, {
-                    description: goal.description,
-                    isPrimaryGoal: checked,
-                  });
+            {showCheckbox && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle(goal.id);
                 }}
-                className="data-[state=checked]:bg-skinbestie-primary"
-              />
-              <Label
-                htmlFor={`goal-primary-${goal.id}`}
-                className="text-sm font-medium cursor-pointer"
+                className={cn(
+                  "w-5 h-5 rounded border-2 transition-colors",
+                  goal.complete
+                    ? "bg-skinbestie-primary border-skinbestie-primary"
+                    : "border-gray-300 hover:border-gray-400",
+                )}
+                aria-label={
+                  goal.complete ? "Mark as incomplete" : "Mark as complete"
+                }
               >
-                Make primary focus
-              </Label>
-            </div>
-
-            {goal.completedAt && (
-              <p key="completed-date" className="text-xs text-gray-400 mt-1">
-                Completed {new Date(goal.completedAt).toLocaleDateString()}
-              </p>
+                {goal.complete && <Check className="w-3 h-3 text-white" />}
+              </button>
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-1">
-            {/* Edit Button */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleStartEdit();
-              }}
-              className="flex-1 sm:flex-none sm:h-9 sm:w-7 sm:p-0 sm:border-0 sm:bg-transparent text-gray-700 sm:text-gray-400 hover:bg-gray-50 sm:hover:bg-transparent sm:hover:text-gray-700 rounded-lg transition-colors"
-            >
-              <Pencil className="w-4 h-4 sm:mr-0 mr-2" />
-              <span className="sm:hidden">Edit</span>
-            </Button>
-
-            {/* Delete Button */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(goal.id);
-              }}
-              aria-label="Delete goal"
-              className="flex-1 sm:flex-none sm:h-9 sm:w-7 sm:p-0 sm:border-0 sm:bg-transparent text-red-600 sm:text-gray-400 hover:bg-red-50 sm:hover:bg-transparent sm:hover:text-red-600 rounded-lg transition-colors"
-            >
-              <Trash2 className="w-4 h-4 sm:mr-0 mr-2" />
-              <span className="sm:hidden">Delete</span>
-            </Button>
-          </div>
+          {/* Delete Button - Top right */}
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(goal.id);
+            }}
+            className="text-gray-400 hover:text-red-600 -mr-2"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
         </div>
+
+        {/* Goal Content */}
+        <div className="flex-1 space-y-3">
+          <p
+            className={cn(
+              "text-sm",
+              goal.complete && "line-through text-gray-400",
+            )}
+          >
+            {goal.description}
+          </p>
+          {showMainFocus && (
+            <div className="space-y-3">
+              <div
+                className={cn(
+                  "flex items-center gap-2 px-2 py-1 rounded-md w-fit transition-colors",
+                  goal.isPrimaryGoal
+                    ? "bg-skinbestie-primary/10"
+                    : "bg-transparent",
+                )}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Switch
+                  id={`goal-primary-mobile-${goal.id}`}
+                  checked={goal.isPrimaryGoal ?? false}
+                  onCheckedChange={(checked) => {
+                    onEdit(goal.id, {
+                      description: goal.description,
+                      isPrimaryGoal: checked,
+                      timeline: goal.timeline,
+                    });
+                  }}
+                  className="data-[state=checked]:bg-skinbestie-primary"
+                />
+                {goal.isPrimaryGoal && (
+                  <Star className="w-4 h-4 text-skinbestie-primary fill-skinbestie-primary" />
+                )}
+                <Label
+                  htmlFor={`goal-primary-mobile-${goal.id}`}
+                  className={cn(
+                    "text-sm font-medium cursor-pointer",
+                    goal.isPrimaryGoal
+                      ? "text-skinbestie-primary"
+                      : "text-gray-700",
+                  )}
+                >
+                  Main focus
+                </Label>
+              </div>
+              <div className="space-y-1" onClick={(e) => e.stopPropagation()}>
+                <Label
+                  htmlFor={`goal-timeline-mobile-${goal.id}`}
+                  className="text-xs text-gray-500"
+                >
+                  Timeline
+                </Label>
+                <Select
+                  value={goal.timeline || "3 months"}
+                  onValueChange={(value) => {
+                    onEdit(goal.id, {
+                      description: goal.description,
+                      isPrimaryGoal: goal.isPrimaryGoal,
+                      timeline: value,
+                    });
+                  }}
+                >
+                  <SelectTrigger
+                    id={`goal-timeline-mobile-${goal.id}`}
+                    className="h-9 w-full text-sm border-gray-300 mt-2"
+                  >
+                    <SelectValue placeholder="3 months" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map(
+                      (month) => {
+                        const value = `${month} ${month === 1 ? "month" : "months"}`;
+                        return (
+                          <SelectItem key={month} value={value}>
+                            {value}
+                            {month === 3 && " (Recommended)"}
+                          </SelectItem>
+                        );
+                      },
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          {goal.completedAt && (
+            <p className="text-xs text-gray-400 mt-1">
+              Completed {new Date(goal.completedAt).toLocaleDateString()}
+            </p>
+          )}
+        </div>
+
+        {/* Edit Button - Full width below description */}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleStartEdit();
+          }}
+          className="w-full"
+        >
+          Edit
+        </Button>
       </div>
     </div>
   );

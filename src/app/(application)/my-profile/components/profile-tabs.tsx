@@ -7,7 +7,10 @@ import { cn } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { type DashboardResponse } from "../../dashboard/schemas";
-import { RoutineTabs } from "../../dashboard/shared/routine";
+import {
+  RoutineTabs,
+  UpcomingRoutineTabs,
+} from "../../dashboard/shared/routine";
 import { ProgressPhotos } from "../progress-photos";
 import { UploadProvider } from "../progress-photos/upload-context";
 import { MyProducts } from "./my-products";
@@ -23,7 +26,7 @@ interface ProfileTabsProps {
 
 export function ProfileTabs({ dashboard }: ProfileTabsProps) {
   const queryClient = useQueryClient();
-  const { todayRoutine } = dashboard;
+  const { todayRoutine, routine } = dashboard;
 
   // Initialize checked steps from todayRoutine completion status
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(() => {
@@ -148,16 +151,38 @@ export function ProfileTabs({ dashboard }: ProfileTabsProps) {
           </TabsList>
 
           <TabsContent value="routines" className="mt-6 space-y-6">
-            {/* Routine Tabs */}
-            <RoutineTabs
-              todayRoutine={todayRoutine}
-              checkedSteps={checkedSteps}
-              onStepToggle={handleStepToggle}
-              onAllStepsToggle={handleAllStepsToggle}
-              noBorder={true}
-              noPadding={true}
-              useSwitch={true}
-            />
+            {/* Routine Section */}
+            {todayRoutine && todayRoutine.length > 0 ? (
+              /* Active Routine - has today's steps */
+              <RoutineTabs
+                todayRoutine={todayRoutine}
+                checkedSteps={checkedSteps}
+                onStepToggle={handleStepToggle}
+                onAllStepsToggle={handleAllStepsToggle}
+                noBorder={true}
+                noPadding={true}
+                useSwitch={true}
+              />
+            ) : routine ? (
+              /* Upcoming Routine - no today's steps but routine exists */
+              <UpcomingRoutineTabs
+                routine={routine}
+                noBorder={true}
+                noPadding={true}
+                useSwitch={true}
+              />
+            ) : (
+              /* No routine at all */
+              <RoutineTabs
+                todayRoutine={todayRoutine}
+                checkedSteps={checkedSteps}
+                onStepToggle={handleStepToggle}
+                onAllStepsToggle={handleAllStepsToggle}
+                noBorder={true}
+                noPadding={true}
+                useSwitch={true}
+              />
+            )}
 
             {/* Separator */}
             <div className="border-t border-gray-200"></div>

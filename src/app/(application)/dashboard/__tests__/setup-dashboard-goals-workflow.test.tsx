@@ -168,9 +168,11 @@ describe("Setup Dashboard - Goals Review Workflow", () => {
       await screen.findByRole("heading", { name: /your skin goals/i }),
     ).toBeInTheDocument();
 
-    // User sees both goals from coach
-    expect(screen.getByText(/clear acne within 3 months/i)).toBeInTheDocument();
-    expect(screen.getByText(/reduce dark spots/i)).toBeInTheDocument();
+    // User sees both goals from coach (note: goals appear twice due to responsive layouts)
+    expect(
+      screen.getAllByText(/clear acne within 3 months/i)[0],
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/reduce dark spots/i)[0]).toBeInTheDocument();
 
     // User sees description text
     expect(

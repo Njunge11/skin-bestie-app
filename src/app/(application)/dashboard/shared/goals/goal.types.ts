@@ -4,6 +4,7 @@ export type { Goal } from "@/lib/schemas";
 export interface GoalFormData {
   description: string;
   isPrimaryGoal?: boolean;
+  timeline?: string;
 }
 
 export interface GoalsTemplate {
