@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterAll, vi } from "vitest";
 import { getCoachWhatsAppUrl } from "../whatsapp-actions";
 
 describe("WhatsApp Actions - Unit Tests", () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SubscriberDashboard } from "../subscriber-dashboard";
-import type { Routine, RoutineStep } from "../schemas/dashboard.schema";
+import type { Routine, RoutineTemplateStep } from "../schemas/dashboard.schema";
 
 // Mock server actions
 vi.mock("../shared/goals", async (importOriginal) => {
@@ -55,8 +55,8 @@ function renderWithQueryClient(ui: React.ReactElement) {
 
 // Mock data factories
 const createMockRoutineStep = (
-  overrides: Partial<RoutineStep> = {},
-): RoutineStep => ({
+  overrides: Partial<RoutineTemplateStep> = {},
+): RoutineTemplateStep => ({
   id: crypto.randomUUID(),
   routineStep: "Cleanse",
   productName: "CeraVe Hydrating Cleanser",
