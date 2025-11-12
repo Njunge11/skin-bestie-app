@@ -347,32 +347,10 @@ export function GoalItem({
 
       {/* Mobile Layout - Vertical */}
       <div className="flex md:hidden flex-col gap-3 w-full">
-        {/* Top row: Drag handle, checkbox, and delete button */}
+        {/* Top row: Drag handle and delete button */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-gray-400">
-              <GripVertical className="w-5 h-5" />
-            </div>
-
-            {showCheckbox && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggle(goal.id);
-                }}
-                className={cn(
-                  "w-5 h-5 rounded border-2 transition-colors",
-                  goal.complete
-                    ? "bg-skinbestie-primary border-skinbestie-primary"
-                    : "border-gray-300 hover:border-gray-400",
-                )}
-                aria-label={
-                  goal.complete ? "Mark as incomplete" : "Mark as complete"
-                }
-              >
-                {goal.complete && <Check className="w-3 h-3 text-white" />}
-              </button>
-            )}
+          <div className="text-gray-400">
+            <GripVertical className="w-5 h-5" />
           </div>
 
           {/* Delete Button - Top right */}
@@ -389,16 +367,37 @@ export function GoalItem({
           </Button>
         </div>
 
-        {/* Goal Content */}
+        {/* Goal Content with checkbox */}
         <div className="flex-1 space-y-3">
-          <p
-            className={cn(
-              "text-sm",
-              goal.complete && "line-through text-gray-400",
+          <div className="flex items-start gap-3">
+            {showCheckbox && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle(goal.id);
+                }}
+                className={cn(
+                  "w-5 h-5 rounded border-2 transition-colors flex-shrink-0 mt-0.5",
+                  goal.complete
+                    ? "bg-skinbestie-primary border-skinbestie-primary"
+                    : "border-gray-300 hover:border-gray-400",
+                )}
+                aria-label={
+                  goal.complete ? "Mark as incomplete" : "Mark as complete"
+                }
+              >
+                {goal.complete && <Check className="w-3 h-3 text-white" />}
+              </button>
             )}
-          >
-            {goal.description}
-          </p>
+            <p
+              className={cn(
+                "text-sm flex-1",
+                goal.complete && "line-through text-gray-400",
+              )}
+            >
+              {goal.description}
+            </p>
+          </div>
           {showMainFocus && (
             <div className="space-y-3">
               <div

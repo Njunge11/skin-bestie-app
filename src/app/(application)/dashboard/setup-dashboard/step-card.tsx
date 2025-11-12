@@ -37,7 +37,7 @@ const statusConfig = {
       variant: "default" as const,
       label: "COMPLETED",
       className:
-        "bg-skinbestie-success-dark text-white border-skinbestie-success-dark",
+        "bg-skinbestie-success-dark text-white border-skinbestie-success-dark py-1 leading-none",
     },
     avatarClass: "bg-skinbestie-success-dark",
   },
@@ -45,7 +45,7 @@ const statusConfig = {
     badge: {
       variant: "outline" as const,
       label: "PENDING",
-      className: "border-orange-400 text-orange-600",
+      className: "border-orange-400 text-orange-600 py-1 leading-none",
     },
     avatarClass: "bg-gray-200",
   },
@@ -53,7 +53,7 @@ const statusConfig = {
     badge: {
       variant: "outline" as const,
       label: "WAITING",
-      className: "border-gray-400 text-gray-600",
+      className: "border-gray-400 text-gray-600 py-1 leading-none",
     },
     avatarClass: "bg-gray-300",
   },

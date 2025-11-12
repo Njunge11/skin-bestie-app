@@ -263,6 +263,7 @@ export function ReviewGoalsModal({
             onToggleGoal={handleToggleGoal}
             onDeleteGoal={handleDeleteGoal}
             onReorderGoals={handleReorderGoals}
+            showMainFocus={true}
           />
         </div>
 
