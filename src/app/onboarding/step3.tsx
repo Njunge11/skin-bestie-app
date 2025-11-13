@@ -212,9 +212,6 @@ export default function Step3() {
       )}
 
       <hr className="mt-6 border-t-[0.03125rem] border-[#030303]" />
-      <p className="mt-6 font-medium text-base leading-[150%] tracking-[-0.01em] text-[#3F4548]">
-        Select as many as you like. Choose &quot;Other&quot; to type your own.
-      </p>
 
       <fieldset className="w-full">
         <div className="mt-4 flex flex-wrap gap-x-3 gap-y-2">
