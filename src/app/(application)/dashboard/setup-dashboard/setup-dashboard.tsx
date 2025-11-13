@@ -507,7 +507,7 @@ export function SetupDashboard({
           <div className="mt-2">
             <WhatHappensNextCard
               description="Your coach is reviewing your progress and will be in touch soon. Keep up the great work!"
-              coachName="Coach"
+              coachName="Benji"
             />
           </div>
         </CardContent>
