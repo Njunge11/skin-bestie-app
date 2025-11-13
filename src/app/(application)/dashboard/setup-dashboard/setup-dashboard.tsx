@@ -12,8 +12,15 @@ import { SelectSkinTypeModal } from "./select-skin-type-modal";
 import { WhatHappensNextCard } from "./what-happens-next-card";
 import { ViewRoutineModal } from "./view-routine-modal";
 import { PreferredNameModal } from "./preferred-name-modal";
+import { ProductsPurchasedModal } from "./products-purchased-modal";
+import { ChangeStartDateModal } from "./change-start-date-modal";
 import { ReviewGoalsModal } from "../shared/goals";
-import { updateNickname, updateSkinTest } from "./setup-dashboard-actions";
+import {
+  updateNickname,
+  updateSkinTest,
+  confirmProductsReceived,
+  updateRoutineStartDate,
+} from "./setup-dashboard-actions";
 import { type DashboardResponse } from "../schemas";
 
 interface SetupDashboardProps {
@@ -58,6 +65,16 @@ function getRoutineState(hasPublishedRoutine: boolean) {
   return { status: "waiting" as const, variant: "muted" as const };
 }
 
+function getProductsState(
+  productsReceived: boolean,
+  routineStartDateSet: boolean,
+) {
+  if (productsReceived && routineStartDateSet) {
+    return { status: "completed" as const, variant: "success" as const };
+  }
+  return { status: "pending" as const, variant: "default" as const };
+}
+
 export function SetupDashboard({
   dashboard,
   setOptimisticNickname,
@@ -67,6 +84,11 @@ export function SetupDashboard({
   const queryClient = useQueryClient();
   const [isRefreshingGoals, setIsRefreshingGoals] = useState(false);
   const [isRefreshingRoutine, setIsRefreshingRoutine] = useState(false);
+  const [optimisticProductsReceived, setOptimisticProductsReceived] =
+    useState(false);
+  const [optimisticStartDate, setOptimisticStartDate] = useState<Date | null>(
+    null,
+  );
 
   const handleRefreshGoals = async () => {
     setIsRefreshingGoals(true);
@@ -132,6 +154,10 @@ export function SetupDashboard({
   const [showSelectSkinTypeModal, setShowSelectSkinTypeModal] = useState(false);
   const [showReviewGoalsModal, setShowReviewGoalsModal] = useState(false);
   const [showViewRoutineModal, setShowViewRoutineModal] = useState(false);
+  const [showProductsPurchasedModal, setShowProductsPurchasedModal] =
+    useState(false);
+  const [showChangeStartDateModal, setShowChangeStartDateModal] =
+    useState(false);
 
   // Track if user has explicitly closed the modal during this session
   const [hasClosedNicknameModal, setHasClosedNicknameModal] = useState(false);
@@ -238,6 +264,10 @@ export function SetupDashboard({
   );
   const { status: routineStatus, variant: routineVariant } = getRoutineState(
     steps.hasPublishedRoutine,
+  );
+  const { status: productsStatus, variant: productsVariant } = getProductsState(
+    optimisticProductsReceived || steps.productsReceived || false,
+    optimisticStartDate !== null || steps.routineStartDateSet || false,
   );
 
   // Render booking button
@@ -405,6 +435,74 @@ export function SetupDashboard({
             {routineContent}
           </StepCard>
 
+          {/* Step 5: Purchase Products - Only show if routine is published */}
+          {steps.hasPublishedRoutine && (
+            <StepCard
+              stepNumber={5}
+              status={productsStatus}
+              title="Purchase Your Products"
+              description="Get the recommended products from your routine and confirm when they arrive to start your skincare journey."
+              variant={productsVariant}
+            >
+              {optimisticProductsReceived || steps.productsReceived ? (
+                <div className="space-y-4 mt-6">
+                  {optimisticStartDate || steps.routineStartDateSet ? (
+                    <>
+                      <Button
+                        onClick={() => setShowChangeStartDateModal(true)}
+                        className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white w-full sm:w-auto"
+                      >
+                        Change Start Date
+                      </Button>
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">🎉</span>
+                        <p className="text-sm text-gray-700">
+                          Your routine starts on{" "}
+                          <span className="font-semibold">
+                            {optimisticStartDate
+                              ? optimisticStartDate.toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    weekday: "long",
+                                    month: "long",
+                                    day: "numeric",
+                                  },
+                                )
+                              : dashboard.routine?.startDate
+                                ? new Date(
+                                    dashboard.routine.startDate,
+                                  ).toLocaleDateString("en-US", {
+                                    weekday: "long",
+                                    month: "long",
+                                    day: "numeric",
+                                  })
+                                : "Soon"}
+                          </span>
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={() => setShowChangeStartDateModal(true)}
+                      className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white w-full sm:w-auto"
+                    >
+                      Set Your Start Date
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <Button
+                  onClick={() => setShowProductsPurchasedModal(true)}
+                  className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white w-full sm:w-auto mt-6"
+                >
+                  Confirm Products Received
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              )}
+            </StepCard>
+          )}
+
           {/* What Happens Next */}
           <div className="mt-2">
             <WhatHappensNextCard
@@ -450,6 +548,126 @@ export function SetupDashboard({
         open={showViewRoutineModal}
         onOpenChange={setShowViewRoutineModal}
         routine={dashboard.routine || undefined}
+      />
+
+      {/* Products Purchased Modal */}
+      <ProductsPurchasedModal
+        key={showProductsPurchasedModal ? "open" : "closed"}
+        open={showProductsPurchasedModal}
+        onOpenChange={setShowProductsPurchasedModal}
+        onConfirmProductsReceived={async () => {
+          const result = await confirmProductsReceived();
+
+          if (!result.success) {
+            toast.error("Failed to confirm products received", {
+              description: result.error.message + ". Please try again.",
+            });
+            throw new Error(result.error.message);
+          }
+
+          toast.success("Products confirmed!");
+
+          // Invalidate dashboard query to refetch fresh data from backend
+          queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+        }}
+        onConfirm={async (startDate: Date) => {
+          // Check if routine exists
+          if (!dashboard.routine?.id) {
+            toast.error("Unable to set start date", {
+              description: "No routine found. Please contact support.",
+            });
+            return false;
+          }
+
+          // Optimistically update start date
+          setOptimisticStartDate(startDate);
+
+          const result = await updateRoutineStartDate(
+            dashboard.routine.id,
+            startDate,
+          );
+
+          if (!result.success) {
+            // Revert optimistic update on error
+            setOptimisticStartDate(null);
+
+            toast.error("Failed to set start date", {
+              description: result.error.message + ". Please try again.",
+            });
+            return false;
+          }
+
+          toast.success("Start date set!", {
+            description:
+              "Your routine will start on " +
+              startDate.toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              }),
+          });
+
+          // Invalidate dashboard query to refetch fresh data in background
+          queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+          return true;
+        }}
+      />
+
+      {/* Change Start Date Modal */}
+      <ChangeStartDateModal
+        open={showChangeStartDateModal}
+        onOpenChange={setShowChangeStartDateModal}
+        currentStartDate={
+          optimisticStartDate ||
+          (dashboard.routine?.startDate
+            ? new Date(dashboard.routine.startDate)
+            : undefined)
+        }
+        onConfirm={async (startDate: Date) => {
+          // Check if routine exists
+          if (!dashboard.routine?.id) {
+            toast.error("Unable to update start date", {
+              description: "No routine found. Please contact support.",
+            });
+            return false;
+          }
+
+          // Optimistically update UI immediately
+          setOptimisticStartDate(startDate);
+
+          const result = await updateRoutineStartDate(
+            dashboard.routine.id,
+            startDate,
+          );
+
+          if (!result.success) {
+            // Revert optimistic update on error
+            setOptimisticStartDate(
+              dashboard.routine?.startDate
+                ? new Date(dashboard.routine.startDate)
+                : null,
+            );
+
+            toast.error("Failed to update start date", {
+              description: result.error.message + ". Please try again.",
+            });
+            return false;
+          }
+
+          toast.success("Start date updated!", {
+            description:
+              "Your routine will now start on " +
+              startDate.toLocaleDateString("en-US", {
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+              }),
+          });
+
+          // Invalidate dashboard query to refetch fresh data in background
+          queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+          return true;
+        }}
       />
     </section>
   );

@@ -14,6 +14,8 @@ export const setupProgressSchema = z.object({
     hasPublishedGoals: z.boolean(),
     hasPublishedRoutine: z.boolean(),
     hasCompletedBooking: z.boolean(),
+    productsReceived: z.boolean(),
+    routineStartDateSet: z.boolean(),
   }),
 });
 

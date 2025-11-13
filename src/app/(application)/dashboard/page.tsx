@@ -42,6 +42,8 @@ function checkSetupComplete(dashboard: DashboardResponse): boolean {
     steps.hasPublishedGoals &&
     steps.hasPublishedRoutine &&
     steps.hasCompletedBooking &&
+    steps.productsReceived &&
+    steps.routineStartDateSet &&
     dashboard.goalsAcknowledgedByClient;
 
   return allStepsComplete;
