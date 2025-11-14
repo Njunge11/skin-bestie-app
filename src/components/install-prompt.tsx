@@ -54,6 +54,17 @@ export default function InstallPrompt() {
     return shouldShow && iOS && !standalone;
   });
 
+  // Register service worker
+  // From: https://nextjs.org/docs/app/guides/progressive-web-apps
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+        updateViaCache: "none",
+      });
+    }
+  }, []);
+
   // ✅ useEffect only for external system synchronization (event listener)
   useEffect(() => {
     if (!shouldShowPrompt()) {
