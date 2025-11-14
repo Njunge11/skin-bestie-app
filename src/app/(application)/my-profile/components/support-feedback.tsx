@@ -51,7 +51,7 @@ export function SupportFeedback({}: SupportFeedbackProps) {
       {/* Coach Section */}
       <div className="space-y-6">
         <h2 className="text-xl font-bold text-gray-900">
-          Your Skinbestie Coach
+          Your SkinBestie Coach
         </h2>
 
         {/* Coach Card */}

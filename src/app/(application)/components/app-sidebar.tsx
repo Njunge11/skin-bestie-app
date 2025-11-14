@@ -45,7 +45,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         >
           <Image
             src="/logo.svg"
-            alt="Skinbestie"
+            alt="SkinBestie"
             className="h-8 w-auto"
             width={120}
             height={32}

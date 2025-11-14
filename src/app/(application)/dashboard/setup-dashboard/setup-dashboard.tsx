@@ -387,7 +387,7 @@ export function SetupDashboard({
           <StepCard
             status={bookingStatus}
             stepNumber={1}
-            title="Book Your Consultation"
+            title="Book Your Coaching Call"
             description="A calm, friendly 50-minute video chat where we get to know you: lifestyle, skin history, current routine, and goals. Together we'll map a simple, personalised routine that fits your life."
             variant={bookingVariant}
           >
@@ -410,7 +410,7 @@ export function SetupDashboard({
             stepNumber={3}
             status={goalsStatus}
             title="Set Your Skin Goals"
-            description="Create SMART goals based on your consultation to guide your skincare journey."
+            description="Create SMART goals based on your coaching call to guide your skincare journey."
             variant={goalsVariant}
             onRefresh={
               goalsStatus === "waiting" ? handleRefreshGoals : undefined

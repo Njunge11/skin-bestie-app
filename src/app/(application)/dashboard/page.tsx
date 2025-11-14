@@ -11,9 +11,9 @@ import InstallPrompt from "@/components/install-prompt";
 
 function getGreeting(nickname: string): string {
   if (nickname) {
-    return `Welcome to Skinbestie, ${nickname}!`;
+    return `Welcome to SkinBestie, ${nickname}!`;
   }
-  return "Welcome to Skinbestie!";
+  return "Welcome to SkinBestie!";
 }
 
 function getErrorMessage(error: unknown): string {
