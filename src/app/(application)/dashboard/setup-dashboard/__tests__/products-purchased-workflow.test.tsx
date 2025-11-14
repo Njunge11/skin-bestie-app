@@ -76,6 +76,7 @@ const createMockDashboard = (
       occupation: null,
       bio: null,
       timezone: "America/New_York",
+      feedbackSurveyVisible: false,
       profileTags: [],
     },
     setupProgress: {

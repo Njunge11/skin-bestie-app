@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import type { DashboardResponse } from "../../dashboard/schemas";
-import { ShareFeedback } from "./share-feedback";
+import { ShareFeedback } from "../feedback/";
 import { getCoachWhatsAppUrl } from "../../actions/whatsapp-actions";
 import { toast } from "sonner";
 
@@ -12,7 +12,7 @@ interface SupportFeedbackProps {
   dashboard: DashboardResponse;
 }
 
-export function SupportFeedback({}: SupportFeedbackProps) {
+export function SupportFeedback({ dashboard }: SupportFeedbackProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   // Mock coach data
@@ -107,8 +107,10 @@ export function SupportFeedback({}: SupportFeedbackProps) {
         </div>
       </div>
 
-      {/* Share Feedback Section */}
-      <ShareFeedback />
+      {/* Share Feedback Section - Only show if enabled */}
+      {dashboard.user.feedbackSurveyVisible && (
+        <ShareFeedback userProfileId={dashboard.user.userProfileId} />
+      )}
     </div>
   );
 }

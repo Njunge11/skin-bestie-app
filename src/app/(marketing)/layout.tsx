@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 
 import Footer from "./footer";
+import { ServerActionErrorBoundary } from "@/components/server-action-error-boundary";
 // If you have app/fonts.ts exporting fonts, import them here
 // import { anton } from "@/app/fonts";
 
@@ -16,13 +17,15 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-dvh bg-background text-foreground">
-      {/* <div className={anton.className}> // if you want a marketing-only font */}
+    <ServerActionErrorBoundary>
+      <div className="min-h-dvh bg-background text-foreground">
+        {/* <div className={anton.className}> // if you want a marketing-only font */}
 
-      <main>{children}</main>
-      <Footer />
+        <main>{children}</main>
+        <Footer />
 
-      {/* </div> */}
-    </div>
+        {/* </div> */}
+      </div>
+    </ServerActionErrorBoundary>
   );
 }
