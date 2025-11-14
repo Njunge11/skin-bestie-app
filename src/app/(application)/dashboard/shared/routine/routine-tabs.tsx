@@ -265,7 +265,7 @@ export function RoutineTabs({
                       productName={step.productName}
                       description={step.instructions}
                       category={step.routineStep}
-                      productUrl={step.productUrl}
+                      productUrl={step.productUrl ?? undefined}
                       showCheckbox={true}
                       showViewProduct={true}
                       productNameAsLink={false}
@@ -291,7 +291,7 @@ export function RoutineTabs({
                       productName={step.productName}
                       description={step.instructions}
                       category={step.routineStep}
-                      productUrl={step.productUrl}
+                      productUrl={step.productUrl ?? undefined}
                       showCheckbox={true}
                       showViewProduct={true}
                       productNameAsLink={false}
@@ -370,7 +370,7 @@ export function RoutineTabs({
                       productName={step.productName}
                       description={step.instructions}
                       category={step.routineStep}
-                      productUrl={step.productUrl}
+                      productUrl={step.productUrl ?? undefined}
                       showCheckbox={true}
                       showViewProduct={true}
                       productNameAsLink={false}
@@ -392,7 +392,7 @@ export function RoutineTabs({
                     productName={step.productName}
                     description={step.instructions}
                     category={step.routineStep}
-                    productUrl={step.productUrl}
+                    productUrl={step.productUrl ?? undefined}
                     showCheckbox={true}
                     showViewProduct={true}
                     productNameAsLink={false}

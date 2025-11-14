@@ -22,7 +22,7 @@ interface ViewRoutineModalProps {
       instructions?: string;
       description?: string;
       routineStep?: string;
-      productUrl?: string;
+      productUrl?: string | null;
       order?: number;
     }>;
     evening?: Array<{
@@ -32,7 +32,7 @@ interface ViewRoutineModalProps {
       instructions?: string;
       description?: string;
       routineStep?: string;
-      productUrl?: string;
+      productUrl?: string | null;
       order?: number;
     }>;
   };

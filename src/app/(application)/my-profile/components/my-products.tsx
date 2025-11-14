@@ -18,7 +18,7 @@ interface Product {
   id: string;
   productName: string;
   routineStep: string;
-  productUrl: string;
+  productUrl: string | undefined;
   purchaseInstructions: string | null;
 }
 
@@ -43,7 +43,7 @@ export function MyProducts({ dashboard }: MyProductsProps) {
           id: item.id,
           productName: item.productName,
           routineStep: item.routineStep,
-          productUrl: item.productUrl,
+          productUrl: item.productUrl ?? undefined,
           purchaseInstructions: routine.productPurchaseInstructions || null,
         });
       }

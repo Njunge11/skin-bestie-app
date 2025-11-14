@@ -113,7 +113,7 @@ export function CatchupTasks({ catchupSteps }: CatchupTasksProps) {
                 productName={step.productName}
                 description={step.instructions}
                 category={step.routineStep}
-                productUrl={step.productUrl}
+                productUrl={step.productUrl ?? undefined}
                 showCheckbox={true}
                 isChecked={checkedSteps.has(step.id)}
                 onCheckedChange={(checked) =>
