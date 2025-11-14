@@ -82,6 +82,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-black scroll-smooth scroll-pt-20">
       <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
         <link
           rel="apple-touch-startup-image"
           href="/apple-splash-2048-2732.png"
