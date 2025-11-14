@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
       "We collaborate with you to curate a simple routine that's tailored to your lifestyle, your budget, and your skin goals.",
     start_url: "/",
     display: "standalone",
-    background_color: "#FFFDF5",
+    background_color: "#258E67",
     theme_color: "#195284",
     icons: [
       {
