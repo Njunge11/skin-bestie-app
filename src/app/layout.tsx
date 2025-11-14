@@ -51,9 +51,12 @@ export const metadata: Metadata = {
     images: ["/hero.jpg"],
   },
   icons: {
-    icon: "/Favicon.png",
-    shortcut: "/Favicon.png",
     apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "SkinBestie",
+    statusBarStyle: "default",
   },
   robots: {
     index: true,
