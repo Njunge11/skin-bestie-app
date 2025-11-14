@@ -66,7 +66,7 @@ export function WhatHappensNextCard({
             variant="outline"
             className="w-full border-skinbestie-primary text-skinbestie-primary mt-2"
           >
-            What You Get With Skin Bestie
+            What You Get With SkinBestie
           </Button>
         </CardContent>
       </Card>
