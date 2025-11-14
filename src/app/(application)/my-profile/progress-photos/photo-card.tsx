@@ -16,7 +16,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { formatPhotoDate } from "./progress-photos.helpers";
 import type { Photo } from "./progress-photos.types";
 
 interface PhotoCardProps {
@@ -136,13 +135,7 @@ export function PhotoCard({
         </div>
 
         {/* Photo label with date */}
-        <p className="text-sm text-gray-600">
-          {photo.apiData?.uploadedAt
-            ? formatPhotoDate(photo.apiData.uploadedAt)
-            : photo.addedAt
-              ? formatPhotoDate(photo.addedAt)
-              : ""}
-        </p>
+        <p className="text-sm text-gray-600">{photo.name}</p>
       </div>
 
       {/* Delete confirmation dialog */}

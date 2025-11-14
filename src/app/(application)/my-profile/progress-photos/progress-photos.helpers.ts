@@ -1,4 +1,38 @@
 /**
+ * Get ordinal suffix for a day (1st, 2nd, 3rd, 4th, etc.)
+ */
+function getOrdinalSuffix(day: number): string {
+  if (day > 3 && day < 21) return "th";
+  switch (day % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+}
+
+/**
+ * Format a date to "Month Dayth, Year" format
+ * Examples:
+ * - "November 14th, 2025"
+ * - "January 1st, 2024"
+ * - "March 22nd, 2025"
+ */
+export function formatPhotoLabel(dateString: string): string {
+  const date = new Date(dateString);
+  const month = date.toLocaleDateString("en-US", { month: "long" });
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const suffix = getOrdinalSuffix(day);
+
+  return `${month} ${day}${suffix}, ${year}`;
+}
+
+/**
  * Format a date string to human-readable format
  * Examples:
  * - "Today at 2:30 PM"

@@ -332,7 +332,7 @@ function CodeInputScreen({ email }: { email: string }) {
     }
   };
 
-  const handleRequestNewCode = async () => {
+  const _handleRequestNewCode = async () => {
     setCode("");
     setError(null);
     await handleResend();
@@ -440,7 +440,6 @@ function CodeInputScreen({ email }: { email: string }) {
 
 function OnboardingBlockedScreen({
   email,
-  profileStatus,
 }: {
   email: string;
   profileStatus: ProfileStatusResponse;

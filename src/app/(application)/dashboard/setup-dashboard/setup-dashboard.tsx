@@ -84,8 +84,7 @@ export function SetupDashboard({
   const queryClient = useQueryClient();
   const [isRefreshingGoals, setIsRefreshingGoals] = useState(false);
   const [isRefreshingRoutine, setIsRefreshingRoutine] = useState(false);
-  const [optimisticProductsReceived, setOptimisticProductsReceived] =
-    useState(false);
+  const [optimisticProductsReceived] = useState(false);
   const [optimisticStartDate, setOptimisticStartDate] = useState<Date | null>(
     null,
   );

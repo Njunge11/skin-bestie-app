@@ -11,12 +11,10 @@ type ValuesItem = {
 
 export default function Values({
   heading = "Our Values",
-  imageSrc,
-  imageAlt,
   items,
 }: {
   heading?: string;
-  imageSrc: string;
+  imageSrc?: string;
   imageAlt: string;
   items: ValuesItem[];
 }) {

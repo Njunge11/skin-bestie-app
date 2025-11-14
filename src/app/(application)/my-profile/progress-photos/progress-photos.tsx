@@ -10,6 +10,7 @@ import { PhotoViewModal } from "./photo-view-modal";
 import { ComparePhotosModal } from "./compare-photos-modal";
 import { usePhotos } from "./hooks/use-photos";
 import { useUpload } from "./upload-context";
+import { formatPhotoLabel } from "./progress-photos.helpers";
 import type { Photo } from "./progress-photos.types";
 
 interface ProgressPhotosProps {
@@ -55,9 +56,7 @@ export function ProgressPhotos({
   // Convert API photos to Photo format
   const apiList: Photo[] = apiPhotos.map((apiPhoto) => ({
     id: apiPhoto.id,
-    name:
-      apiPhoto.originalName ||
-      new Date(apiPhoto.uploadedAt).toLocaleDateString(),
+    name: formatPhotoLabel(apiPhoto.uploadedAt),
     size: parseFloat((apiPhoto.bytes / (1024 * 1024)).toFixed(1)),
     url: apiPhoto.imageUrl,
     uploadStatus: "uploaded" as const,
@@ -131,6 +130,35 @@ export function ProgressPhotos({
   };
 
   const handleFileSelect = async (files: File[]) => {
+    // Check monthly upload limit (2 photos per month)
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const photosThisMonth = apiPhotos.filter((photo) => {
+      const uploadDate = new Date(photo.uploadedAt);
+      return (
+        uploadDate.getMonth() === currentMonth &&
+        uploadDate.getFullYear() === currentYear
+      );
+    });
+
+    const remainingSlots = 2 - photosThisMonth.length;
+
+    if (remainingSlots <= 0) {
+      toast.error(
+        "You've already uploaded 2 photos this month. Please wait until next month to upload more.",
+      );
+      return;
+    }
+
+    if (files.length > remainingSlots) {
+      toast.error(
+        `You can only upload ${remainingSlots} more photo${remainingSlots === 1 ? "" : "s"} this month. You've already uploaded ${photosThisMonth.length} photo${photosThisMonth.length === 1 ? "" : "s"} in ${now.toLocaleString("default", { month: "long" })}.`,
+      );
+      return;
+    }
+
     const { uploadPhoto } = await import("./photo-api");
 
     // Add all files to uploading state immediately
@@ -239,6 +267,26 @@ export function ProgressPhotos({
     uploadAreaRef.current?.triggerUpload();
   };
 
+  // Calculate monthly upload status
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const photosThisMonth = apiPhotos.filter((photo) => {
+    const uploadDate = new Date(photo.uploadedAt);
+    return (
+      uploadDate.getMonth() === currentMonth &&
+      uploadDate.getFullYear() === currentYear
+    );
+  });
+
+  const monthlyUploadStatus = {
+    uploaded: photosThisMonth.length,
+    limit: 2,
+    remaining: 2 - photosThisMonth.length,
+    monthName: now.toLocaleString("default", { month: "long" }),
+  };
+
   return (
     <>
       <PhotoUploadArea ref={uploadAreaRef} onFileSelect={handleFileSelect} />
@@ -256,6 +304,7 @@ export function ProgressPhotos({
           onUploadClick={handleUploadClick}
           onDelete={handleDelete}
           onRetry={handleRetry}
+          monthlyUploadStatus={monthlyUploadStatus}
         />
       )}
 

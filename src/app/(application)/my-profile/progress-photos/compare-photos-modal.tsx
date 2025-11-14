@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ZoomControls } from "./zoom-controls";
-import { formatPhotoDate } from "./progress-photos.helpers";
 import type { Photo } from "./progress-photos.types";
 
 interface ComparePhotosModalProps {
@@ -85,11 +84,7 @@ export function ComparePhotosModal({
               )}
             </TransformWrapper>
             <p className="text-sm font-medium text-gray-900 text-center">
-              {photo1.apiData?.uploadedAt
-                ? formatPhotoDate(photo1.apiData.uploadedAt)
-                : photo1.addedAt
-                  ? formatPhotoDate(photo1.addedAt)
-                  : photo1.name}
+              {photo1.name}
             </p>
           </div>
 
@@ -134,11 +129,7 @@ export function ComparePhotosModal({
               )}
             </TransformWrapper>
             <p className="text-sm font-medium text-gray-900 text-center">
-              {photo2.apiData?.uploadedAt
-                ? formatPhotoDate(photo2.apiData.uploadedAt)
-                : photo2.addedAt
-                  ? formatPhotoDate(photo2.addedAt)
-                  : photo2.name}
+              {photo2.name}
             </p>
           </div>
         </div>

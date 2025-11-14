@@ -14,11 +14,7 @@ import userEvent from "@testing-library/user-event";
 import { render, mockPush, clearAllMocks } from "./test-utils";
 import LoginClient from "../login.client";
 import { server } from "./mocks/server";
-import {
-  resetMockState,
-  getStoredCodeForEmail,
-  setCodeToExpired,
-} from "./mocks/handlers";
+import { resetMockState } from "./mocks/handlers";
 import { LoginContent } from "@/utils/extractors/login.extractor";
 import * as loginActions from "../actions";
 

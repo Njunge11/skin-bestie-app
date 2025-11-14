@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RoutineItemCard } from "./routine-item-card";
@@ -27,9 +26,7 @@ interface UpcomingRoutineTabsProps {
 export function UpcomingRoutineTabs({
   routine,
   noBorder = false,
-  defaultTabStyle = false,
   noPadding = false,
-  useSwitch = false,
 }: UpcomingRoutineTabsProps) {
   const [activeTab, setActiveTab] = useState("morning");
 
@@ -101,8 +98,9 @@ export function UpcomingRoutineTabs({
 
           {/* Routine Steps - Same cards as active routine, just no checkbox */}
           <div className="space-y-4 mt-4">
-            {activeTab === "morning"
-              ? morningSteps.map((step) => (
+            {activeTab === "morning" ? (
+              morningSteps.length > 0 ? (
+                morningSteps.map((step) => (
                   <RoutineItemCard
                     key={step.id}
                     productName={step.productName}
@@ -114,18 +112,29 @@ export function UpcomingRoutineTabs({
                     productNameAsLink={false}
                   />
                 ))
-              : eveningSteps.map((step) => (
-                  <RoutineItemCard
-                    key={step.id}
-                    productName={step.productName}
-                    description={step.instructions}
-                    category={step.routineStep}
-                    productUrl={step.productUrl ?? undefined}
-                    showCheckbox={false}
-                    showViewProduct={true}
-                    productNameAsLink={false}
-                  />
-                ))}
+              ) : (
+                <p className="text-muted-foreground">
+                  No morning routine steps yet.
+                </p>
+              )
+            ) : eveningSteps.length > 0 ? (
+              eveningSteps.map((step) => (
+                <RoutineItemCard
+                  key={step.id}
+                  productName={step.productName}
+                  description={step.instructions}
+                  category={step.routineStep}
+                  productUrl={step.productUrl ?? undefined}
+                  showCheckbox={false}
+                  showViewProduct={true}
+                  productNameAsLink={false}
+                />
+              ))
+            ) : (
+              <p className="text-muted-foreground">
+                No evening routine steps yet.
+              </p>
+            )}
           </div>
         </div>
       </CardContent>

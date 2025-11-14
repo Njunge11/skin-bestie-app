@@ -37,7 +37,7 @@ export function Header({ userName, userEmail }: HeaderProps) {
       } else {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to open WhatsApp. Please try again.");
     } finally {
       setIsLoadingWhatsApp(false);

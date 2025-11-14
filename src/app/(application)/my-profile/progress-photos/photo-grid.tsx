@@ -15,6 +15,12 @@ interface PhotoGridProps {
   onUploadClick?: () => void;
   onDelete?: (photoId: string) => void;
   onRetry?: (photoId: string) => void;
+  monthlyUploadStatus?: {
+    uploaded: number;
+    limit: number;
+    remaining: number;
+    monthName: string;
+  };
 }
 
 export function PhotoGrid({
@@ -27,6 +33,7 @@ export function PhotoGrid({
   onUploadClick,
   onDelete,
   onRetry,
+  monthlyUploadStatus,
 }: PhotoGridProps) {
   // Count uploaded photos (from backend)
   const uploadedPhotos = photos.filter((p) => p.uploadStatus === "uploaded");
@@ -39,44 +46,72 @@ export function PhotoGrid({
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-900">
-          My Progress {photos.length === 1 ? "Photo" : "Photos"}
-        </h3>
-        <div className="flex items-center gap-2">
-          {isCompareMode ? (
-            <>
-              <span className="text-sm text-gray-600">
-                Select 2 photos to compare
-              </span>
-              <Button
-                variant="outline"
-                onClick={onCancelCompare}
-                className="text-gray-700"
-              >
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <>
-              {showCompareButton && (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xl font-semibold text-gray-900">
+            My Progress {photos.length === 1 ? "Photo" : "Photos"}
+          </h3>
+          <div className="flex items-center gap-2">
+            {isCompareMode ? (
+              <>
+                <span className="text-sm text-gray-600">
+                  Select 2 photos to compare
+                </span>
                 <Button
                   variant="outline"
-                  onClick={onCompareClick}
-                  className="border-skinbestie-primary text-skinbestie-primary hover:bg-skinbestie-primary/10"
+                  onClick={onCancelCompare}
+                  className="text-gray-700"
                 >
-                  Compare
+                  Cancel
                 </Button>
-              )}
-              <Button
-                onClick={onUploadClick}
-                className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white"
-              >
-                Upload
-              </Button>
-            </>
-          )}
+              </>
+            ) : (
+              <>
+                {showCompareButton && (
+                  <Button
+                    variant="outline"
+                    onClick={onCompareClick}
+                    className="border-skinbestie-primary text-skinbestie-primary hover:bg-skinbestie-primary/10"
+                  >
+                    Compare
+                  </Button>
+                )}
+                <Button
+                  onClick={onUploadClick}
+                  className="bg-skinbestie-primary hover:bg-skinbestie-primary/90 text-white"
+                  disabled={monthlyUploadStatus?.remaining === 0}
+                >
+                  Upload
+                </Button>
+              </>
+            )}
+          </div>
         </div>
+
+        {/* Monthly Upload Status */}
+        {monthlyUploadStatus && (
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-600">
+              {monthlyUploadStatus.monthName} uploads:
+            </span>
+            <span
+              className={
+                monthlyUploadStatus.remaining > 0
+                  ? "font-medium text-gray-900"
+                  : "font-medium text-orange-600"
+              }
+            >
+              {monthlyUploadStatus.uploaded} of {monthlyUploadStatus.limit} used
+            </span>
+            {monthlyUploadStatus.remaining > 0 ? (
+              <span className="text-gray-500">
+                ({monthlyUploadStatus.remaining} remaining)
+              </span>
+            ) : (
+              <span className="text-orange-600">(limit reached)</span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Photos Grid */}

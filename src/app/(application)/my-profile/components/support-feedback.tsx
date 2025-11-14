@@ -39,7 +39,7 @@ export function SupportFeedback({}: SupportFeedbackProps) {
       } else {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to open WhatsApp. Please try again.");
     } finally {
       setIsLoading(false);

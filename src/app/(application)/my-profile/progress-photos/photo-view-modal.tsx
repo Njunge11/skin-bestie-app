@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { ZoomControls } from "./zoom-controls";
-import { formatPhotoDate } from "./progress-photos.helpers";
 import type { Photo } from "./progress-photos.types";
 
 interface PhotoViewModalProps {
@@ -35,11 +34,7 @@ export function PhotoViewModal({
         <div className="max-w-md space-y-4">
           <DialogHeader className="text-left">
             <DialogTitle className="text-xl font-bold">
-              {photo.apiData?.uploadedAt
-                ? formatPhotoDate(photo.apiData.uploadedAt)
-                : photo.addedAt
-                  ? formatPhotoDate(photo.addedAt)
-                  : photo.name}
+              {photo.name}
             </DialogTitle>
           </DialogHeader>
           <TransformWrapper
@@ -57,7 +52,7 @@ export function PhotoViewModal({
                   align="left"
                 />
                 <TransformComponent
-                  wrapperClass="relative rounded-lg overflow-hidden aspect-[3/4] bg-gray-100"
+                  wrapperClass="relative rounded-lg overflow-hidden aspect-[3/4] bg-gray-100 min-h-[500px]"
                   contentClass="w-full h-full"
                 >
                   {isBlobUrl ? (
@@ -72,6 +67,7 @@ export function PhotoViewModal({
                       alt={photo.name}
                       width={width}
                       height={height}
+                      placeholder="empty"
                       className="w-full h-full object-cover"
                       sizes="(max-width: 768px) 100vw, 600px"
                     />

@@ -118,7 +118,7 @@ export function HttpAdapter(): Adapter {
      * Create user - Not needed for our flow since users are created during onboarding
      * But required by Adapter interface
      */
-    async createUser(user) {
+    async createUser(_user) {
       // Users are created via onboarding flow, not via NextAuth
       // If this gets called, it means a user is trying to sign in who doesn't exist
       console.warn(
