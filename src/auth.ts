@@ -8,7 +8,6 @@ import authConfig from "./auth.config";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: HttpAdapter(),
   session: { strategy: "jwt" },
-  debug: true, // Enable detailed logging
   ...authConfig,
   providers: [
     // Verification code provider (6-digit code)

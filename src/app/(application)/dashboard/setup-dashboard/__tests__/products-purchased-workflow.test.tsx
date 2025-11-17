@@ -308,9 +308,24 @@ describe("Products Purchased Workflow - Integration Tests", () => {
       // Select a future date (5 days from now)
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 5);
-      const futureDateButton = screen.getByRole("button", {
-        name: new RegExp(futureDate.getDate().toString()),
+      const formattedDate = futureDate.toLocaleDateString();
+
+      // Wait for calendar to render
+      // Note: Using data-day attribute because multiple dates can have same day number (e.g., "20")
+      // We query by role first (accessible), then filter by data attribute to disambiguate
+      const futureDateButton = await waitFor(() => {
+        const buttons = screen.queryAllByRole("button");
+        const dateButton = buttons.find(
+          (button) => button.getAttribute("data-day") === formattedDate,
+        );
+        if (!dateButton) {
+          throw new Error(
+            `Calendar date button not found for ${formattedDate}`,
+          );
+        }
+        return dateButton;
       });
+
       await user.click(futureDateButton);
 
       // Confirm
@@ -751,11 +766,25 @@ describe("Products Purchased Workflow - Integration Tests", () => {
       await user.click(screen.getByRole("button", { name: /pick a date/i }));
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 3);
-      await user.click(
-        screen.getByRole("button", {
-          name: new RegExp(futureDate.getDate().toString()),
-        }),
-      );
+      const formattedDate = futureDate.toLocaleDateString();
+
+      // Wait for calendar to render
+      // Note: Using data-day attribute because multiple dates can have same day number (e.g., "20")
+      // We query by role first (accessible), then filter by data attribute to disambiguate
+      const dateButton = await waitFor(() => {
+        const buttons = screen.queryAllByRole("button");
+        const btn = buttons.find(
+          (button) => button.getAttribute("data-day") === formattedDate,
+        );
+        if (!btn) {
+          throw new Error(
+            `Calendar date button not found for ${formattedDate}`,
+          );
+        }
+        return btn;
+      });
+
+      await user.click(dateButton);
 
       // Now enabled
       expect(
