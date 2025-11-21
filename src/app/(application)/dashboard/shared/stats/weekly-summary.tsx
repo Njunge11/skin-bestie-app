@@ -14,7 +14,7 @@ export function WeeklySummary({ message }: WeeklySummaryProps) {
           </h2>
           <p className="text-lg text-gray-700">{message}</p>
         </div>
-        <div className="text-4xl flex-shrink-0">🔥</div>
+        <div className="text-4xl flex-shrink-0 leading-none">🔥</div>
       </div>
     </Card>
   );

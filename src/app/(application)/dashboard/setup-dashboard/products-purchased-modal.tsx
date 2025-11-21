@@ -165,75 +165,35 @@ export function ProductsPurchasedModal({
                     </h3>
                     <ScrollArea className="h-[200px] rounded-lg border border-gray-200 bg-white">
                       <div className="p-3 space-y-2">
-                        {/* Morning Products */}
-                        {routine.morning && routine.morning.length > 0 && (
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                              <span>☀️</span>
-                              <span>Morning</span>
+                        {/* All Products */}
+                        {[
+                          ...(routine.morning || []),
+                          ...(routine.evening || []),
+                        ].map((step) => (
+                          <div
+                            key={step.id}
+                            className="flex items-start justify-between gap-2 p-2 bg-skinbestie-neutral rounded"
+                          >
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">
+                                {step.productName}
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                {step.routineStep}
+                              </p>
                             </div>
-                            {routine.morning.map((step) => (
-                              <div
-                                key={step.id}
-                                className="flex items-start justify-between gap-2 p-2 bg-skinbestie-neutral rounded"
+                            {step.productUrl && (
+                              <a
+                                href={step.productUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-skinbestie-primary hover:opacity-90 transition-colors font-medium underline whitespace-nowrap"
                               >
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium text-gray-900">
-                                    {step.productName}
-                                  </p>
-                                  <p className="text-xs text-gray-600">
-                                    {step.routineStep}
-                                  </p>
-                                </div>
-                                {step.productUrl && (
-                                  <a
-                                    href={step.productUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-skinbestie-primary hover:opacity-90 transition-colors font-medium underline whitespace-nowrap"
-                                  >
-                                    View/Purchase
-                                  </a>
-                                )}
-                              </div>
-                            ))}
+                                View/Purchase
+                              </a>
+                            )}
                           </div>
-                        )}
-
-                        {/* Evening Products */}
-                        {routine.evening && routine.evening.length > 0 && (
-                          <div className="space-y-2 mt-3">
-                            <div className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
-                              <span>🌙</span>
-                              <span>Evening</span>
-                            </div>
-                            {routine.evening.map((step) => (
-                              <div
-                                key={step.id}
-                                className="flex items-start justify-between gap-2 p-2 bg-skinbestie-neutral rounded"
-                              >
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium text-gray-900">
-                                    {step.productName}
-                                  </p>
-                                  <p className="text-xs text-gray-600">
-                                    {step.routineStep}
-                                  </p>
-                                </div>
-                                {step.productUrl && (
-                                  <a
-                                    href={step.productUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-skinbestie-primary hover:opacity-90 transition-colors font-medium underline whitespace-nowrap"
-                                  >
-                                    View/Purchase
-                                  </a>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                        ))}
                       </div>
                     </ScrollArea>
                   </div>
