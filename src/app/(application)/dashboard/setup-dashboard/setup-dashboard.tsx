@@ -554,6 +554,7 @@ export function SetupDashboard({
         key={showProductsPurchasedModal ? "open" : "closed"}
         open={showProductsPurchasedModal}
         onOpenChange={setShowProductsPurchasedModal}
+        routine={dashboard.routine || undefined}
         onConfirmProductsReceived={async () => {
           const result = await confirmProductsReceived();
 

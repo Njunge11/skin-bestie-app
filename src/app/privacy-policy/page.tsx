@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { anton } from "../fonts";
+import { showCookiePreferences } from "@/components/cookie-consent";
 
 // Note: metadata export doesn't work in client components
 // Metadata should be added via layout.tsx or converted to server component
@@ -977,14 +978,14 @@ export default function PrivacyPolicyPage() {
                 Help function within your browser to learn how to manage your
                 settings within your browser. For more information about the
                 cookies we use, please see our{" "}
-                <Link
-                  href="/cookie-preferences"
+                <button
+                  onClick={() => showCookiePreferences()}
                   className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
                   style={{ color: "#EB6D98" }}
                 >
                   Cookie Preferences
-                </Link>{" "}
-                page. For general information about cookies, please consult:{" "}
+                </button>
+                . For general information about cookies, please consult:{" "}
                 <a
                   href="https://allaboutcookies.org/"
                   target="_blank"

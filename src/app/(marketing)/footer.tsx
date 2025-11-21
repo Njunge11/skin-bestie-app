@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { anton } from "../fonts";
+import { showCookiePreferences } from "@/components/cookie-consent";
 
 export default function Footer() {
   return (
@@ -46,9 +49,12 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/cookie-preferences" className="text-[#FAFAFA]">
+                  <button
+                    onClick={() => showCookiePreferences()}
+                    className="text-[#FAFAFA] hover:opacity-80 transition-opacity"
+                  >
                     COOKIE PREFERENCES
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>

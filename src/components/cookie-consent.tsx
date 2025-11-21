@@ -7,44 +7,11 @@ import { cookieConsentConfig } from "@/lib/cookie-consent-config";
 
 export default function CookieConsentBanner() {
   useEffect(() => {
-    CookieConsent.run({
-      ...cookieConsentConfig,
-      onFirstConsent: () => {
-        // Remove overlay when user makes their first choice
-        document.body.classList.remove("cc-overlay");
-      },
-      onChange: () => {
-        // Remove overlay when user changes preferences
-        document.body.classList.remove("cc-overlay");
-      },
-    });
+    CookieConsent.run(cookieConsentConfig);
 
-    // Add overlay class if consent hasn't been given yet
-    if (!CookieConsent.validConsent()) {
-      document.body.classList.add("cc-overlay");
-    }
-
-    // Minimal styling - button colors + overlay
+    // Brand styling only - colors for buttons, links, and toggles
     const style = document.createElement("style");
     style.textContent = `
-      /* Dark overlay/backdrop - blocks clicks but allows scrolling */
-      body.cc-overlay::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 999998;
-        pointer-events: auto;
-      }
-
-      #cc-main {
-        position: relative;
-        z-index: 999999;
-      }
-
       /* Accept All button - Brand blue */
       button[data-role="all"] {
         background-color: #235588 !important;
@@ -90,7 +57,7 @@ export default function CookieConsentBanner() {
 }
 
 export const showCookiePreferences = () => {
-  CookieConsent.showPreferences();
+  CookieConsent.show();
 };
 
 export const acceptCookieCategory = (category: string) => {

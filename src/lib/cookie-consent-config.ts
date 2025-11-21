@@ -3,25 +3,16 @@ import type { CookieConsentConfig } from "vanilla-cookieconsent";
 export const cookieConsentConfig: CookieConsentConfig = {
   guiOptions: {
     consentModal: {
-      layout: "bar inline",
-      position: "bottom",
-      equalWeightButtons: true,
-      flipButtons: false,
+      layout: "box",
+      position: "middle center",
     },
     preferencesModal: {
       layout: "box",
       position: "right",
-      equalWeightButtons: true,
-      flipButtons: false,
     },
   },
 
-  cookie: {
-    name: "cc_cookie",
-    path: "/",
-    sameSite: "Lax",
-    expiresAfterDays: 182,
-  },
+  disablePageInteraction: true,
 
   categories: {
     necessary: {
@@ -102,14 +93,14 @@ export const cookieConsentConfig: CookieConsentConfig = {
                 body: [
                   {
                     name: "authjs.session-token",
-                    domain: "skinbestie.com",
+                    domain: "skinbestie.co",
                     description:
                       "Authentication session cookie for secure login using Auth.js",
                     expiration: "30 days",
                   },
                   {
                     name: "cc_cookie",
-                    domain: "skinbestie.com",
+                    domain: "skinbestie.co",
                     description: "Stores your cookie consent preferences",
                     expiration: "6 months",
                   },

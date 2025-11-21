@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { anton } from "../fonts";
+import { showCookiePreferences } from "@/components/cookie-consent";
 
 export default function TermsAndConditionsPage() {
   const [activeSection, setActiveSection] = useState("introduction");
@@ -155,13 +156,13 @@ export default function TermsAndConditionsPage() {
                   Terms of Use
                 </Link>
                 , and{" "}
-                <Link
-                  href="/cookie-preferences"
+                <button
+                  onClick={() => showCookiePreferences()}
                   className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
                   style={{ color: "#EB6D98" }}
                 >
                   Cookie Preferences
-                </Link>
+                </button>
                 .
               </p>
             </section>

@@ -267,7 +267,7 @@ export function RoutineTabs({
                       category={step.routineStep}
                       productUrl={step.productUrl ?? undefined}
                       showCheckbox={true}
-                      showViewProduct={true}
+                      showViewProduct={false}
                       productNameAsLink={false}
                       isChecked={checkedSteps.has(step.id)}
                       onCheckedChange={(checked) =>
@@ -293,7 +293,7 @@ export function RoutineTabs({
                       category={step.routineStep}
                       productUrl={step.productUrl ?? undefined}
                       showCheckbox={true}
-                      showViewProduct={true}
+                      showViewProduct={false}
                       productNameAsLink={false}
                       isChecked={checkedSteps.has(step.id)}
                       onCheckedChange={(checked) =>
@@ -372,7 +372,7 @@ export function RoutineTabs({
                       category={step.routineStep}
                       productUrl={step.productUrl ?? undefined}
                       showCheckbox={true}
-                      showViewProduct={true}
+                      showViewProduct={false}
                       productNameAsLink={false}
                       isChecked={checkedSteps.has(step.id)}
                       onCheckedChange={(checked) =>
@@ -394,7 +394,7 @@ export function RoutineTabs({
                     category={step.routineStep}
                     productUrl={step.productUrl ?? undefined}
                     showCheckbox={true}
-                    showViewProduct={true}
+                    showViewProduct={false}
                     productNameAsLink={false}
                     isChecked={checkedSteps.has(step.id)}
                     onCheckedChange={(checked) =>
