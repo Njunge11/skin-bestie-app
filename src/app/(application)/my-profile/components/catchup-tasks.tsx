@@ -119,7 +119,7 @@ export function CatchupTasks({ catchupSteps }: CatchupTasksProps) {
                 onCheckedChange={(checked) =>
                   handleStepToggle(step.id, checked)
                 }
-                showViewProduct={true}
+                showViewProduct={false}
                 productNameAsLink={false}
               />
             ))}

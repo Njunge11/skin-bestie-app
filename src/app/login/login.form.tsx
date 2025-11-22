@@ -332,12 +332,6 @@ function CodeInputScreen({ email }: { email: string }) {
     }
   };
 
-  const _handleRequestNewCode = async () => {
-    setCode("");
-    setError(null);
-    await handleResend();
-  };
-
   return (
     <div className="flex flex-col items-center justify-center min-h-[21rem] space-y-6">
       {/* Success Icon */}

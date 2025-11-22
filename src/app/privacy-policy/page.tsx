@@ -168,7 +168,7 @@ export default function PrivacyPolicyPage() {
                 Privacy Policy
               </h3>
               <p
-                className="text-base leading-relaxed"
+                className="text-base leading-relaxed mb-4"
                 style={{ color: "#1B1D1F" }}
               >
                 This privacy policy gives you information about how SkinBestie
@@ -178,16 +178,12 @@ export default function PrivacyPolicyPage() {
                 virtual skin coaching services, purchase a product or service,
                 or take part in a competition.
               </p>
-            </section>
-
-            {/* Meaning of personal data */}
-            <section id="meaning-personal-data">
-              <h2
-                className={`${anton.className} text-2xl lg:text-3xl font-normal uppercase mb-6`}
+              <h3
+                className={`${anton.className} text-xl lg:text-2xl font-normal uppercase mb-4 mt-8`}
                 style={{ color: "#222118" }}
               >
                 Meaning of personal data
-              </h2>
+              </h3>
               <p
                 className="text-base leading-relaxed mb-4"
                 style={{ color: "#1B1D1F" }}
@@ -650,15 +646,8 @@ export default function PrivacyPolicyPage() {
                 communications, you will still receive service-related
                 communications that are essential for administrative or customer
                 service purposes for example relating to order confirmations,
-                updates to our{" "}
-                <Link
-                  href="/terms-and-conditions"
-                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
-                  style={{ color: "#EB6D98" }}
-                >
-                  Terms and Conditions
-                </Link>
-                , or checking that your contact details are correct.
+                updates to our Terms and Conditions, or checking that your
+                contact details are correct.
               </p>
             </section>
 
@@ -735,7 +724,7 @@ export default function PrivacyPolicyPage() {
                 6. International data transfers
               </h2>
               <p
-                className="text-base leading-relaxed"
+                className="text-base leading-relaxed mb-4"
                 style={{ color: "#1B1D1F" }}
               >
                 In some instances, your data may be transferred to and processed
@@ -745,7 +734,7 @@ export default function PrivacyPolicyPage() {
                 your personal data to a country or international organisation
                 outside the UK/EEA where:
               </p>
-              <ul className="space-y-3 ml-6 mt-4">
+              <ul className="space-y-3 ml-6">
                 <li className="flex items-start">
                   <span
                     className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0"
@@ -974,18 +963,18 @@ export default function PrivacyPolicyPage() {
                 disabling some types of cookies may prevent you from using
                 certain parts of our website. If you wish to manage your
                 preferences regarding the cookies that are set by our website,
-                please use the tool available on the website or refer to the
-                Help function within your browser to learn how to manage your
-                settings within your browser. For more information about the
-                cookies we use, please see our{" "}
+                please use our{" "}
                 <button
-                  onClick={() => showCookiePreferences()}
-                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                  type="button"
+                  onClick={showCookiePreferences}
+                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity cursor-pointer"
                   style={{ color: "#EB6D98" }}
                 >
                   Cookie Preferences
-                </button>
-                . For general information about cookies, please consult:{" "}
+                </button>{" "}
+                tool or refer to the Help function within your browser to learn
+                how to manage your settings within your browser. For more
+                information, please consult the following link:{" "}
                 <a
                   href="https://allaboutcookies.org/"
                   target="_blank"

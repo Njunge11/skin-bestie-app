@@ -99,6 +99,8 @@ export function ViewRoutineModal({
                       category={item.routineStep || ""}
                       productUrl={item.productUrl || ""}
                       showCheckbox={false}
+                      showViewProduct={false}
+                      productNameAsLink={false}
                     />
                   ))}
                 </div>
@@ -121,6 +123,8 @@ export function ViewRoutineModal({
                       category={item.routineStep || ""}
                       productUrl={item.productUrl || ""}
                       showCheckbox={false}
+                      showViewProduct={false}
+                      productNameAsLink={false}
                     />
                   ))}
                 </div>

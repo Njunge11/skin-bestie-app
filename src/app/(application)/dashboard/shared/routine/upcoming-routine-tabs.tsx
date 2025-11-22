@@ -108,7 +108,7 @@ export function UpcomingRoutineTabs({
                     category={step.routineStep}
                     productUrl={step.productUrl ?? undefined}
                     showCheckbox={false}
-                    showViewProduct={true}
+                    showViewProduct={false}
                     productNameAsLink={false}
                   />
                 ))
@@ -126,7 +126,7 @@ export function UpcomingRoutineTabs({
                   category={step.routineStep}
                   productUrl={step.productUrl ?? undefined}
                   showCheckbox={false}
-                  showViewProduct={true}
+                  showViewProduct={false}
                   productNameAsLink={false}
                 />
               ))

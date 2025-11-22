@@ -57,7 +57,7 @@ export default function CookieConsentBanner() {
 }
 
 export const showCookiePreferences = () => {
-  CookieConsent.show();
+  CookieConsent.show(true);
 };
 
 export const acceptCookieCategory = (category: string) => {

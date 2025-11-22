@@ -204,34 +204,6 @@ describe("Upcoming Routine - UI Tests", () => {
       const checkboxes = screen.queryAllByRole("checkbox");
       expect(checkboxes).toHaveLength(0);
     });
-
-    it("shows product view button in upcoming routine", () => {
-      const futureRoutine = createMockRoutine({
-        morning: [
-          createMockRoutineStep({
-            productName: "CeraVe Cleanser",
-            productUrl: "https://example.com/products/cleanser",
-          }),
-        ],
-      });
-
-      renderWithQueryClient(
-        <SubscriberDashboard
-          userName="Alex"
-          todayRoutine={[]}
-          goals={[]}
-          routine={futureRoutine}
-        />,
-      );
-
-      // Should show product name
-      expect(screen.getAllByText("CeraVe Cleanser")[0]).toBeInTheDocument();
-
-      // Should have "View Product" button (appears twice due to responsive layouts)
-      expect(
-        screen.getAllByRole("link", { name: /view product/i })[0],
-      ).toBeInTheDocument();
-    });
   });
 
   describe("Scenario 3: Empty State (both todayRoutine and routine are empty)", () => {

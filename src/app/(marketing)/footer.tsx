@@ -50,8 +50,9 @@ export default function Footer() {
                 </li>
                 <li>
                   <button
-                    onClick={() => showCookiePreferences()}
-                    className="text-[#FAFAFA] hover:opacity-80 transition-opacity"
+                    type="button"
+                    onClick={showCookiePreferences}
+                    className="text-[#FAFAFA] hover:opacity-80 transition-opacity cursor-pointer"
                   >
                     COOKIE PREFERENCES
                   </button>
