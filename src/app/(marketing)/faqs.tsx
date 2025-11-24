@@ -44,7 +44,7 @@ export default function Faqs({
               {heading}
               {heading2 ? <span className="block">{heading2}</span> : null}
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-700 leading-relaxed">
+            <p className="font-medium text-base sm:text-lg lg:text-xl text-gray-700 leading-relaxed">
               {subheading}
             </p>
           </div>

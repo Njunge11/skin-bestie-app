@@ -19,7 +19,7 @@ interface ViewRoutineModalProps {
       id?: string;
       name?: string;
       productName?: string;
-      instructions?: string;
+      instructions?: string | null;
       description?: string;
       routineStep?: string;
       productUrl?: string | null;
@@ -29,7 +29,7 @@ interface ViewRoutineModalProps {
       id?: string;
       name?: string;
       productName?: string;
-      instructions?: string;
+      instructions?: string | null;
       description?: string;
       routineStep?: string;
       productUrl?: string | null;

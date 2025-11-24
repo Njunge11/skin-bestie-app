@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { anton } from "../fonts";
-import { showCookiePreferences } from "@/components/cookie-consent";
 
 // Note: metadata export doesn't work in client components
 // Metadata should be added via layout.tsx or converted to server component
@@ -963,18 +962,10 @@ export default function PrivacyPolicyPage() {
                 disabling some types of cookies may prevent you from using
                 certain parts of our website. If you wish to manage your
                 preferences regarding the cookies that are set by our website,
-                please use our{" "}
-                <button
-                  type="button"
-                  onClick={showCookiePreferences}
-                  className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity cursor-pointer"
-                  style={{ color: "#EB6D98" }}
-                >
-                  Cookie Preferences
-                </button>{" "}
-                tool or refer to the Help function within your browser to learn
-                how to manage your settings within your browser. For more
-                information, please consult the following link:{" "}
+                please use the tool available on the website or refer to the
+                Help function within your browser to learn how to manage your
+                settings within your browser. For more information, please
+                consult the following link:{" "}
                 <a
                   href="https://allaboutcookies.org/"
                   target="_blank"

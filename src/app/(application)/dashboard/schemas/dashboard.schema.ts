@@ -27,7 +27,7 @@ export const todayRoutineStepSchema = z.object({
   routineStep: z.string(),
   productName: z.string(),
   productUrl: z.string().nullable(),
-  instructions: z.string(),
+  instructions: z.string().nullable(),
   timeOfDay: z.enum(["morning", "evening"]),
   order: z.number(),
   status: z.enum([
@@ -49,9 +49,10 @@ export const routineTemplateStepSchema = z.object({
   routineStep: z.string(),
   productName: z.string(),
   productUrl: z.string().nullable(),
-  instructions: z.string(),
+  instructions: z.string().nullable(),
   frequency: z.enum([
     "daily",
+    "1x per week",
     "2x per week",
     "3x per week",
     "4x per week",

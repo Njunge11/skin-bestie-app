@@ -5,7 +5,7 @@ import { Check } from "lucide-react";
 
 interface RoutineItemCardProps {
   productName: string;
-  description: string;
+  description: string | null;
   category: string;
   productUrl?: string;
   showCheckbox?: boolean;
@@ -118,7 +118,9 @@ export function RoutineItemCard({
           )}
 
           {/* Description */}
-          <p className="text-sm text-gray-600">{description}</p>
+          {description && (
+            <p className="text-sm text-gray-600">{description}</p>
+          )}
         </div>
       </div>
 
@@ -201,7 +203,9 @@ export function RoutineItemCard({
           )}
 
           {/* Description */}
-          <p className="text-sm text-gray-600">{description}</p>
+          {description && (
+            <p className="text-sm text-gray-600">{description}</p>
+          )}
         </div>
       </div>
     </div>

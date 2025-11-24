@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { showCookiePreferences } from "@/components/cookie-consent";
 
 export default function PrivacyPage() {
   const [activeSection, setActiveSection] = useState("important-info");
@@ -594,17 +593,10 @@ export default function PrivacyPage() {
                 disabling some types of cookies may prevent you from using
                 certain parts of our website. If you wish to manage your
                 preferences regarding the cookies that are set by our website,
-                please use our{" "}
-                <button
-                  type="button"
-                  onClick={showCookiePreferences}
-                  className="text-skinbestie-primary hover:underline font-medium cursor-pointer"
-                >
-                  Cookie Preferences
-                </button>{" "}
-                tool or refer to the Help function within your browser to learn
-                how to manage your settings within your browser. For more
-                information, please consult the following link:{" "}
+                please use the tool available on the website or refer to the
+                Help function within your browser to learn how to manage your
+                settings within your browser. For more information, please
+                consult the following link:{" "}
                 <a
                   href="https://allaboutcookies.org/"
                   target="_blank"
