@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Home, User, Shield, LogOut, BookOpen } from "lucide-react";
-import { handleSignOut } from "../actions";
+import { signOut } from "next-auth/react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Sidebar,
   SidebarContent,
@@ -27,12 +28,28 @@ const navigation = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const { isMobile, setOpenMobile } = useSidebar();
 
   const handleLinkClick = () => {
     if (isMobile) {
       setOpenMobile(false);
     }
+  };
+
+  const handleLogout = async () => {
+    // Clear TanStack Query cache
+    queryClient.clear();
+
+    // Sign out (clears both server cookie and SessionProvider cache)
+    await signOut({ redirect: false });
+
+    // Navigate to login
+    router.push("/login");
+
+    // Force Next.js to invalidate router cache
+    router.refresh();
   };
 
   return (
@@ -85,15 +102,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <form action={handleSignOut}>
-                <button
-                  type="submit"
-                  className="w-full flex items-center gap-2"
-                >
-                  <LogOut />
-                  <span>Logout</span>
-                </button>
-              </form>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2"
+              >
+                <LogOut />
+                <span>Logout</span>
+              </button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

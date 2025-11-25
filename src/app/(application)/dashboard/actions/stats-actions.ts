@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/auth";
+import { verifySession } from "@/lib/dal";
 import { api, ApiError } from "@/lib/api-client";
 
 type Result<T> =
@@ -31,22 +31,11 @@ interface StatsResponse {
  */
 export async function fetchStatsAction(): Promise<Result<StatsResponse>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
-    console.log(
-      "🔵 [fetchStatsAction] Fetching stats for userId:",
-      session.user.id,
-    );
+    console.log("🔵 [fetchStatsAction] Fetching stats for userId:", userId);
 
-    const result = await api.get(
-      `/api/consumer-app/stats?userId=${session.user.id}`,
-    );
+    const result = await api.get(`/api/consumer-app/stats?userId=${userId}`);
 
     console.log(
       "✅ [fetchStatsAction] Stats response:",

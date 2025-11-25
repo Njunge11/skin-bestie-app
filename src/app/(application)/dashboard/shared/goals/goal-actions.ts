@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/auth";
+import { verifySession } from "@/lib/dal";
 import { api, ApiError } from "@/lib/api-client";
 import type { Goal, GoalFormData } from "./goal.types";
 
@@ -15,16 +15,10 @@ export async function createGoalAction(
   data: GoalFormData,
 ): Promise<Result<Goal>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     const result = await api.post("/api/consumer-app/goals", {
-      userId: session.user.id,
+      userId: userId,
       description: data.description,
       isPrimaryGoal: data.isPrimaryGoal ?? false,
     });
@@ -62,13 +56,7 @@ export async function updateGoalAction(
   data: GoalFormData,
 ): Promise<Result<Goal>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     const result = await api.patch(`/api/consumer-app/goals/${goalId}`, data);
 
@@ -105,13 +93,7 @@ export async function toggleGoalAction(
   complete: boolean,
 ): Promise<Result<Goal>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     const result = await api.patch(`/api/consumer-app/goals/${goalId}`, {
       complete,
@@ -147,13 +129,7 @@ export async function toggleGoalAction(
  */
 export async function deleteGoalAction(goalId: string): Promise<Result<void>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     await api.delete(`/api/consumer-app/goals/${goalId}`);
 
@@ -188,16 +164,10 @@ export async function reorderGoalsAction(
   goalIds: string[],
 ): Promise<Result<void>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     await api.post("/api/consumer-app/goals/reorder", {
-      userId: session.user.id,
+      userId: userId,
       goalIds,
     });
 
@@ -232,16 +202,10 @@ export async function acknowledgeGoalsAction(
   acknowledged: boolean,
 ): Promise<Result<void>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     await api.patch("/api/consumer-app/goals/acknowledge", {
-      userId: session.user.id,
+      userId: userId,
       goalsAcknowledgedByClient: acknowledged,
     });
 

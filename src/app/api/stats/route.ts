@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { getSession } from "@/lib/dal";
 import { NextResponse } from "next/server";
 
 // API Response interface
@@ -20,7 +20,7 @@ interface StatsApiResponse {
 
 export async function GET() {
   try {
-    const session = await auth();
+    const session = await getSession();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

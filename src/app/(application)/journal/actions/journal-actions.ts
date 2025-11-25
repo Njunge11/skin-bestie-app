@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/auth";
+import { verifySession } from "@/lib/dal";
 import { api } from "@/lib/api-client";
 
 // Lexical JSON structure type
@@ -57,17 +57,11 @@ function getEmptyLexicalJSON(): LexicalJSON {
  */
 export async function fetchJournalsAction(): Promise<Result<Journal[]>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     // Call backend API to get all journals for this user
     const response = await api.get(
-      `/api/consumer-app/journals?userId=${session.user.id}`,
+      `/api/consumer-app/journals?userId=${userId}`,
     );
 
     // Extract journals array from response
@@ -91,17 +85,11 @@ export async function fetchJournalAction(
   journalId: string,
 ): Promise<Result<Journal>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     // Call backend API to get specific journal with userId query param
     const response = await api.get(
-      `/api/consumer-app/journals/${journalId}?userId=${session.user.id}`,
+      `/api/consumer-app/journals/${journalId}?userId=${userId}`,
     );
 
     return { success: true, data: response };
@@ -124,17 +112,11 @@ export async function createJournalAction(
   data: JournalFormData,
 ): Promise<Result<Journal>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     // Call backend API to create journal
     const response = await api.post("/api/consumer-app/journals", {
-      userId: session.user.id,
+      userId: userId,
       title: data.title || "Untitled Journal Entry",
       content: data.content || getEmptyLexicalJSON(),
       public: data.public ?? false,
@@ -163,19 +145,13 @@ export async function updateJournalAction(
   data: Partial<JournalFormData>,
 ): Promise<Result<Journal>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     // Call backend API to update journal
     const response = await api.patch(
       `/api/consumer-app/journals/${journalId}`,
       {
-        userId: session.user.id,
+        userId: userId,
         ...data,
       },
     );
@@ -201,17 +177,11 @@ export async function deleteJournalAction(
   journalId: string,
 ): Promise<Result<void>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     // Call backend API to delete journal
     await api.delete(`/api/consumer-app/journals/${journalId}`, {
-      userId: session.user.id,
+      userId: userId,
     });
 
     return { success: true, data: undefined };

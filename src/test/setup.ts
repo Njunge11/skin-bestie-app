@@ -56,9 +56,31 @@ vi.mock("react", async () => {
   };
 });
 
+// Mock server-only module (used in DAL)
+vi.mock("server-only", () => ({}));
+
 // Mock next-auth for all tests
 vi.mock("@/auth", () => ({
   auth: vi.fn().mockResolvedValue({
+    user: {
+      id: "test-user-id",
+      email: "test@example.com",
+      name: "Test User",
+    },
+  }),
+}));
+
+// Mock Data Access Layer (DAL)
+vi.mock("@/lib/dal", () => ({
+  verifySession: vi.fn().mockResolvedValue({
+    userId: "test-user-id",
+    user: {
+      id: "test-user-id",
+      email: "test@example.com",
+      name: "Test User",
+    },
+  }),
+  getSession: vi.fn().mockResolvedValue({
     user: {
       id: "test-user-id",
       email: "test@example.com",

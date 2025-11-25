@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/auth";
+import { verifySession } from "@/lib/dal";
 import { api, ApiError } from "@/lib/api-client";
 import { dashboardResponseSchema, type DashboardResponse } from "../schemas";
 
@@ -9,16 +9,10 @@ import { dashboardResponseSchema, type DashboardResponse } from "../schemas";
  * Validates response against schema for runtime safety
  */
 export async function fetchDashboardAction(): Promise<DashboardResponse> {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized: No valid session");
-  }
+  const { userId } = await verifySession();
 
   try {
-    const data = await api.get(
-      `/api/consumer-app/dashboard?userId=${session.user.id}`,
-    );
+    const data = await api.get(`/api/consumer-app/dashboard?userId=${userId}`);
 
     // Runtime validation at API boundary
     const result = dashboardResponseSchema.safeParse(data);
@@ -43,20 +37,10 @@ export async function fetchDashboardAction(): Promise<DashboardResponse> {
  */
 export async function updateNickname(nickname: string) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return {
-        success: false as const,
-        error: {
-          message: "Unauthorized",
-          code: "UNAUTHORIZED",
-        },
-      };
-    }
+    const { userId } = await verifySession();
 
     const requestBody = {
-      userId: session.user.id,
+      userId,
       nickname,
     };
 
@@ -106,20 +90,10 @@ export async function updateNickname(nickname: string) {
  */
 export async function updateSkinTest(skinType: string) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.id) {
-      return {
-        success: false as const,
-        error: {
-          message: "Unauthorized",
-          code: "UNAUTHORIZED",
-        },
-      };
-    }
+    const { userId } = await verifySession();
 
     const result = await api.patch("/api/consumer-app/profile", {
-      userId: session.user.id,
+      userId,
       skinType: [skinType],
       hasCompletedSkinTest: true,
     });

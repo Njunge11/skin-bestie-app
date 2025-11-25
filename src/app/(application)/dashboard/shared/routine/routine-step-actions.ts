@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "@/auth";
+import { verifySession } from "@/lib/dal";
 import { api, ApiError } from "@/lib/api-client";
 
 type Result<T> =
@@ -32,16 +32,10 @@ export async function toggleRoutineStepAction(
   completed: boolean,
 ): Promise<Result<RoutineStepCompletion>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     const requestBody = {
-      userId: session.user.id,
+      userId: userId,
       stepId,
       completed,
     };
@@ -95,16 +89,10 @@ export async function toggleMultipleStepsAction(
   completed: boolean,
 ): Promise<Result<RoutineStepCompletion[]>> {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: { message: "Unauthorized", code: "UNAUTHORIZED" },
-      };
-    }
+    const { userId } = await verifySession();
 
     const requestBody = {
-      userId: session.user.id,
+      userId: userId,
       stepIds,
       completed,
     };

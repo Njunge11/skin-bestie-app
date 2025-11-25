@@ -31,7 +31,7 @@ export default function Pricing({
             >
               {heading}
             </h1>
-            <p className="font-medium text-base sm:text-lg lg:text-xl text-gray-700 leading-relaxed">
+            <p className="font-medium text-base sm:text-lg lg:text-xl text-[#1B1D1F] leading-relaxed">
               {subheading}
             </p>
           </div>
