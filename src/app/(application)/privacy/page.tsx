@@ -15,7 +15,7 @@ export default function PrivacyPage() {
     { id: "international-transfers", label: "International data transfers" },
     { id: "data-security", label: "Data security" },
     { id: "data-retention", label: "Data retention" },
-    { id: "your-rights", label: "Your rights" },
+    { id: "your-rights", label: "Your rights under UK data protection law" },
     { id: "cookies", label: "Cookies" },
     { id: "children", label: "Children's privacy" },
     { id: "changes", label: "Changes to this Privacy Policy" },
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
 
           {/* Content Area */}
           <main className="lg:col-span-3 space-y-12">
-            {/* Important information and who we are */}
+            {/* 1. Important information and who we are */}
             <section id="important-info">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 1. Important information and who we are
@@ -92,7 +92,10 @@ export default function PrivacyPage() {
                 to the UK General Data Protection Regulation (UK GDPR). We are
                 also subject to the EU General Data Protection Regulation (EU
                 GDPR) in relation to any services we provide to individuals in
-                the European Economic Area (EEA).
+                the European Economic Area (EEA). You can find more information
+                about your rights under UK data protection law, and how to
+                exercise them, in Section 9 (Your rights under UK data
+                protection law) below.
               </p>
               <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-6">
                 Privacy Policy
@@ -129,7 +132,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* Information we collect */}
+            {/* 2. Information we collect */}
             <section id="info-collect">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 2. Information we collect
@@ -239,7 +242,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* How is your personal data collected? */}
+            {/* 3. How is your personal data collected? */}
             <section id="how-collected">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 3. How is your personal data collected?
@@ -255,7 +258,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* How we use your personal data */}
+            {/* 4. How we use your personal data */}
             <section id="how-we-use">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 4. How we use your personal data
@@ -398,7 +401,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* How we share your information */}
+            {/* 5. How we share your information */}
             <section id="how-we-share">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 5. How we share your information
@@ -438,7 +441,7 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            {/* International data transfers */}
+            {/* 6. International data transfers */}
             <section id="international-transfers">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 6. International data transfers
@@ -479,7 +482,7 @@ export default function PrivacyPage() {
               </ul>
             </section>
 
-            {/* Data security */}
+            {/* 7. Data security */}
             <section id="data-security">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 7. Data security
@@ -496,7 +499,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* Data Retention */}
+            {/* 8. Data Retention */}
             <section id="data-retention">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 8. Data Retention
@@ -512,74 +515,107 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* Your Rights */}
+            {/* 9. Your rights under UK data protection law */}
             <section id="your-rights">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
-                9. Your Rights
+                9. Your rights under UK data protection law
               </h2>
               <p className="text-base leading-relaxed mb-4 text-gray-700">
-                You have rights regarding your personal data under data
-                protection laws, including:
+                If you are in the United Kingdom, the UK General Data Protection
+                Regulation and the Data Protection Act 2018 give you certain
+                rights in relation to your personal data. In particular, you
+                have the right to:
               </p>
               <ul className="space-y-3 ml-6 mb-6">
                 <li className="flex items-start">
                   <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 bg-gray-900"></span>
                   <span className="text-base leading-relaxed text-gray-700">
-                    <strong>Right to Access:</strong> Obtain access to your
-                    personal data and request a copy.
+                    Access the personal data we hold about you and request a
+                    copy of it.
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 bg-gray-900"></span>
                   <span className="text-base leading-relaxed text-gray-700">
-                    <strong>Right to Rectification:</strong> Correct any
-                    inaccurate or incomplete data.
+                    <strong>Rectification</strong> – ask us to correct
+                    inaccurate or incomplete personal data.
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 bg-gray-900"></span>
                   <span className="text-base leading-relaxed text-gray-700">
-                    <strong>Right to Erasure:</strong> Request that we delete
-                    your data under certain circumstances.
+                    <strong>Erasure</strong> – ask us to delete your personal
+                    data in certain circumstances (sometimes called the
+                    &quot;right to be forgotten&quot;).
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 bg-gray-900"></span>
                   <span className="text-base leading-relaxed text-gray-700">
-                    <strong>Right to Restrict Processing:</strong> Request a
-                    restriction on the processing of your data in certain
-                    situations.
+                    <strong>Restriction</strong> – ask us to restrict the way we
+                    use your personal data in certain circumstances.
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 bg-gray-900"></span>
                   <span className="text-base leading-relaxed text-gray-700">
-                    <strong>Right to Data Portability:</strong> Request your
-                    personal data in a structured, machine-readable format.
+                    <strong>Objection</strong> – object to our use of your
+                    personal data where we rely on our legitimate interests,
+                    including for direct marketing.
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 bg-gray-900"></span>
                   <span className="text-base leading-relaxed text-gray-700">
-                    <strong>Right to Object:</strong> Object to the processing
-                    of your data, including for direct marketing purposes.
+                    <strong>Data portability</strong> – ask us to provide your
+                    personal data in a structured, commonly used and
+                    machine-readable format, or to transmit it to another
+                    organisation where this is technically feasible and the
+                    legal conditions are met.
                   </span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0 bg-gray-900"></span>
                   <span className="text-base leading-relaxed text-gray-700">
-                    <strong>Right to Withdraw Consent:</strong> Withdraw your
-                    consent where we are relying on it to process your data.
+                    <strong>Withdraw consent</strong> – withdraw your consent at
+                    any time where we rely on consent to process your personal
+                    data (for example, for certain types of marketing).
                   </span>
                 </li>
               </ul>
+              <p className="text-base leading-relaxed mb-4 text-gray-700">
+                To exercise any of these rights, or to ask a question about how
+                we handle your personal data, please email us at
+                privacy@skinbestie.co. To help us locate your information,
+                please include the email address you use with SkinBestie and any
+                relevant details (for example, order numbers, booking references
+                or your account username). We may ask you for reasonable
+                additional information to confirm your identity before we
+                respond to your request.
+              </p>
+              <p className="text-base leading-relaxed mb-4 text-gray-700">
+                We aim to respond to all valid requests within one month. If
+                your request is particularly complex or you have made a number
+                of requests, we may take longer. If this happens, we will let
+                you know and keep you updated.
+              </p>
+              <p className="text-base leading-relaxed mb-4 text-gray-700">
+                If you are based in the European Economic Area (EEA), you may
+                also have similar rights under the EU GDPR. You can contact us
+                at privacy@skinbestie.co and we will handle your request in line
+                with the data protection laws that apply to you.
+              </p>
               <p className="text-base leading-relaxed text-gray-700">
-                To exercise any of these rights, please contact us at
-                privacy@skinbestie.co.
+                You also have the right to raise a concern with your local data
+                protection authority at any time. In the UK, this is the
+                Information Commissioner&apos;s Office (ICO). However, we would
+                appreciate the chance to deal with your concerns first, so
+                please consider contacting us at privacy@skinbestie.co before
+                you contact a regulator.
               </p>
             </section>
 
-            {/* Cookies */}
+            {/* 10. Cookies */}
             <section id="cookies">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 10. Cookies
@@ -608,7 +644,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* Children's privacy */}
+            {/* 11. Children's privacy */}
             <section id="children">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 11. Children&apos;s privacy
@@ -622,7 +658,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* Changes to this Privacy Policy */}
+            {/* 12. Changes to this Privacy Policy */}
             <section id="changes">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 12. Changes to this Privacy Policy
@@ -636,7 +672,7 @@ export default function PrivacyPage() {
               </p>
             </section>
 
-            {/* Contact Information */}
+            {/* 13. Contact Information */}
             <section id="contact">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 13. Contact Information
@@ -646,23 +682,22 @@ export default function PrivacyPage() {
                 or our data practices, please contact us at
                 privacy@skinbestie.co.
               </p>
+              <p className="text-base leading-relaxed mb-4 text-gray-700">
+                When contacting us about your personal data, please use the
+                email address associated with your SkinBestie account if
+                possible, and include any relevant details (such as order
+                numbers or booking references) so that we can identify you and
+                respond more quickly.
+              </p>
               <p className="text-base leading-relaxed text-gray-700">
-                Alternatively, you have the right to lodge a complaint with the
-                Information Commissioner&apos;s Office (ICO), the UK&apos;s
-                supervisory authority for data protection, via their website at{" "}
-                <a
-                  href="https://www.ico.org.uk"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-skinbestie-primary hover:underline"
-                >
-                  www.ico.org.uk
-                </a>
-                .
+                Further information about your rights, including your right to
+                raise a concern with the UK Information Commissioner&apos;s
+                Office (ICO), is set out in Section 9 (Your rights under UK data
+                protection law).
               </p>
             </section>
 
-            {/* Third party links */}
+            {/* 14. Third party links */}
             <section id="third-party">
               <h2 className="text-xl font-bold text-gray-900 mb-4">
                 14. Third party links
