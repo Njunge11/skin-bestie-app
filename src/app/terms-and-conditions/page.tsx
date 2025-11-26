@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { anton } from "../fonts";
+import { showCookiePreferences } from "@/components/cookie-consent";
 
 export default function TermsAndConditionsPage() {
   const [activeSection, setActiveSection] = useState("introduction");
@@ -146,8 +147,31 @@ export default function TermsAndConditionsPage() {
                 </p>
                 <p className="mb-4" style={{ color: "#222118" }}>
                   These terms sit alongside our other policies available on our
-                  website, including our Privacy Policy, Terms of Use, and
-                  Cookie Settings.
+                  website, including our{" "}
+                  <Link
+                    href="/privacy-policy"
+                    className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                    style={{ color: "#EB6D98" }}
+                  >
+                    Privacy Policy
+                  </Link>
+                  ,{" "}
+                  <Link
+                    href="/terms-of-use"
+                    className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                    style={{ color: "#EB6D98" }}
+                  >
+                    Terms of Use
+                  </Link>
+                  , and{" "}
+                  <button
+                    onClick={showCookiePreferences}
+                    className="underline hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-skinbestie-landing-pink transition-opacity"
+                    style={{ color: "#EB6D98" }}
+                  >
+                    Cookie Preferences
+                  </button>
+                  .
                 </p>
               </section>
 
