@@ -176,8 +176,15 @@ describe("Setup Dashboard - View Routine Workflow", () => {
       ),
     ).toBeInTheDocument();
 
-    // User sees morning routine heading
-    expect(screen.getByText(/morning routine/i)).toBeInTheDocument();
+    // User sees switcher component
+    expect(
+      screen.getByText(/switch to view your morning or evening routine/i),
+    ).toBeInTheDocument();
+
+    // User sees morning routine by default
+    expect(
+      screen.getByText("Morning Routine", { selector: "span" }),
+    ).toBeInTheDocument();
 
     // User sees morning products
     expect(
@@ -187,13 +194,29 @@ describe("Setup Dashboard - View Routine Workflow", () => {
       screen.getAllByText("CeraVe Daily Moisturizing Lotion")[0],
     ).toBeInTheDocument();
 
+    // Evening product should NOT be visible yet (not active tab)
+    expect(
+      screen.queryByText("CeraVe Foaming Facial Cleanser"),
+    ).not.toBeInTheDocument();
+
+    // User clicks evening button to switch
+    const eveningButton = screen.getByRole("button", { name: /🌙/i });
+    await user.click(eveningButton);
+
     // User sees evening routine heading
-    expect(screen.getByText(/evening routine/i)).toBeInTheDocument();
+    expect(
+      screen.getByText("Evening Routine", { selector: "span" }),
+    ).toBeInTheDocument();
 
     // User sees evening product
     expect(
       screen.getAllByText("CeraVe Foaming Facial Cleanser")[0],
     ).toBeInTheDocument();
+
+    // Morning products should NOT be visible now
+    expect(
+      screen.queryByText("CeraVe Hydrating Cleanser"),
+    ).not.toBeInTheDocument();
 
     // User clicks Close button (the main button, not the X)
     const closeButtons = screen.getAllByRole("button", { name: /close/i });
@@ -256,14 +279,30 @@ describe("Setup Dashboard - View Routine Workflow", () => {
       await screen.findByRole("heading", { name: /your custom routine/i }),
     ).toBeInTheDocument();
 
-    // User sees morning routine
-    expect(screen.getByText(/morning routine/i)).toBeInTheDocument();
+    // User sees switcher component
+    expect(
+      screen.getByText(/switch to view your morning or evening routine/i),
+    ).toBeInTheDocument();
+
+    // User sees morning routine by default
+    expect(
+      screen.getByText("Morning Routine", { selector: "span" }),
+    ).toBeInTheDocument();
     expect(
       screen.getAllByText("Simple Morning Cleanser")[0],
     ).toBeInTheDocument();
 
-    // User does NOT see evening routine heading (no evening steps)
-    expect(screen.queryByText(/evening routine/i)).not.toBeInTheDocument();
+    // User can switch to evening routine
+    const eveningButton = screen.getByRole("button", { name: /🌙/i });
+    await user.click(eveningButton);
+
+    // User sees evening routine heading but no steps
+    expect(
+      screen.getByText("Evening Routine", { selector: "span" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/no evening routine steps yet/i),
+    ).toBeInTheDocument();
   });
 
   it("user closes modal using X button", async () => {

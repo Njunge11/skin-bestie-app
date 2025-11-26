@@ -22,11 +22,8 @@ export default function TermsOfUsePage() {
     { id: "internet-security", label: "Internet security and privacy" },
     { id: "copyright", label: "Copyright and Intellectual Property" },
     { id: "user-generated-content", label: "User-generated content" },
-    { id: "user-content-standards", label: "User Content Standards" },
-    {
-      id: "intellectual-property-user",
-      label: "Intellectual property (User Content)",
-    },
+    { id: "user-content-standards", label: "User Content" },
+    { id: "intellectual-property", label: "Intellectual property" },
     { id: "applicable-law", label: "Applicable Law and Jurisdiction" },
   ];
 
@@ -442,21 +439,17 @@ export default function TermsOfUsePage() {
                   regimes and treaties around the world. All such rights are
                   reserved. You acquire no rights or licences in or to our
                   website and/or the Content other than the limited right to use
-                  our website in accordance with these Terms.
-                </p>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  You may not copy, reproduce, recompile, decompile,
-                  disassemble, reverse engineer, distribute, publish, display,
-                  perform, modify, upload to create derivative works from,
-                  transmit, or in any other way exploit any part of our website.
-                  In the event that we make part of the website available to you
-                  which enables you to edit a picture (especially in order to
-                  track your progress), you hereby acknowledge and agree that
-                  such part of the website shall only be for your own private
-                  use, in compliance with its intended purpose and in accordance
-                  with any further restrictions or guidelines made known to you.
-                </p>
-                <p className="text-gray-700 leading-relaxed mb-4">
+                  our website in accordance with these Terms. You may not copy,
+                  reproduce, recompile, decompile, disassemble, reverse
+                  engineer, distribute, publish, display, perform, modify,
+                  upload to create derivative works from, transmit, or in any
+                  other way exploit any part of our website. In the event that
+                  we make part of the website available to you which enables you
+                  to edit a picture (especially in order to track your
+                  progress), you hereby acknowledge and agree that such part of
+                  the website shall only be for your own private use, in
+                  compliance with its intended purpose and in accordance with
+                  any further restrictions or guidelines made known to you.
                   Additionally, you may not offer for sale or sell or distribute
                   over any other medium (including distribution by over-the-air
                   television or radio broadcast or distribution on a computer
@@ -467,24 +460,19 @@ export default function TermsOfUsePage() {
                   to construct a database of any kind, nor may our website be
                   stored (in its entirety or in any part) in databases for
                   access by you or any third party or to distribute any database
-                  websites containing all or part of our website.
-                </p>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  You may not use any of our trademarks or trade names without
-                  our prior express written consent and you acknowledge that you
-                  have no ownership rights in and to any of those names and
-                  marks. You must not use any part of the content on our website
-                  for commercial purposes without obtaining a licence to do so
-                  from us or our licensors. If you print off, copy or download
-                  any part of our website in breach of these Terms, your right
-                  to use our website will cease immediately and you must, at our
+                  websites containing all or part of our website. You may not
+                  use any of our trademarks or trade names without our prior
+                  express written consent and you acknowledge that you have no
+                  ownership rights in and to any of those names and marks. You
+                  must not use any part of the content on our website for
+                  commercial purposes without obtaining a licence to do so from
+                  us or our licensors. If you print off, copy or download any
+                  part of our website in breach of these Terms, your right to
+                  use our website will cease immediately and you must, at our
                   option, return or destroy any copies of the Content you have
-                  made.
-                </p>
-                <p className="text-gray-700 leading-relaxed">
-                  You agree to abide by all additional copyright notices or
-                  restrictions contained in our website. You agree to notify us
-                  promptly in writing promptly if you become aware of any
+                  made. You agree to abide by all additional copyright notices
+                  or restrictions contained in our website. You agree to notify
+                  us promptly in writing promptly if you become aware of any
                   unauthorised access to or use of our website by any party or
                   of any claim that our website or any of the contents of our
                   website infringes any copyright, trademark, or other
@@ -555,16 +543,16 @@ export default function TermsOfUsePage() {
                 </p>
               </section>
 
-              {/* User Content Standards */}
+              {/* User Content */}
               <section
                 id="user-content-standards"
                 className="mb-16 scroll-mt-8"
               >
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                  User Content Standards
+                  User Content
                 </h2>
                 <p className="text-gray-700 leading-relaxed mb-4 font-medium">
-                  User Content Must:
+                  Must:
                 </p>
                 <ul className="list-disc pl-6 mb-6 text-gray-700 space-y-2">
                   <li>Be accurate (where it states facts);</li>
@@ -572,7 +560,7 @@ export default function TermsOfUsePage() {
                   <li>Be reflective of your own use of the service</li>
                   <li>
                     Comply with applicable law in the UK and in any country from
-                    which it is posted
+                    which it is posted,
                   </li>
                 </ul>
                 <p className="text-gray-700 leading-relaxed mb-4 font-medium">
@@ -595,9 +583,8 @@ export default function TermsOfUsePage() {
                   </li>
                   <li>
                     Infringe any copyright, database right or trademark of any
-                    other person.
+                    other person. Be likely to deceive any person.
                   </li>
-                  <li>Be likely to deceive any person.</li>
                   <li>
                     Be made in breach of any legal duty owed to a third party,
                     such as a contractual duty or a duty of confidence.
@@ -609,19 +596,15 @@ export default function TermsOfUsePage() {
                   </li>
                   <li>
                     Be likely to harass, upset, intimidate, embarrass, alarm or
-                    annoy any other person.
-                  </li>
-                  <li>
-                    Be used to impersonate any person, or to misrepresent your
-                    identity or affiliation with any person.
+                    annoy any other person. Be used to impersonate any person,
+                    or to misrepresent your identity or affiliation with any
+                    person.
                   </li>
                   <li>
                     Give the impression that they emanate from us, if this is
-                    not the case.
-                  </li>
-                  <li>
-                    Advocate, promote or assist any unlawful act such as (by way
-                    of example only) copyright infringement or computer misuse.
+                    not the case. Advocate, promote or assist any unlawful act
+                    such as (by way of example only) copyright infringement or
+                    computer misuse.
                   </li>
                   <li>
                     Use any third-party intellectual property without prior
@@ -661,13 +644,10 @@ export default function TermsOfUsePage() {
                 </p>
               </section>
 
-              {/* Intellectual property (User Content) */}
-              <section
-                id="intellectual-property-user"
-                className="mb-16 scroll-mt-8"
-              >
+              {/* Intellectual property */}
+              <section id="intellectual-property" className="mb-16 scroll-mt-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-6">
-                  Intellectual property (User Content)
+                  Intellectual property
                 </h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
                   For any User Content that you upload or you post on the
@@ -768,6 +748,15 @@ export default function TermsOfUsePage() {
           </main>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-black text-white py-12 mt-24">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 text-center">
+          <p className="text-sm opacity-80">
+            © 2025 SkinBestie. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

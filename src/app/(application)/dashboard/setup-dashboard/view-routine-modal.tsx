@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Sparkles, X } from "lucide-react";
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RoutineItemCard } from "../shared/routine";
+import { cn } from "@/lib/utils";
 
 interface ViewRoutineModalProps {
   open: boolean;
@@ -43,6 +45,8 @@ export function ViewRoutineModal({
   onOpenChange,
   routine,
 }: ViewRoutineModalProps) {
+  const [activeTab, setActiveTab] = useState("morning");
+
   // Get routines from the object structure and sort by order
   const morningRoutine = (routine?.morning || []).sort(
     (a, b) => (a.order || 0) - (b.order || 0),
@@ -82,16 +86,54 @@ export function ViewRoutineModal({
         </DialogHeader>
 
         {hasRoutines ? (
-          <>
-            {/* Morning Routine */}
-            {morningRoutine.length > 0 && (
-              <div className="mt-4 space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <span>☀️</span>
-                  <span>Morning Routine</span>
-                </h3>
-                <div className="space-y-3">
-                  {morningRoutine.map((item, index) => (
+          <div className="mt-4 space-y-4">
+            {/* Helper Text */}
+            <p className="text-sm text-gray-600">
+              Switch to view your morning or evening routine
+            </p>
+
+            {/* Custom Switch Component */}
+            <div className="space-y-4">
+              {/* Toggle Switch */}
+              <div className="relative flex items-center bg-skinbestie-primary rounded-full p-0.5 gap-0.5 w-fit">
+                {/* Sun Icon Button */}
+                <button
+                  onClick={() => setActiveTab("morning")}
+                  className={cn(
+                    "relative z-10 flex items-center justify-center w-10 h-8 rounded-full transition-all",
+                    activeTab === "morning"
+                      ? "bg-white text-gray-900"
+                      : "bg-transparent text-white",
+                  )}
+                >
+                  <span className="text-lg">☀️</span>
+                </button>
+
+                {/* Moon Icon Button */}
+                <button
+                  onClick={() => setActiveTab("evening")}
+                  className={cn(
+                    "relative z-10 flex items-center justify-center w-10 h-8 rounded-full transition-all",
+                    activeTab === "evening"
+                      ? "bg-white text-gray-900"
+                      : "bg-transparent text-white",
+                  )}
+                >
+                  <span className="text-lg">🌙</span>
+                </button>
+              </div>
+
+              {/* Routine Label */}
+              <span className="text-xl font-semibold text-gray-900">
+                {activeTab === "morning" ? "Morning" : "Evening"} Routine
+              </span>
+            </div>
+
+            {/* Routine steps based on active tab */}
+            <div className="space-y-3">
+              {activeTab === "morning" ? (
+                morningRoutine.length > 0 ? (
+                  morningRoutine.map((item, index) => (
                     <RoutineItemCard
                       key={item.id || `morning-${index}`}
                       productName={item.productName || item.name || ""}
@@ -102,35 +144,28 @@ export function ViewRoutineModal({
                       showViewProduct={false}
                       productNameAsLink={false}
                     />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Evening Routine */}
-            {eveningRoutine.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <span>🌙</span>
-                  <span>Evening Routine</span>
-                </h3>
-                <div className="space-y-3">
-                  {eveningRoutine.map((item, index) => (
-                    <RoutineItemCard
-                      key={item.id || `evening-${index}`}
-                      productName={item.productName || item.name || ""}
-                      description={item.instructions || item.description || ""}
-                      category={item.routineStep || ""}
-                      productUrl={item.productUrl || ""}
-                      showCheckbox={false}
-                      showViewProduct={false}
-                      productNameAsLink={false}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
+                  ))
+                ) : (
+                  <p className="text-gray-600">No morning routine steps yet.</p>
+                )
+              ) : eveningRoutine.length > 0 ? (
+                eveningRoutine.map((item, index) => (
+                  <RoutineItemCard
+                    key={item.id || `evening-${index}`}
+                    productName={item.productName || item.name || ""}
+                    description={item.instructions || item.description || ""}
+                    category={item.routineStep || ""}
+                    productUrl={item.productUrl || ""}
+                    showCheckbox={false}
+                    showViewProduct={false}
+                    productNameAsLink={false}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-600">No evening routine steps yet.</p>
+              )}
+            </div>
+          </div>
         ) : (
           <div className="mt-4 text-center py-8">
             <p className="text-gray-600">
