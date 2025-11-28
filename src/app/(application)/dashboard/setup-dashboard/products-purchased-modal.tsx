@@ -165,35 +165,39 @@ export function ProductsPurchasedModal({
                     </h3>
                     <ScrollArea className="h-[200px] rounded-lg border border-gray-200 bg-white">
                       <div className="p-3 space-y-2">
-                        {/* All Products */}
+                        {/* All Products - Filter out instruction_only steps */}
                         {[
                           ...(routine.morning || []),
                           ...(routine.evening || []),
-                        ].map((step) => (
-                          <div
-                            key={step.id}
-                            className="flex items-start justify-between gap-2 p-2 bg-skinbestie-neutral rounded"
-                          >
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">
-                                {step.productName}
-                              </p>
-                              <p className="text-xs text-gray-600">
-                                {step.routineStep}
-                              </p>
+                        ]
+                          .filter(
+                            (step) => step.stepType !== "instruction_only",
+                          )
+                          .map((step) => (
+                            <div
+                              key={step.id}
+                              className="flex items-start justify-between gap-2 p-2 bg-skinbestie-neutral rounded"
+                            >
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-900">
+                                  {step.productName}
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  {step.routineStep}
+                                </p>
+                              </div>
+                              {step.productUrl && (
+                                <a
+                                  href={step.productUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-skinbestie-primary hover:opacity-90 transition-colors font-medium underline whitespace-nowrap"
+                                >
+                                  View/Purchase
+                                </a>
+                              )}
                             </div>
-                            {step.productUrl && (
-                              <a
-                                href={step.productUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs text-skinbestie-primary hover:opacity-90 transition-colors font-medium underline whitespace-nowrap"
-                              >
-                                View/Purchase
-                              </a>
-                            )}
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </ScrollArea>
                   </div>

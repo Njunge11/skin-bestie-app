@@ -262,6 +262,8 @@ export function RoutineTabs({
                   morningSteps.map((step) => (
                     <RoutineItemCard
                       key={step.id}
+                      stepType={step.stepType}
+                      stepName={step.stepName}
                       productName={step.productName}
                       description={step.instructions}
                       category={step.routineStep}
@@ -288,6 +290,8 @@ export function RoutineTabs({
                   eveningSteps.map((step) => (
                     <RoutineItemCard
                       key={step.id}
+                      stepType={step.stepType}
+                      stepName={step.stepName}
                       productName={step.productName}
                       description={step.instructions}
                       category={step.routineStep}
@@ -367,6 +371,8 @@ export function RoutineTabs({
                   morningSteps.map((step) => (
                     <RoutineItemCard
                       key={step.id}
+                      stepType={step.stepType}
+                      stepName={step.stepName}
                       productName={step.productName}
                       description={step.instructions}
                       category={step.routineStep}
@@ -389,6 +395,8 @@ export function RoutineTabs({
                 eveningSteps.map((step) => (
                   <RoutineItemCard
                     key={step.id}
+                    stepType={step.stepType}
+                    stepName={step.stepName}
                     productName={step.productName}
                     description={step.instructions}
                     category={step.routineStep}

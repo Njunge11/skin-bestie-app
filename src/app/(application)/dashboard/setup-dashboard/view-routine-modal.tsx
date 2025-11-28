@@ -12,32 +12,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { RoutineItemCard } from "../shared/routine";
 import { cn } from "@/lib/utils";
+import type { Routine } from "../schemas/dashboard.schema";
 
 interface ViewRoutineModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  routine?: {
-    morning?: Array<{
-      id?: string;
-      name?: string;
-      productName?: string;
-      instructions?: string | null;
-      description?: string;
-      routineStep?: string;
-      productUrl?: string | null;
-      order?: number;
-    }>;
-    evening?: Array<{
-      id?: string;
-      name?: string;
-      productName?: string;
-      instructions?: string | null;
-      description?: string;
-      routineStep?: string;
-      productUrl?: string | null;
-      order?: number;
-    }>;
-  };
+  routine?: Routine;
 }
 
 export function ViewRoutineModal({
@@ -136,10 +116,12 @@ export function ViewRoutineModal({
                   morningRoutine.map((item, index) => (
                     <RoutineItemCard
                       key={item.id || `morning-${index}`}
-                      productName={item.productName || item.name || ""}
-                      description={item.instructions || item.description || ""}
-                      category={item.routineStep || ""}
-                      productUrl={item.productUrl || ""}
+                      stepType={item.stepType}
+                      stepName={item.stepName}
+                      productName={item.productName}
+                      description={item.instructions}
+                      category={item.routineStep}
+                      productUrl={item.productUrl ?? undefined}
                       showCheckbox={false}
                       showViewProduct={false}
                       productNameAsLink={false}
@@ -152,10 +134,12 @@ export function ViewRoutineModal({
                 eveningRoutine.map((item, index) => (
                   <RoutineItemCard
                     key={item.id || `evening-${index}`}
-                    productName={item.productName || item.name || ""}
-                    description={item.instructions || item.description || ""}
-                    category={item.routineStep || ""}
-                    productUrl={item.productUrl || ""}
+                    stepType={item.stepType}
+                    stepName={item.stepName}
+                    productName={item.productName}
+                    description={item.instructions}
+                    category={item.routineStep}
+                    productUrl={item.productUrl ?? undefined}
                     showCheckbox={false}
                     showViewProduct={false}
                     productNameAsLink={false}

@@ -40,6 +40,7 @@ interface GoalsSectionProps {
   onReorderGoals: (goals: Goal[]) => Promise<void>;
   showCheckboxes?: boolean;
   showMainFocus?: boolean;
+  showAddButton?: boolean;
 }
 
 export function GoalsSection({
@@ -51,6 +52,7 @@ export function GoalsSection({
   onReorderGoals,
   showCheckboxes = false,
   showMainFocus = false,
+  showAddButton = true,
 }: GoalsSectionProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [newGoalData, setNewGoalData] = useState<GoalFormData>({
@@ -290,7 +292,7 @@ export function GoalsSection({
                     </div>
                   </div>
                 </div>
-              ) : uniqueGoals.length > 0 ? (
+              ) : uniqueGoals.length > 0 && showAddButton ? (
                 <Button
                   key="add-goal-button"
                   variant="outline"

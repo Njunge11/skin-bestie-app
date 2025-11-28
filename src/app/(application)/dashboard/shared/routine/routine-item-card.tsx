@@ -4,9 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
 
 interface RoutineItemCardProps {
-  productName: string;
+  stepType?: "product" | "instruction_only";
+  stepName?: string | null;
+  productName: string | null;
   description: string | null;
-  category: string;
+  category: string | null; // routineStep
   productUrl?: string;
   showCheckbox?: boolean;
   isChecked?: boolean;
@@ -16,6 +18,8 @@ interface RoutineItemCardProps {
 }
 
 export function RoutineItemCard({
+  stepType,
+  stepName,
   productName,
   description,
   category,
@@ -26,6 +30,20 @@ export function RoutineItemCard({
   showViewProduct = true,
   productNameAsLink = false,
 }: RoutineItemCardProps) {
+  // Determine display values based on step type
+  const isInstructionOnly = stepType === "instruction_only";
+
+  // Badge text: "Step" for instruction_only, category (routineStep) for products
+  const badgeText = isInstructionOnly ? "Step" : category || "Step";
+
+  // Title text: stepName for instruction_only, productName for products
+  // If no stepName, use instructions as title for instruction_only
+  const titleText = isInstructionOnly
+    ? stepName || description || "Step"
+    : productName || "Product";
+
+  // For accessibility labels
+  const itemLabel = titleText;
   return (
     <div
       className={`border rounded-lg py-6 px-4 transition-all ${
@@ -46,8 +64,8 @@ export function RoutineItemCard({
                 onClick={() => onCheckedChange?.(!isChecked)}
                 aria-label={
                   isChecked
-                    ? `Unmark ${productName} as complete`
-                    : `Mark ${productName} as complete`
+                    ? `Unmark ${itemLabel} as complete`
+                    : `Mark ${itemLabel} as complete`
                 }
                 className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer flex-shrink-0 ${
                   isChecked
@@ -68,7 +86,7 @@ export function RoutineItemCard({
                   : "bg-skinbestie-primary text-white hover:bg-skinbestie-primary"
               }
             >
-              {category}
+              {badgeText}
             </Badge>
           </div>
 
@@ -82,6 +100,7 @@ export function RoutineItemCard({
             </Badge>
           ) : (
             showViewProduct &&
+            !isInstructionOnly &&
             productUrl && (
               <a
                 href={productUrl}
@@ -95,10 +114,10 @@ export function RoutineItemCard({
           )}
         </div>
 
-        {/* Row 2: Product Name and Description */}
+        {/* Row 2: Title and Description */}
         <div className="space-y-2 mt-4">
-          {/* Product Name */}
-          {productNameAsLink && productUrl ? (
+          {/* Title (Product Name or Step Name) */}
+          {productNameAsLink && !isInstructionOnly && productUrl ? (
             <a
               href={productUrl}
               target="_blank"
@@ -109,16 +128,14 @@ export function RoutineItemCard({
                   : "text-skinbestie-primary hover:text-skinbestie-primary/90"
               }`}
             >
-              {productName}
+              {titleText}
             </a>
           ) : (
-            <h3 className="text-lg font-semibold text-gray-900">
-              {productName}
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">{titleText}</h3>
           )}
 
-          {/* Description */}
-          {description && (
+          {/* Description - Don't show if instruction_only and no stepName (already showing as title) */}
+          {description && !(isInstructionOnly && !stepName) && (
             <p className="text-sm text-gray-600">{description}</p>
           )}
         </div>
@@ -133,8 +150,8 @@ export function RoutineItemCard({
             onClick={() => onCheckedChange?.(!isChecked)}
             aria-label={
               isChecked
-                ? `Unmark ${productName} as complete`
-                : `Mark ${productName} as complete`
+                ? `Unmark ${itemLabel} as complete`
+                : `Mark ${itemLabel} as complete`
             }
             className={`flex items-center justify-center h-5 w-5 rounded border-2 transition-all cursor-pointer flex-shrink-0 ${
               isChecked
@@ -148,7 +165,7 @@ export function RoutineItemCard({
 
         {/* Content */}
         <div className="flex-1 space-y-3">
-          {/* Category Badge and View Product / Completed Badge */}
+          {/* Badge and View Product / Completed Badge */}
           <div className="flex items-center justify-between">
             <Badge
               variant="secondary"
@@ -158,7 +175,7 @@ export function RoutineItemCard({
                   : "bg-skinbestie-primary text-white hover:bg-skinbestie-primary"
               }
             >
-              {category}
+              {badgeText}
             </Badge>
             {isChecked ? (
               <Badge
@@ -169,6 +186,7 @@ export function RoutineItemCard({
               </Badge>
             ) : (
               showViewProduct &&
+              !isInstructionOnly &&
               productUrl && (
                 <a
                   href={productUrl}
@@ -182,8 +200,8 @@ export function RoutineItemCard({
             )}
           </div>
 
-          {/* Product Name */}
-          {productNameAsLink && productUrl ? (
+          {/* Title (Product Name or Step Name) */}
+          {productNameAsLink && !isInstructionOnly && productUrl ? (
             <a
               href={productUrl}
               target="_blank"
@@ -194,16 +212,14 @@ export function RoutineItemCard({
                   : "text-skinbestie-primary hover:text-skinbestie-primary/90"
               }`}
             >
-              {productName}
+              {titleText}
             </a>
           ) : (
-            <h3 className="text-lg font-semibold text-gray-900">
-              {productName}
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">{titleText}</h3>
           )}
 
-          {/* Description */}
-          {description && (
+          {/* Description - Don't show if instruction_only and no stepName (already showing as title) */}
+          {description && !(isInstructionOnly && !stepName) && (
             <p className="text-sm text-gray-600">{description}</p>
           )}
         </div>

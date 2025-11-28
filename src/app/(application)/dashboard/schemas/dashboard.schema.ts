@@ -21,11 +21,14 @@ export const setupProgressSchema = z.object({
 
 /**
  * Today's routine step schema - includes status and completion tracking
+ * Note: Currently only returns stepType="product" from backend
  */
 export const todayRoutineStepSchema = z.object({
   id: z.string(),
-  routineStep: z.string(),
-  productName: z.string(),
+  stepType: z.enum(["product", "instruction_only"]).optional(), // Not currently sent by backend
+  stepName: z.string().nullable().optional(), // For instruction_only steps (not currently sent)
+  routineStep: z.string().nullable(), // Required for products, null for instruction_only
+  productName: z.string().nullable(), // Required for products, null for instruction_only
   productUrl: z.string().nullable(),
   instructions: z.string().nullable(),
   timeOfDay: z.enum(["morning", "evening"]),
@@ -33,21 +36,23 @@ export const todayRoutineStepSchema = z.object({
   status: z.enum([
     "pending",
     "on-time",
-    "late",
+    "late", // grace-period status
     "missed",
-    "completed",
-    "skipped",
+    "completed", // Backend maps "on-time" to "completed"
   ]),
   completedAt: z.string().nullable(),
 });
 
 /**
  * Routine template step schema - includes frequency and days
+ * Note: Currently only returns stepType="product" from backend
  */
 export const routineTemplateStepSchema = z.object({
   id: z.string(),
-  routineStep: z.string(),
-  productName: z.string(),
+  stepType: z.enum(["product", "instruction_only"]).optional(), // Not currently sent by backend
+  stepName: z.string().nullable().optional(), // For instruction_only steps (not currently sent)
+  routineStep: z.string().nullable(), // Required for products, null for instruction_only
+  productName: z.string().nullable(), // Required for products, null for instruction_only
   productUrl: z.string().nullable(),
   instructions: z.string().nullable(),
   frequency: z.enum([

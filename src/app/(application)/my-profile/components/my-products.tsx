@@ -17,7 +17,7 @@ interface MyProductsProps {
 interface Product {
   id: string;
   productName: string;
-  routineStep: string;
+  routineStep: string | null;
   productUrl: string | undefined;
   purchaseInstructions: string | null;
 }
@@ -36,8 +36,13 @@ export function MyProducts({ dashboard }: MyProductsProps) {
       ...(routine.evening || []),
     ];
 
-    // Use productName as key to avoid duplicates
+    // Use productName as key to avoid duplicates (filter out instruction-only steps)
     allProducts.forEach((item) => {
+      // Skip instruction-only steps
+      if (item.stepType === "instruction_only") return;
+      // Skip items without productName
+      if (!item.productName) return;
+
       if (!productMap.has(item.productName)) {
         productMap.set(item.productName, {
           id: item.id,
@@ -81,16 +86,20 @@ export function MyProducts({ dashboard }: MyProductsProps) {
               <TableCell className="font-semibold whitespace-normal break-words">
                 {product.productName}
               </TableCell>
-              <TableCell>{product.routineStep}</TableCell>
+              <TableCell>{product.routineStep || "N/A"}</TableCell>
               <TableCell>
-                <a
-                  href={product.productUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-skinbestie-primary hover:underline"
-                >
-                  View Product
-                </a>
+                {product.productUrl ? (
+                  <a
+                    href={product.productUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-skinbestie-primary hover:underline"
+                  >
+                    View Product
+                  </a>
+                ) : (
+                  <span className="text-gray-400 text-sm">No Link</span>
+                )}
               </TableCell>
               <TableCell className="text-gray-600 whitespace-normal break-words">
                 {product.purchaseInstructions || "No special instructions"}
