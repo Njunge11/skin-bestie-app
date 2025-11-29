@@ -41,9 +41,21 @@ export function GoalsSection({
   // Default to collapsed when there are multiple goals
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Split goals: first goal vs. rest
-  const firstGoal = goals && goals.length > 0 ? [goals[0]] : [];
-  const remainingGoals = goals && goals.length > 1 ? goals.slice(1) : [];
+  // Split goals: primary goal vs. rest
+  const primaryGoal = goals?.find((g) => g.isPrimaryGoal);
+  const nonPrimaryGoals = goals?.filter((g) => !g.isPrimaryGoal) || [];
+
+  // If there's a primary goal, show it; otherwise show first goal
+  const visibleGoal = primaryGoal
+    ? [primaryGoal]
+    : goals && goals.length > 0
+      ? [goals[0]]
+      : [];
+  const remainingGoals = primaryGoal
+    ? nonPrimaryGoals
+    : goals && goals.length > 1
+      ? goals.slice(1)
+      : [];
 
   return (
     <Card
@@ -67,9 +79,9 @@ export function GoalsSection({
       <CardContent className={cn(noPadding && "p-0")}>
         {hasMultipleGoals ? (
           <div className="space-y-4">
-            {/* Always show first goal - hide "Add Another Goal" button */}
+            {/* Always show primary goal (or first goal if no primary) - hide "Add Another Goal" button */}
             <FeatureGoalsSection
-              goals={firstGoal}
+              goals={visibleGoal}
               onAddGoal={onAddGoal}
               onUpdateGoal={onUpdateGoal}
               onToggleGoal={onToggleGoal}
