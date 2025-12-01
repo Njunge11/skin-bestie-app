@@ -66,9 +66,13 @@ function getRoutineState(hasPublishedRoutine: boolean) {
 }
 
 function getProductsState(
+  hasPublishedRoutine: boolean,
   productsReceived: boolean,
   routineStartDateSet: boolean,
 ) {
+  if (!hasPublishedRoutine) {
+    return { status: "waiting" as const, variant: "muted" as const };
+  }
   if (productsReceived && routineStartDateSet) {
     return { status: "completed" as const, variant: "success" as const };
   }
@@ -82,73 +86,11 @@ export function SetupDashboard({
   setOptimisticSkinTest,
 }: SetupDashboardProps) {
   const queryClient = useQueryClient();
-  const [isRefreshingGoals, setIsRefreshingGoals] = useState(false);
-  const [isRefreshingRoutine, setIsRefreshingRoutine] = useState(false);
   const [optimisticProductsReceived] = useState(false);
   const [optimisticStartDate, setOptimisticStartDate] = useState<Date | null>(
     null,
   );
 
-  const handleRefreshGoals = async () => {
-    setIsRefreshingGoals(true);
-
-    // Store previous state
-    const previousGoalsStatus = dashboard.setupProgress.steps.hasPublishedGoals;
-
-    // Invalidate and wait for refetch
-    await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-
-    // Small delay to allow refetch
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Check if anything changed
-    const currentData = queryClient.getQueryData(["dashboard"]) as
-      | DashboardResponse
-      | undefined;
-
-    if (currentData) {
-      const goalsChanged =
-        currentData.setupProgress.steps.hasPublishedGoals !==
-        previousGoalsStatus;
-
-      if (!goalsChanged) {
-        toast.info("No updates yet, check back soon!");
-      }
-    }
-
-    setIsRefreshingGoals(false);
-  };
-
-  const handleRefreshRoutine = async () => {
-    setIsRefreshingRoutine(true);
-
-    // Store previous state
-    const previousRoutineStatus =
-      dashboard.setupProgress.steps.hasPublishedRoutine;
-
-    // Invalidate and wait for refetch
-    await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-
-    // Small delay to allow refetch
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Check if anything changed
-    const currentData = queryClient.getQueryData(["dashboard"]) as
-      | DashboardResponse
-      | undefined;
-
-    if (currentData) {
-      const routineChanged =
-        currentData.setupProgress.steps.hasPublishedRoutine !==
-        previousRoutineStatus;
-
-      if (!routineChanged) {
-        toast.info("No updates yet, check back soon!");
-      }
-    }
-
-    setIsRefreshingRoutine(false);
-  };
   const [showSkinTestModal, setShowSkinTestModal] = useState(false);
   const [showSelectSkinTypeModal, setShowSelectSkinTypeModal] = useState(false);
   const [showReviewGoalsModal, setShowReviewGoalsModal] = useState(false);
@@ -265,6 +207,7 @@ export function SetupDashboard({
     steps.hasPublishedRoutine,
   );
   const { status: productsStatus, variant: productsVariant } = getProductsState(
+    steps.hasPublishedRoutine,
     optimisticProductsReceived || steps.productsReceived || false,
     optimisticStartDate !== null || steps.routineStartDateSet || false,
   );
@@ -411,10 +354,6 @@ export function SetupDashboard({
             title="Set Your Skin Goals"
             description="Create SMART goals based on your coaching call to guide your skincare journey."
             variant={goalsVariant}
-            onRefresh={
-              goalsStatus === "waiting" ? handleRefreshGoals : undefined
-            }
-            isRefreshing={isRefreshingGoals}
           >
             {goalsContent}
           </StepCard>
@@ -426,24 +365,20 @@ export function SetupDashboard({
             title="Get Your Custom Routine"
             description="Receive your personalised morning and evening skincare routine with product recommendations."
             variant={routineVariant}
-            onRefresh={
-              routineStatus === "waiting" ? handleRefreshRoutine : undefined
-            }
-            isRefreshing={isRefreshingRoutine}
           >
             {routineContent}
           </StepCard>
 
-          {/* Step 5: Purchase Products - Only show if routine is published */}
-          {steps.hasPublishedRoutine && (
-            <StepCard
-              stepNumber={5}
-              status={productsStatus}
-              title="Purchase Your Products"
-              description="Get the recommended products from your routine and confirm when they arrive to start your skincare journey."
-              variant={productsVariant}
-            >
-              {optimisticProductsReceived || steps.productsReceived ? (
+          {/* Step 5: Purchase Products */}
+          <StepCard
+            stepNumber={5}
+            status={productsStatus}
+            title="Purchase Your Products"
+            description="Get the recommended products from your routine and confirm when they arrive to start your skincare journey."
+            variant={productsVariant}
+          >
+            {steps.hasPublishedRoutine ? (
+              optimisticProductsReceived || steps.productsReceived ? (
                 <div className="space-y-4 mt-6">
                   {optimisticStartDate || steps.routineStartDateSet ? (
                     <>
@@ -498,9 +433,17 @@ export function SetupDashboard({
                   Confirm Products Received
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-              )}
-            </StepCard>
-          )}
+              )
+            ) : (
+              <p className="text-sm text-gray-600 flex items-center gap-2 mt-6">
+                <span>⏳</span>
+                <span>
+                  Your product recommendations will appear once your routine is
+                  ready
+                </span>
+              </p>
+            )}
+          </StepCard>
 
           {/* What Happens Next */}
           <div className="mt-2">

@@ -22,6 +22,7 @@ async function request(
         "Content-Type": "application/json",
         "x-api-key": API_KEY,
       },
+      cache: "no-store",
       ...(body ? { body: JSON.stringify(body) } : {}),
     });
 

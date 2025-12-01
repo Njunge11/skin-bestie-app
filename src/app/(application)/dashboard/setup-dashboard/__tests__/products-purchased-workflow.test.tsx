@@ -792,8 +792,8 @@ describe("Products Purchased Workflow - Integration Tests", () => {
       ).not.toBeDisabled();
     });
 
-    it("Step 5 (Purchase Products) only shows when routine is published", async () => {
-      // Scenario 1: Routine NOT published - Step 5 should not be visible
+    it("Step 5 shows waiting state when routine is not published", async () => {
+      // Scenario 1: Routine NOT published - Step 5 visible with waiting state
       vi.mocked(fetchDashboardAction).mockResolvedValue(
         createMockDashboard({
           steps: {
@@ -812,17 +812,24 @@ describe("Products Purchased Workflow - Integration Tests", () => {
       // Wait for dashboard to load
       await screen.findByText(/welcome to skinbestie/i);
 
-      // Step 5 should NOT be visible
+      // Step 5 SHOULD be visible with title
       expect(
-        screen.queryByText(/purchase your products/i),
-      ).not.toBeInTheDocument();
+        await screen.findByText(/purchase your products/i),
+      ).toBeInTheDocument();
+
+      // But should show waiting message instead of action button
+      expect(
+        screen.getByText(
+          /your product recommendations will appear once your routine is ready/i,
+        ),
+      ).toBeInTheDocument();
       expect(
         screen.queryByRole("button", { name: /confirm products received/i }),
       ).not.toBeInTheDocument();
 
       unmount();
 
-      // Scenario 2: Routine IS published - Step 5 should be visible
+      // Scenario 2: Routine IS published - Step 5 shows action button
       vi.mocked(fetchDashboardAction).mockResolvedValue(
         createMockDashboard({
           steps: {
@@ -841,13 +848,20 @@ describe("Products Purchased Workflow - Integration Tests", () => {
       // Wait for dashboard to load
       await screen.findByText(/welcome to skinbestie/i);
 
-      // Step 5 SHOULD be visible
+      // Step 5 SHOULD be visible with action button
       expect(
         await screen.findByText(/purchase your products/i),
       ).toBeInTheDocument();
       expect(
         screen.getByRole("button", { name: /confirm products received/i }),
       ).toBeInTheDocument();
+
+      // Waiting message should NOT be visible
+      expect(
+        screen.queryByText(
+          /your product recommendations will appear once your routine is ready/i,
+        ),
+      ).not.toBeInTheDocument();
     });
   });
 });
