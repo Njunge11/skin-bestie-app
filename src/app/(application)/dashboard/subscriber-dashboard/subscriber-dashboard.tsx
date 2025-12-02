@@ -308,7 +308,7 @@ export function SubscriberDashboard({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <MetricCard
             label="Current Streak"
-            value={`${stats.currentStreak.days} days`}
+            value={`${stats.currentStreak.days} ${stats.currentStreak.days === 1 ? "day" : "days"}`}
             subtitle="Consecutive days active"
             icon={Flame}
             iconColor="pink"
