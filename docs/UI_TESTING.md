@@ -491,6 +491,60 @@ it('shows error when email is invalid', () => {});
 
 ---
 
+## MSW (Mock Service Worker) in This Codebase
+
+MSW is configured globally in `src/test/setup.ts`. It intercepts all fetch requests.
+
+### Key Rules
+
+1. **Don't try to override fetch** - MSW intercepts at a lower level than `vi.stubGlobal` or `vi.spyOn(global, 'fetch')`. It won't work.
+
+2. **Use `server.use()` for test-specific handlers:**
+```typescript
+import { server } from "./mocks/server";
+import { http, HttpResponse } from "msw";
+
+it("handles API response", async () => {
+  server.use(
+    http.post("/api/checkout/session", () => {
+      return HttpResponse.json({
+        mode: "redirect",
+        url: "https://checkout.stripe.com/test",
+      });
+    }),
+  );
+
+  // ... rest of test
+});
+```
+
+3. **Reset handlers between tests:**
+```typescript
+beforeEach(() => {
+  server.resetHandlers();
+});
+```
+
+4. **For error responses:**
+```typescript
+server.use(
+  http.post("/api/endpoint", () => {
+    return HttpResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 },
+    );
+  }),
+);
+```
+
+### Before Writing a New Test
+
+1. **Read `src/test/setup.ts`** - Understand what's already mocked globally
+2. **Check existing test patterns** - Look at similar tests in the codebase
+3. **Check docs immediately when stuck** - Don't guess, read the MSW docs
+
+---
+
 ## Key Takeaways
 
 1. **Test behavior, not implementation**
@@ -500,3 +554,4 @@ it('shows error when email is invalid', () => {});
 5. **Write complete user workflows, not isolated unit tests**
 6. **Don't test implementation details** (state, props, handlers, CSS)
 7. **Focus on error recovery workflows, not error permutations**
+8. **Use MSW's `server.use()` for API mocking** - Don't try to override global fetch

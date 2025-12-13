@@ -14,11 +14,13 @@ export function useWizard() {
 export function WizardProvider({
   children,
   steps,
+  initialStepIndex = 0,
 }: {
   children: ReactNode;
   steps: StepMeta[];
+  initialStepIndex?: number;
 }) {
-  const [stepIndex, setStepIndex] = useState(0);
+  const [stepIndex, setStepIndex] = useState(initialStepIndex);
   const total = steps.length;
   const clampedIndex = Math.min(Math.max(stepIndex, 0), Math.max(total - 1, 0));
   const current = steps[clampedIndex];

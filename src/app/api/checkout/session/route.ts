@@ -105,11 +105,30 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
 });
 
+// Payment type configuration
+const PAYMENT_TYPE = process.env.NEXT_PUBLIC_PAYMENT_TYPE || "IN_APP";
+
 type Body = {
   quantity?: number;
   customerEmail?: string;
   metadata?: Record<string, string>;
 };
+
+/**
+ * Find existing customer by email or create a new one
+ */
+async function getOrCreateCustomer(email?: string): Promise<string> {
+  if (email) {
+    const found = await stripe.customers.list({ email, limit: 1 });
+    if (found.data[0]?.id) {
+      return found.data[0].id;
+    }
+    const created = await stripe.customers.create({ email });
+    return created.id;
+  }
+  const created = await stripe.customers.create({});
+  return created.id;
+}
 
 export async function POST(req: Request) {
   try {
@@ -128,52 +147,73 @@ export async function POST(req: Request) {
       );
     }
 
-    // Ensure a Customer
-    let customerId: string;
-    if (customerEmail) {
-      const found = await stripe.customers.list({
-        email: customerEmail,
-        limit: 1,
+    // Get or create customer
+    const customerId = await getOrCreateCustomer(customerEmail);
+
+    // REDIRECT mode: Create Checkout Session
+    // See: https://docs.stripe.com/billing/subscriptions/build-subscriptions?ui=checkout
+    // See: https://docs.stripe.com/api/checkout/sessions/create
+    if (PAYMENT_TYPE === "REDIRECT") {
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+      const userProfileId = metadata.userProfileId || "";
+
+      // Create Checkout Session for subscription
+      // {CHECKOUT_SESSION_ID} is a template literal that Stripe replaces with the actual session ID
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        customer: customerId,
+        line_items: [{ price: priceId, quantity }],
+        success_url: `${baseUrl}/onboarding?payment_success=true&session_id={CHECKOUT_SESSION_ID}&profile_id=${userProfileId}`,
+        cancel_url: `${baseUrl}/onboarding?payment_canceled=true&profile_id=${userProfileId}`,
+        metadata,
+        subscription_data: {
+          metadata: {
+            userProfileId, // Attach to subscription for webhook access
+          },
+        },
       });
-      customerId =
-        found.data[0]?.id ??
-        (await stripe.customers.create({ email: customerEmail })).id;
-    } else {
-      customerId = (await stripe.customers.create({})).id;
+
+      // Get price info for frontend display
+      const price = await stripe.prices.retrieve(priceId);
+
+      return NextResponse.json({
+        mode: "redirect",
+        url: session.url,
+        plan_unit_amount: price.unit_amount ?? null,
+        plan_currency: price.currency ?? null,
+      });
     }
 
-    // Create Subscription per docs: default_incomplete + expand confirmation_secret
+    // IN_APP mode: Create Subscription with default_incomplete
+    // This is the existing flow for embedded payment elements
     const sub = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId, quantity }],
       payment_behavior: "default_incomplete",
       payment_settings: {
         save_default_payment_method: "on_subscription",
-        // (Optionally) limit methods here if you want:
         payment_method_types: ["card"],
       },
-      // Recommended for improved behavior on Basil:
       billing_mode: { type: "flexible" },
       metadata,
-      expand: [
-        "latest_invoice.confirmation_secret",
-        "pending_setup_intent", // for $0 due now / trials
-      ],
+      expand: ["latest_invoice.confirmation_secret", "pending_setup_intent"],
     });
 
-    // latest_invoice is either a string ID or an expanded object.
+    // latest_invoice is either a string ID or an expanded object
     const inv =
       typeof sub.latest_invoice === "object" && sub.latest_invoice
         ? sub.latest_invoice
         : null;
 
-    // New path: confirmation_secret holds the client_secret you pass to the frontend
+    // confirmation_secret holds the client_secret for the frontend
     const confirmationSecret = inv?.confirmation_secret?.client_secret;
 
     if (confirmationSecret) {
       const price = await stripe.prices.retrieve(priceId);
       return NextResponse.json({
-        intent_type: "payment", // you'll confirm a PaymentIntent on the client
+        mode: "in_app",
+        intent_type: "payment",
         client_secret: confirmationSecret,
         plan_unit_amount: price.unit_amount ?? null,
         plan_currency: price.currency ?? null,
@@ -182,7 +222,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // Trials / $0 first invoice => SetupIntent flow remains the same
+    // Trials / $0 first invoice => SetupIntent flow
     const si =
       sub.pending_setup_intent && typeof sub.pending_setup_intent === "object"
         ? sub.pending_setup_intent
@@ -191,6 +231,7 @@ export async function POST(req: Request) {
     if (si?.client_secret) {
       const price = await stripe.prices.retrieve(priceId);
       return NextResponse.json({
+        mode: "in_app",
         intent_type: "setup",
         client_secret: si.client_secret,
         plan_unit_amount: price.unit_amount ?? null,
