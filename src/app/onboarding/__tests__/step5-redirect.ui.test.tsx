@@ -290,7 +290,7 @@ describe("Step 5: REDIRECT Payment Mode - Payment Success Flow", () => {
     ).toBeInTheDocument();
   });
 
-  it("user sees error message when API call fails", async () => {
+  it("user sees error message when profile fetch fails", async () => {
     // Simulate returning from Stripe with payment_success=true
     vi.mocked(useSearchParams).mockReturnValue(
       new URLSearchParams(
@@ -299,7 +299,7 @@ describe("Step 5: REDIRECT Payment Mode - Payment Success Flow", () => {
     );
 
     // Mock getUserProfile to fail (API error)
-    // Component has retry: 3 with exponential backoff (~7s total)
+    // Component has retry: 2 for profile fetch
     const { getUserProfile } = await import("../actions");
     vi.mocked(getUserProfile).mockResolvedValue({
       success: false,
@@ -308,18 +308,71 @@ describe("Step 5: REDIRECT Payment Mode - Payment Success Flow", () => {
 
     render(<Step5WithProfile />);
 
-    // Wait for polling to fail (retry: 3 with exponential backoff takes ~7s)
+    // Wait for profile fetch to fail (retry: 2)
     expect(
       await screen.findByText(
-        /unable to confirm your subscription/i,
+        /we couldn't load your details/i,
         {},
         { timeout: 10000 },
       ),
+    ).toBeInTheDocument();
+
+    // User sees Retry button
+    expect(screen.getByRole("button", { name: /retry/i })).toBeInTheDocument();
+  }, 15000);
+
+  it("user returns from canceled payment and can retry", async () => {
+    vi.mocked(useSearchParams).mockReturnValue(
+      new URLSearchParams(
+        "payment_canceled=true&profile_id=test-profile-123",
+      ) as unknown as ReturnType<typeof useSearchParams>,
+    );
+
+    const { getUserProfile } = await import("../actions");
+    vi.mocked(getUserProfile).mockResolvedValue({
+      success: true,
+      data: makeProfile({ isSubscribed: false }),
+    });
+
+    render(<Step5WithProfile />);
+
+    // User sees canceled message
+    expect(
+      await screen.findByText(/your payment was canceled/i),
     ).toBeInTheDocument();
 
     // User sees Try Again button
     expect(
       screen.getByRole("button", { name: /try again/i }),
     ).toBeInTheDocument();
-  }, 15000);
+  });
+
+  it("user completes payment and clicks Book first session", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(useSearchParams).mockReturnValue(
+      new URLSearchParams(
+        "payment_success=true&profile_id=test-profile-123",
+      ) as unknown as ReturnType<typeof useSearchParams>,
+    );
+
+    const { getUserProfile } = await import("../actions");
+    vi.mocked(getUserProfile).mockResolvedValue({
+      success: true,
+      data: makeProfile({ isSubscribed: true }),
+    });
+
+    render(<Step5WithProfile />);
+
+    // User sees success screen
+    expect(await screen.findByText(/you're all set/i)).toBeInTheDocument();
+
+    // User clicks "Book first session"
+    const bookButton = screen.getByRole("button", {
+      name: /book first session/i,
+    });
+    await user.click(bookButton);
+
+    // Button click triggers wizard navigation (handled by context)
+  });
 });

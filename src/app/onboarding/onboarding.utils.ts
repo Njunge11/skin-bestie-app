@@ -2,6 +2,7 @@
 
 import type { UseFormSetValue } from "react-hook-form";
 import type { OnboardingSchema } from "./onboarding.schema";
+import type { UserProfile } from "./actions";
 
 const STEP_ORDER = [
   "PERSONAL",
@@ -106,4 +107,75 @@ export function populateFormFromProfile(
   if (profile.allergyDetails) {
     setValue("allergy", profile.allergyDetails);
   }
+}
+
+/**
+ * Map profile data to form values for React Hook Form's `values` prop
+ * Used when returning from Stripe payment (success or canceled)
+ */
+export function mapProfileToFormValues(profile: UserProfile): OnboardingSchema {
+  // Separate predefined concerns from custom ones
+  let concerns: string[] = [];
+  let concernOther = "";
+
+  if (profile.concerns && Array.isArray(profile.concerns)) {
+    const predefinedSelected = profile.concerns.filter(
+      (c: string) => PREDEFINED_CONCERNS.includes(c) && c !== "Other",
+    );
+    const customConcerns = profile.concerns.filter(
+      (c: string) => !PREDEFINED_CONCERNS.includes(c),
+    );
+
+    if (customConcerns.length > 0) {
+      concerns = [...predefinedSelected, "Other"];
+      concernOther = customConcerns.join(", ");
+    } else {
+      concerns = profile.concerns.filter((c: string) =>
+        PREDEFINED_CONCERNS.includes(c),
+      );
+    }
+  }
+
+  // Parse phone number to extract local part (remove country code)
+  // Assumes UK format: +44XXXXXXXXXX -> 0XXXXXXXXXX
+  let mobileLocal = "";
+  if (profile.phoneNumber) {
+    if (profile.phoneNumber.startsWith("+44")) {
+      mobileLocal = "0" + profile.phoneNumber.slice(3);
+    } else {
+      mobileLocal = profile.phoneNumber;
+    }
+  }
+
+  // Format date of birth to YYYY-MM-DD string
+  let dateOfBirth = "";
+  if (profile.dateOfBirth) {
+    const date =
+      profile.dateOfBirth instanceof Date
+        ? profile.dateOfBirth
+        : new Date(profile.dateOfBirth);
+    dateOfBirth = date.toISOString().split("T")[0];
+  }
+
+  return {
+    userProfileId: profile.id,
+    firstName: profile.firstName || "",
+    lastName: profile.lastName || "",
+    email: profile.email || "",
+    mobileLocal,
+    mobileCountryISO: "GB", // Default to GB
+    dateOfBirth,
+    goal: "", // Not stored in profile
+    routineNote: "", // Not stored in profile
+    skinTypes: profile.skinType || [],
+    concerns,
+    concernOther,
+    hasAllergy:
+      profile.hasAllergies === null || profile.hasAllergies === undefined
+        ? undefined
+        : profile.hasAllergies
+          ? "Yes"
+          : "No",
+    allergy: profile.allergyDetails || "",
+  };
 }

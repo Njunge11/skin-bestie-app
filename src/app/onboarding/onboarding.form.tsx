@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { anton } from "@/app/fonts";
@@ -55,20 +54,6 @@ export default function OnboardingForm() {
     STEP_COMPONENTS[current.component as keyof typeof STEP_COMPONENTS] ?? Step1;
 
   const alignLeft = current.align === "left";
-
-  // Track if Step5 or Step6 is showing success screen
-  const [step5Success, setStep5Success] = useState(false);
-  const [step6Success, setStep6Success] = useState(false);
-
-  // Reset success states when step changes
-  useEffect(() => {
-    if (current.component !== "subscribe") {
-      setStep5Success(false);
-    }
-    if (current.component !== "book") {
-      setStep6Success(false);
-    }
-  }, [current.component]);
 
   // ✅ When user presses Back, clear errors for the step we're LEAVING
   const handleBack = () => {
@@ -129,17 +114,48 @@ export default function OnboardingForm() {
 
       {/* Card */}
       <div className="mt-8 mx-auto w-full max-w-[440px] bg-skinbestie-landing-gray p-6 rounded-lg">
-        {/* Show custom heading/subheading for step 6 after booking */}
-        {current.component === "book" && step6Success ? (
-          <p className="text-lg font-medium text-[#3F4548] text-center pt-2">
-            You&apos;re one step closer to better understanding what works best
-            for you.
-          </p>
-        ) : step5Success ? (
-          // Hide heading for step 5 success
-          <></>
+        {current.component === "subscribe" ? (
+          // Step5 controls its own header via composition
+          <StepBody
+            onNext={next}
+            header={
+              <>
+                <h1
+                  className={`${anton.className} text-center text-[2rem] uppercase text-[#222118]`}
+                >
+                  {current.formTitle}
+                </h1>
+                <p className="text-center text-lg font-medium text-[#3F4548] pt-2">
+                  {current.formSub}
+                </p>
+              </>
+            }
+          />
+        ) : current.component === "book" ? (
+          // Step6 controls its own header via composition
+          <StepBody
+            onNext={next}
+            header={
+              <>
+                <h1
+                  className={`${anton.className} text-center text-[2rem] uppercase text-[#222118]`}
+                >
+                  {current.formTitle}
+                </h1>
+                <p className="text-center text-lg font-medium text-[#3F4548] pt-2">
+                  {current.formSub}
+                </p>
+              </>
+            }
+            successHeader={
+              <p className="text-lg font-medium text-[#3F4548] text-center pt-2">
+                You&apos;re one step closer to better understanding what works
+                best for you.
+              </p>
+            }
+          />
         ) : (
-          // Normal heading and subheading
+          // Normal heading and subheading for other steps
           <>
             <h1
               className={`${anton.className} ${
@@ -153,18 +169,10 @@ export default function OnboardingForm() {
             >
               {current.formSub}
             </p>
+            {/* Each step validates only its own fields */}
+            <StepBody onNext={next} />
           </>
         )}
-
-        {/* Each step validates only its own fields */}
-        <StepBody
-          onNext={next}
-          {...(current.component === "subscribe"
-            ? { onShowingSuccess: setStep5Success }
-            : current.component === "book"
-              ? { onShowingSuccess: setStep6Success }
-              : {})}
-        />
       </div>
     </div>
   );

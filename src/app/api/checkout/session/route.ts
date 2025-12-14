@@ -166,6 +166,7 @@ export async function POST(req: Request) {
         line_items: [{ price: priceId, quantity }],
         success_url: `${baseUrl}/onboarding?payment_success=true&session_id={CHECKOUT_SESSION_ID}&profile_id=${userProfileId}`,
         cancel_url: `${baseUrl}/onboarding?payment_canceled=true&profile_id=${userProfileId}`,
+        allow_promotion_codes: true,
         metadata,
         subscription_data: {
           metadata: {
