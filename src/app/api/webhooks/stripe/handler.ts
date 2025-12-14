@@ -90,15 +90,28 @@ export function makeStripeWebhookHandler(deps: StripeWebhookDeps) {
   };
 }
 
-// Default dependencies for production
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-});
+// Lazy initialization to avoid Stripe SDK errors in test environment
+let _defaultDeps: StripeWebhookDeps | null = null;
 
-const defaultDeps: StripeWebhookDeps = {
-  stripe,
-  updateUserProfile,
-  webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
-};
+function getDefaultDeps(): StripeWebhookDeps {
+  if (!_defaultDeps) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2025-08-27.basil",
+    });
 
-export const stripeWebhookHandler = makeStripeWebhookHandler(defaultDeps);
+    _defaultDeps = {
+      stripe,
+      updateUserProfile,
+      webhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+    };
+  }
+  return _defaultDeps;
+}
+
+// Export a handler that lazily initializes deps on first call
+export async function stripeWebhookHandler(
+  request: Request,
+): Promise<Response> {
+  const handler = makeStripeWebhookHandler(getDefaultDeps());
+  return handler(request);
+}

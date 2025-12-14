@@ -23,8 +23,10 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
 );
 
-// Payment type configuration
-const PAYMENT_TYPE = process.env.NEXT_PUBLIC_PAYMENT_TYPE || "IN_APP";
+// Payment type configuration - read inside component to allow test mocking
+function getPaymentType() {
+  return process.env.NEXT_PUBLIC_PAYMENT_TYPE || "IN_APP";
+}
 
 // Keep your appearance rules
 export const appearance = {
@@ -123,7 +125,7 @@ export default function Step5({
   }
 
   // REDIRECT mode: show simplified UI
-  if (PAYMENT_TYPE === "REDIRECT") {
+  if (getPaymentType() === "REDIRECT") {
     return (
       <RedirectPaymentUI
         currentProfile={currentProfile ?? null}
