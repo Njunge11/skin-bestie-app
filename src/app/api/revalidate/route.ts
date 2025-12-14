@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest) {
     }
 
     if (tags && Array.isArray(tags) && tags.length > 0) {
-      Promise.all(tags.map((tag) => revalidateTag(tag)));
+      Promise.all(tags.map((tag) => revalidateTag(tag, "max")));
       console.log("Revalidated tags:", tags);
       revalidated = true;
     }
