@@ -95,11 +95,11 @@ function TestWrapper({ children }: { children: React.ReactNode }) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        retry: false,
+        retry: 0,
         gcTime: 0,
       },
       mutations: {
-        retry: false,
+        retry: 0,
       },
     },
   });

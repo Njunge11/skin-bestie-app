@@ -69,9 +69,12 @@ function CalendarSkeleton() {
 }
 
 export default function CalendlyInline({
-  onShowingSuccess,
+  header,
+  successHeader,
 }: {
-  onShowingSuccess?: (showing: boolean) => void;
+  onNext?: () => void;
+  header?: React.ReactNode;
+  successHeader?: React.ReactNode;
 }) {
   const { getValues } = useFormContext<OnboardingSchema>();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -84,11 +87,6 @@ export default function CalendlyInline({
 
   const MIN_SKELETON_MS = 400; // prevent blink
   const FALLBACK_READY_MS = 3000; // if no postMessage comes
-
-  // Notify parent when booking is completed (to hide heading)
-  useEffect(() => {
-    onShowingSuccess?.(bookingCompleted);
-  }, [bookingCompleted, onShowingSuccess]);
 
   // Get user profile ID
   const userProfileId = getValues("userProfileId");
@@ -218,7 +216,7 @@ export default function CalendlyInline({
     }
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
-  }, [userProfileId, currentProfile, onShowingSuccess]);
+  }, [userProfileId, currentProfile]);
 
   // load calendly assets and init (StrictMode-safe)
   useEffect(() => {
@@ -283,51 +281,59 @@ export default function CalendlyInline({
 
   if (!base) {
     return (
-      <p className="text-sm text-red-600">
-        Missing <code>NEXT_PUBLIC_CALENDLY_EVENT_URL</code>.
-      </p>
+      <>
+        {header}
+        <p className="text-sm text-red-600">
+          Missing <code>NEXT_PUBLIC_CALENDLY_EVENT_URL</code>.
+        </p>
+      </>
     );
   }
 
   return (
-    <div className="w-full">
-      {/* keep your rule + spacing */}
-      <hr className="mt-6 border-t-[0.03125rem] border-[#030303]" />
+    <>
+      {/* Show successHeader when booking completed, otherwise normal header */}
+      {bookingCompleted ? successHeader : header}
 
-      {/* keep your top padding; the height is controlled inside */}
-      <div>
-        <div
-          className="
+      <div className="w-full">
+        {/* keep your rule + spacing */}
+        <hr className="mt-6 border-t-[0.03125rem] border-[#030303]" />
+
+        {/* keep your top padding; the height is controlled inside */}
+        <div>
+          <div
+            className="
             relative w-full
             h-[clamp(22rem,48vh,28rem)]  /* mobile */
             md:h-[29rem]            /* ≈ 513px on md+ */
           "
-          aria-busy={!ready}
-        >
-          {/* overlay skeleton until Calendly is ready */}
-          <div
-            className={[
-              "pointer-events-none transition-opacity duration-150",
-              ready ? "opacity-0" : "opacity-100",
-            ].join(" ")}
+            aria-busy={!ready}
           >
-            <CalendarSkeleton />
+            {/* overlay skeleton until Calendly is ready */}
+            <div
+              className={[
+                "pointer-events-none transition-opacity duration-150",
+                ready ? "opacity-0" : "opacity-100",
+              ].join(" ")}
+            >
+              <CalendarSkeleton />
+            </div>
+
+            {/* Calendly target */}
+            <div ref={containerRef} className="absolute inset-0" />
           </div>
-
-          {/* Calendly target */}
-          <div ref={containerRef} className="absolute inset-0" />
         </div>
-      </div>
 
-      {/* Login button after booking completion */}
-      {bookingCompleted && (
-        <Link
-          href="/login"
-          className="flex items-center justify-center w-full px-6 py-3 bg-[#195284] text-white text-base font-semibold rounded hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#195284]"
-        >
-          Login to your SkinBestie Account
-        </Link>
-      )}
-    </div>
+        {/* Login button after booking completion */}
+        {bookingCompleted && (
+          <Link
+            href="/login"
+            className="flex items-center justify-center w-full px-6 py-3 bg-[#195284] text-white text-base font-semibold rounded hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#195284]"
+          >
+            Login to your SkinBestie Account
+          </Link>
+        )}
+      </div>
+    </>
   );
 }

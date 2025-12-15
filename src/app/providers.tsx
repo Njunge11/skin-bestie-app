@@ -18,6 +18,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
             gcTime: 5 * 60 * 1000, // 5 minutes
             refetchOnWindowFocus: true, // Refetch when user returns to tab
             refetchOnReconnect: true, // Refetch when internet reconnects
+            // Retry with exponential backoff for failed queries
+            retry: 10,
+            retryDelay: (attemptIndex) =>
+              Math.min(1000 * 2 ** attemptIndex, 30000),
           },
         },
       }),

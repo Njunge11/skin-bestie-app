@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -9,10 +9,11 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { useFormContext } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MButton } from "./components/button";
 import { PaymentSkeleton } from "./components/payment.skeleton";
-import { Lock, CheckCircle2 } from "lucide-react";
+import { Lock, CheckCircle2, Loader2 } from "lucide-react";
 import type { OnboardingSchema } from "./onboarding.schema";
 import { useWizard } from "./wizard.provider";
 import { getUserProfile, updateUserProfile } from "./actions";
@@ -21,6 +22,11 @@ import { mergeCompletedSteps } from "./onboarding.utils";
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
 );
+
+// Payment type configuration - read inside component to allow test mocking
+function getPaymentType() {
+  return process.env.NEXT_PUBLIC_PAYMENT_TYPE || "IN_APP";
+}
 
 // Keep your appearance rules
 export const appearance = {
@@ -43,17 +49,17 @@ type IntentType = "payment" | "setup";
 const HEIGHT_CLS = "";
 
 export default function Step5({
-  onShowingSuccess,
+  header,
 }: {
   onNext?: () => void;
-  onShowingSuccess?: (showing: boolean) => void;
+  header?: React.ReactNode;
 }) {
   const { getValues } = useFormContext<OnboardingSchema>();
   const { next } = useWizard();
 
   // Get profile data using TanStack Query
   const userProfileId = getValues("userProfileId");
-  const { data: currentProfile } = useQuery({
+  const { data: currentProfile, isLoading: isProfileLoading } = useQuery({
     queryKey: ["userProfile", userProfileId],
     queryFn: async () => {
       if (!userProfileId) return null;
@@ -109,13 +115,7 @@ export default function Step5({
         }).format(checkoutSession.planUnitAmount / 100)}`
       : "Subscribe";
 
-  // Notify parent when showing success screen (stable callback with useEffect)
-  const isShowingSuccess = !!currentProfile?.isSubscribed;
-  useEffect(() => {
-    onShowingSuccess?.(isShowingSuccess);
-  }, [isShowingSuccess, onShowingSuccess]);
-
-  // If already subscribed, show success screen
+  // If already subscribed, show success screen (no header)
   if (currentProfile?.isSubscribed) {
     return (
       <div className="relative p-3">
@@ -124,40 +124,55 @@ export default function Step5({
     );
   }
 
-  return (
-    <div className="relative p-3">
-      {/* Server error message */}
-      {checkoutError && (
-        <div
-          className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md"
-          role="alert"
-        >
-          <p className="text-sm text-red-800">
-            {checkoutError instanceof Error
-              ? checkoutError.message
-              : "Something went wrong"}
-          </p>
-        </div>
-      )}
+  // REDIRECT mode: show simplified UI
+  if (getPaymentType() === "REDIRECT") {
+    return (
+      <RedirectPaymentUI
+        currentProfile={currentProfile ?? null}
+        isProfileLoading={isProfileLoading}
+        header={header}
+      />
+    );
+  }
 
-      {!checkoutSession ? (
-        <div className={`relative w-full ${HEIGHT_CLS}`}>
-          <PaymentSkeleton />
-        </div>
-      ) : (
-        <Elements
-          stripe={stripePromise}
-          options={{ clientSecret: checkoutSession.clientSecret, appearance }}
-        >
-          <Form
-            intentType={checkoutSession.intentType}
-            buttonText={buttonText}
-            userProfileId={userProfileId}
-            currentProfile={currentProfile || null}
-          />
-        </Elements>
-      )}
-    </div>
+  // IN_APP mode: existing flow
+  return (
+    <>
+      {header}
+      <div className="relative p-3">
+        {/* Server error message */}
+        {checkoutError && (
+          <div
+            className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md"
+            role="alert"
+          >
+            <p className="text-sm text-red-800">
+              {checkoutError instanceof Error
+                ? checkoutError.message
+                : "Something went wrong"}
+            </p>
+          </div>
+        )}
+
+        {!checkoutSession ? (
+          <div className={`relative w-full ${HEIGHT_CLS}`}>
+            <PaymentSkeleton />
+          </div>
+        ) : (
+          <Elements
+            stripe={stripePromise}
+            options={{ clientSecret: checkoutSession.clientSecret, appearance }}
+          >
+            <Form
+              intentType={checkoutSession.intentType}
+              buttonText={buttonText}
+              userProfileId={userProfileId}
+              currentProfile={currentProfile || null}
+            />
+          </Elements>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -189,6 +204,339 @@ function SuccessScreen({ onNext }: { onNext: () => void }) {
         Book first session
       </MButton>
     </div>
+  );
+}
+
+// REDIRECT mode: simplified UI before redirecting to Stripe Checkout
+function RedirectPaymentUI({
+  currentProfile,
+  isProfileLoading,
+  header,
+}: {
+  currentProfile: {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    skinType?: string[] | null;
+    concerns?: string[] | null;
+    hasAllergies?: boolean | null;
+    allergyDetails?: string | null;
+    isSubscribed?: boolean | null;
+  } | null;
+  isProfileLoading: boolean;
+  header?: React.ReactNode;
+}) {
+  const { next } = useWizard();
+  const searchParams = useSearchParams();
+  const paymentCanceled = searchParams.get("payment_canceled") === "true";
+  const paymentSuccess = searchParams.get("payment_success") === "true";
+  const profileIdFromUrl = searchParams.get("profile_id");
+
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // First: fetch profile on payment success
+  const {
+    data: returnProfile,
+    isPending: isLoadingReturnProfile,
+    isError: profileFetchFailed,
+    refetch: refetchProfile,
+  } = useQuery({
+    queryKey: ["profile-return", profileIdFromUrl],
+    queryFn: async () => {
+      if (!profileIdFromUrl) throw new Error("No profile ID");
+      const result = await getUserProfile(profileIdFromUrl);
+      if (!result.success) throw new Error("Failed to fetch profile");
+      return result.data;
+    },
+    enabled: paymentSuccess && !!profileIdFromUrl,
+    retry: 2,
+  });
+
+  // Second: poll for subscription status (only after profile fetch succeeds)
+  // Uses TanStack Query's built-in retry with exponential backoff
+  const {
+    data: subscriptionStatus,
+    isPending: isPolling,
+    isError: pollingFailed,
+    refetch: refetchSubscription,
+  } = useQuery({
+    queryKey: ["subscription-status", profileIdFromUrl],
+    queryFn: async () => {
+      if (!profileIdFromUrl) {
+        throw new Error("No profile ID");
+      }
+
+      const result = await getUserProfile(profileIdFromUrl);
+
+      if (!result.success) {
+        throw new Error("Failed to fetch profile");
+      }
+
+      // Throw error if not yet subscribed - triggers retry with exponential backoff
+      if (!result.data.isSubscribed) {
+        throw new Error("Subscription not yet active");
+      }
+
+      return result.data;
+    },
+    enabled: paymentSuccess && !!returnProfile,
+    retry: 5,
+  });
+
+  // Derive loading state: show loader while profile is being fetched after payment return
+  const isLoadingProfile = paymentCanceled && isProfileLoading;
+
+  // Derive canceled state: show canceled UI when payment was canceled and profile is loaded
+  const showCanceled =
+    paymentCanceled && !isProfileLoading && currentProfile !== null;
+
+  // Derive success state: subscription confirmed via polling
+  const showSuccess = paymentSuccess && subscriptionStatus?.isSubscribed;
+
+  // Derive polling error state: retries exhausted without subscription confirmation
+  const showPollingError = paymentSuccess && pollingFailed;
+
+  // Form population is now handled at the top level (onboarding.client.tsx)
+  // using React Hook Form's `values` prop - no useEffect needed here
+
+  const handleSubscribe = async () => {
+    if (!currentProfile) return;
+
+    setIsRedirecting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/checkout/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerEmail: currentProfile.email,
+          metadata: {
+            userProfileId: currentProfile.id,
+            firstName: currentProfile.firstName,
+            lastName: currentProfile.lastName,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to create checkout session");
+      }
+
+      if (data.mode !== "redirect" || !data.url) {
+        throw new Error("Invalid checkout response");
+      }
+
+      // Redirect to Stripe Checkout
+      // Using replace() to prevent back-button loop
+      window.location.replace(data.url);
+    } catch (err) {
+      setIsRedirecting(false);
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    }
+  };
+
+  // Show success screen when subscription is confirmed
+  if (showSuccess) {
+    return (
+      <div className="relative p-3">
+        <SuccessScreen onNext={() => next()} />
+      </div>
+    );
+  }
+
+  // Show error state when profile_id is missing from URL
+  if (paymentSuccess && !profileIdFromUrl) {
+    return (
+      <>
+        {header}
+        <div className="relative p-3 space-y-4">
+          <div className="p-3 bg-red-50 rounded-md" role="alert">
+            <p className="text-sm text-red-800">
+              We couldn&apos;t load your details. Don&apos;t worry – you
+              won&apos;t be charged again.
+            </p>
+          </div>
+
+          <MButton
+            type="button"
+            onClick={() => window.location.replace("/onboarding")}
+            showIcon={false}
+          >
+            Start Over
+          </MButton>
+        </div>
+      </>
+    );
+  }
+
+  // Show error state when profile fetch fails
+  if (paymentSuccess && profileFetchFailed) {
+    return (
+      <>
+        {header}
+        <div className="relative p-3 space-y-4">
+          <div className="p-3 bg-red-50 rounded-md" role="alert">
+            <p className="text-sm text-red-800">
+              We couldn&apos;t load your details. Don&apos;t worry – you
+              won&apos;t be charged again.
+            </p>
+          </div>
+
+          <MButton
+            type="button"
+            onClick={() => refetchProfile()}
+            disabled={isLoadingReturnProfile}
+            showIcon={false}
+          >
+            {isLoadingReturnProfile ? "Loading..." : "Retry"}
+          </MButton>
+        </div>
+      </>
+    );
+  }
+
+  // Show loading state while fetching profile after payment success
+  if (paymentSuccess && isLoadingReturnProfile) {
+    return (
+      <>
+        {header}
+        <div className="relative p-3 flex flex-col items-center justify-center min-h-[12rem] space-y-4">
+          <Loader2
+            className="w-8 h-8 text-skinbestie-landing-pink animate-spin"
+            aria-hidden="true"
+          />
+          <p className="text-sm text-[#3F4548]">Loading your details...</p>
+        </div>
+      </>
+    );
+  }
+
+  // Show polling/verifying state after successful payment
+  if (paymentSuccess && isPolling) {
+    return (
+      <>
+        {header}
+        <div className="relative p-3 flex flex-col items-center justify-center min-h-[12rem] space-y-4">
+          <Loader2
+            className="w-8 h-8 text-skinbestie-landing-pink animate-spin"
+            aria-hidden="true"
+          />
+          <p className="text-sm text-[#3F4548]">
+            Verifying your subscription...
+          </p>
+        </div>
+      </>
+    );
+  }
+
+  // Show error state when polling fails (retries exhausted)
+  if (showPollingError) {
+    return (
+      <>
+        {header}
+        <div className="relative p-3 space-y-4">
+          <div className="p-3 bg-red-50 rounded-md" role="alert">
+            <p className="text-sm text-red-800">
+              Unable to confirm your subscription.
+            </p>
+          </div>
+
+          <MButton
+            type="button"
+            onClick={() => refetchSubscription()}
+            disabled={isPolling}
+            showIcon={false}
+          >
+            {isPolling ? "Checking..." : "Try Again"}
+          </MButton>
+
+          <div className="flex items-center gap-2 text-xs text-[#3F4548]">
+            <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Your payment is secured by Stripe</span>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Show loading state while fetching profile after payment return (canceled flow)
+  if (isLoadingProfile) {
+    return (
+      <div className="relative p-3 flex flex-col items-center justify-center min-h-[12rem] space-y-4">
+        <Loader2
+          className="w-8 h-8 text-skinbestie-landing-pink animate-spin"
+          aria-hidden="true"
+        />
+        <p className="text-sm text-[#3F4548]">Retrieving Payment Status...</p>
+      </div>
+    );
+  }
+
+  // Show canceled state after loading completes
+  if (showCanceled) {
+    return (
+      <>
+        {header}
+        <div className="relative p-3 space-y-4">
+          <div className="p-3 bg-amber-50 rounded-md" role="status">
+            <p className="text-sm text-amber-800">
+              Your payment was canceled. No charges were made.
+            </p>
+          </div>
+
+          <MButton
+            type="button"
+            onClick={handleSubscribe}
+            disabled={isRedirecting || !currentProfile}
+            showIcon={false}
+          >
+            {isRedirecting ? "Redirecting..." : "Try Again"}
+          </MButton>
+
+          <div className="flex items-center gap-2 text-xs text-[#3F4548]">
+            <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Your payment is secured by Stripe</span>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Normal state - show subscribe UI
+  return (
+    <>
+      {header}
+      <div className="relative p-3 space-y-4">
+        <p className="text-sm text-[#3F4548]">
+          You&apos;ll be securely redirected to Stripe to complete your payment.
+        </p>
+
+        {error && (
+          <div className="p-3 bg-red-50 rounded-md" role="alert">
+            <p className="text-sm text-red-800">{error}. Please try again.</p>
+          </div>
+        )}
+
+        <MButton
+          type="button"
+          onClick={handleSubscribe}
+          disabled={isRedirecting || !currentProfile}
+          showIcon={false}
+        >
+          {isRedirecting ? "Redirecting..." : "Subscribe"}
+        </MButton>
+
+        <div className="flex items-center gap-2 text-xs text-[#3F4548]">
+          <Lock className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>Your payment is secured by Stripe</span>
+        </div>
+      </div>
+    </>
   );
 }
 

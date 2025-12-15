@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { print } from "graphql/language/printer";
 import { wpFetch } from "@/utils/wp";
 import { GET_ONBOARDING_PAGE } from "@/queries/general/onboarding";
 import type { StepMeta } from "./onboarding.types";
 import OnboardingClient from "./onboarding.client";
+import { OnboardingSkeleton } from "./components/onboarding.skeleton";
 
 export const metadata: Metadata = {
   title: "Get Started - SkinBestie",
@@ -153,6 +155,11 @@ async function getOnboardingSteps(): Promise<StepMeta[]> {
 export default async function OnboardingPage() {
   const steps = await getOnboardingSteps();
 
-  // React Hook Form must be inside a Client Component; wrap it in a small client shell:
-  return <OnboardingClient steps={steps} />;
+  // Suspense boundary required for useSearchParams in OnboardingClient
+  // Prevents hydration mismatch when reading URL params for payment return flow
+  return (
+    <Suspense fallback={<OnboardingSkeleton />}>
+      <OnboardingClient steps={steps} />
+    </Suspense>
+  );
 }
