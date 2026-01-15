@@ -3,11 +3,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import type { OnboardingSchema } from "./onboarding.schema";
-import { getUserProfile, updateUserProfile } from "./actions";
-import { mergeCompletedSteps } from "./onboarding.utils";
+import { updateUserProfile } from "./actions";
 
 declare global {
   interface Window {
@@ -91,17 +89,6 @@ export default function CalendlyInline({
   // Get user profile ID
   const userProfileId = getValues("userProfileId");
 
-  // Get current profile data
-  const { data: currentProfile } = useQuery({
-    queryKey: ["userProfile", userProfileId],
-    queryFn: async () => {
-      if (!userProfileId) return null;
-      const result = await getUserProfile(userProfileId);
-      return result.success ? result.data : null;
-    },
-    enabled: !!userProfileId,
-  });
-
   const base = process.env.NEXT_PUBLIC_CALENDLY_EVENT_URL || "";
   const url = useMemo(() => {
     if (!base) return "";
@@ -173,7 +160,7 @@ export default function CalendlyInline({
 
       // Handle successful booking
       if (evt === "calendly.event_scheduled") {
-        if (!userProfileId || !currentProfile) return;
+        if (!userProfileId) return;
 
         try {
           // Extract Calendly event details from payload (if needed for future use)
@@ -186,9 +173,10 @@ export default function CalendlyInline({
             inviteeUri: calendlyInviteeUri,
           });
 
-          const completedSteps = mergeCompletedSteps(
-            currentProfile.completedSteps,
-            [
+          // At Step 6, all previous steps are complete - no need to merge
+          await updateUserProfile(userProfileId, {
+            hasCompletedBooking: true,
+            completedSteps: [
               "PERSONAL",
               "SKIN_TYPE",
               "SKIN_CONCERNS",
@@ -196,11 +184,6 @@ export default function CalendlyInline({
               "SUBSCRIBE",
               "BOOKING",
             ],
-          );
-
-          await updateUserProfile(userProfileId, {
-            hasCompletedBooking: true,
-            completedSteps,
             isCompleted: true,
             completedAt: new Date().toISOString(),
           });
@@ -216,7 +199,7 @@ export default function CalendlyInline({
     }
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
-  }, [userProfileId, currentProfile]);
+  }, [userProfileId]);
 
   // load calendly assets and init (StrictMode-safe)
   useEffect(() => {
