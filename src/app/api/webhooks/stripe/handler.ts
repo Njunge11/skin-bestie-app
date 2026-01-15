@@ -73,6 +73,13 @@ export function makeStripeWebhookHandler(deps: StripeWebhookDeps) {
 
       const result = await deps.updateUserProfile(userProfileId, {
         isSubscribed: true,
+        completedSteps: [
+          "PERSONAL",
+          "SKIN_TYPE",
+          "SKIN_CONCERNS",
+          "ALLERGIES",
+          "SUBSCRIBE",
+        ],
       });
 
       if (!result.success) {

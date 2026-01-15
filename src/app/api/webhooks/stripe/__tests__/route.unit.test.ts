@@ -108,6 +108,13 @@ describe("Stripe Webhook Handler - Unit Tests", () => {
       expect(response.status).toBe(200);
       expect(mockDeps.updateUserProfile).toHaveBeenCalledWith(userProfileId, {
         isSubscribed: true,
+        completedSteps: [
+          "PERSONAL",
+          "SKIN_TYPE",
+          "SKIN_CONCERNS",
+          "ALLERGIES",
+          "SUBSCRIBE",
+        ],
       });
     });
 

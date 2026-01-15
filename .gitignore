@@ -49,3 +49,4 @@ gql
 public/sw*
 public/swe-worker*
 public/workbox-*
+*.code-workspace
