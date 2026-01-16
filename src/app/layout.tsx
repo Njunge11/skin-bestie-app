@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { neueHaasDisplay } from "./fonts";
 import CookieConsent from "@/components/cookie-consent";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 // export const metadata: Metadata = {
 //   metadataBase: new URL(
@@ -333,6 +334,7 @@ export default function RootLayout({
       <body className={`${neueHaasDisplay.className} antialiased`}>
         <Providers>{children}</Providers>
         <CookieConsent />
+        <GoogleAnalytics gaId="G-TT92LTBCWN" />
       </body>
     </html>
   );
